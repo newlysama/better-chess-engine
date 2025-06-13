@@ -1,0 +1,5 @@
+# Trash files
+.vscode
+
+# Build
+build/
