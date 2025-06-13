@@ -1,6 +1,0 @@
-[submodule "subprojects/spdlog"]
-	path = subprojects/spdlog
-	url = git@github.com:gabime/spdlog.git
-[submodule "subprojects/dotenv-cpp"]
-	path = subprojects/dotenv-cpp
-	url = git@github.com:laserpants/dotenv-cpp.git
