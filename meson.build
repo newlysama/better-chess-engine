@@ -1,6 +1,9 @@
 project('chess', 'cpp',
   version        : '0.1.0',
-  default_options: ['cpp_std=c++20', 'wrap_mode=forcefallback']
+  default_options: [
+    'cpp_std=c++20',
+    'wrap_mode=forcefallback',
+    ]
 )
 
 #------------------------------#
@@ -27,6 +30,7 @@ elif mode == 'release'
   add_project_arguments(
     '-DBUILD_RELEASE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
+    '-DPROJECT_ROOT="' + meson.source_root() + '"',
     language: 'cpp'
   )
 
@@ -96,7 +100,7 @@ inc_src = include_directories('src')
 #           SUB DIRS           #
 #------------------------------#
 
-#subdir('src/engine')
+subdir('src/engine')
 subdir('src/logging')
 
 if mode not in ['test', 'benchmark']
