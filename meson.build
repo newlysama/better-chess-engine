@@ -1,5 +1,5 @@
 project('chess', 'cpp',
-  version        : '0.1.0',
+  version : '0.1.0',
   default_options: [
     'cpp_std=c++20',
     'wrap_mode=forcefallback',
@@ -30,7 +30,7 @@ elif mode == 'release'
   add_project_arguments(
     '-DBUILD_RELEASE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
-    '-DPROJECT_ROOT="' + meson.source_root() + '"',
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     language: 'cpp'
   )
 
