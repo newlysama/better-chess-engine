@@ -1,7 +1,13 @@
+/**
+ * @file main.cpp
+ * @author Thibault THOMAS
+ *
+ * @brief Entry point of the program
+ */
+
 /*----- Project Headers -----*/
 #include "logging/include/logging.h"
-//#include "engine/include/Board.h"
-#include "conf/const.h"
+#include "engine/include/board.h"
 
 int main(int argc, char* argv[])
 {
