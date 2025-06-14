@@ -15,6 +15,7 @@
 #include <spdlog/spdlog.h>
 
 /**
+ * @namespace logging
  * @brief Declares loggers initialization and access
  */
 namespace logging
