@@ -1,0 +1,8 @@
+# Build mod
+option(
+    'mode',
+    type        : 'combo',
+    choices     : ['debug', 'profile', 'release', 'test', 'benchmark'],
+    value       : 'debug',
+    description : 'Build mode: debug, profile, release, test or benchmark'
+)
