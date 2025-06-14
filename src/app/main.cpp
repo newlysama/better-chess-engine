@@ -15,5 +15,11 @@ int main(int argc, char* argv[])
     logging::init_engine_logger();
     logging::init_application_logger();
 
+    LOG_APP_DEBUG("App debug");
+    LOG_APP_ERROR("App error");
+
+    LOG_ENGINE_DEBUG("Engine debug");
+    LOG_ENGINE_ERROR("Engine error");
+
     return 0;
 }
