@@ -1,6 +1,0 @@
-[wrap-git]
-directory = dotenv-cpp
-url       = https://github.com/vidstige/dotenv-cpp.git
-
-[provide]
-dotenv-cpp = dotenv_dep
