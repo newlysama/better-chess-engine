@@ -1,3 +1,10 @@
+/**
+ * @file logging.cpp
+ * @author Thibault THOMAS
+ *
+ * @brief Implementation of logging system management
+ */
+
 /*----- System -----*/
 #include <vector>
 
@@ -7,11 +14,12 @@
 
 /*----- Project Headers -----*/
 #include "logging/include/logging.h"
-#include "conf/const.h"
+#include "conf/paths.h"
 
 namespace logging
 {
 
+    // Define loggers
     static std::shared_ptr<spdlog::logger> eng_logger;
     static std::shared_ptr<spdlog::logger> app_logger;
 
@@ -19,6 +27,12 @@ namespace logging
  *                        INIT ENGINE LOGGER                         *
  *-------------------------------------------------------------------*/
 
+    /**
+     * @details
+     * Defines the engine's logger (sinks, level, output) and initialize it.
+     * If we build in release mode, log in log files defined in const.h.
+     * If we are in any other mode, log in stdout.
+     */
     void init_engine_logger()
     {
         if (eng_logger) return;
@@ -26,15 +40,13 @@ namespace logging
         std::vector<spdlog::sink_ptr> sinks;
 
         #if defined(BUILD_RELEASE)
-            // In release mode, log into log files
             auto path = engine_log_file;
 
             sinks.push_back(
-                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true)
+                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
             );
 
         #else
-            // In debug/profile/test/benchmark, log everything in the console
             sinks.push_back(
                 std::make_shared<spdlog::sinks::stdout_color_sink_mt>()
             );
@@ -53,6 +65,10 @@ namespace logging
         spdlog::register_logger(eng_logger);
     }
 
+    /**
+     * @details
+     * Calls engine's logger initialization and return its instance.
+     */
     std::shared_ptr<spdlog::logger> engine_logger()
     {
         init_engine_logger();
@@ -63,6 +79,12 @@ namespace logging
  *                          INIT APP LOGGER                          *
  *-------------------------------------------------------------------*/
 
+    /**
+     * @details
+     * Defines the app's logger (sinks, level, output) and initialize it.
+     * If we build in release mode, log in log files defined in const.h.
+     * If we are in any other mode, log in stdout.
+     */
     void init_application_logger()
     {
         if (app_logger) return;
@@ -73,7 +95,7 @@ namespace logging
             auto path = app_log_file;
 
             sinks.push_back(
-                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true)
+                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
             );
 
         #else
@@ -94,6 +116,10 @@ namespace logging
         spdlog::register_logger(app_logger);
     }
 
+    /**
+     * @details
+     * Calls app's logger initialization and return its instance.
+     */
     std::shared_ptr<spdlog::logger> application_logger()
     {
         init_application_logger();
