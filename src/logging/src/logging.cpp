@@ -40,7 +40,7 @@ namespace logging
         std::vector<spdlog::sink_ptr> sinks;
 
         #if defined(BUILD_RELEASE)
-            auto path = engine_log_file;
+            auto path = conf::paths::engine_log_file;
 
             sinks.push_back(
                 std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
@@ -65,10 +65,6 @@ namespace logging
         spdlog::register_logger(eng_logger);
     }
 
-    /**
-     * @details
-     * Calls engine's logger initialization and return its instance.
-     */
     std::shared_ptr<spdlog::logger> engine_logger()
     {
         init_engine_logger();
@@ -92,7 +88,7 @@ namespace logging
         std::vector<spdlog::sink_ptr> sinks;
 
         #if defined(BUILD_RELEASE)
-            auto path = app_log_file;
+            auto path = conf::paths::app_log_file;
 
             sinks.push_back(
                 std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
@@ -116,10 +112,6 @@ namespace logging
         spdlog::register_logger(app_logger);
     }
 
-    /**
-     * @details
-     * Calls app's logger initialization and return its instance.
-     */
     std::shared_ptr<spdlog::logger> application_logger()
     {
         init_application_logger();
