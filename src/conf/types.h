@@ -22,9 +22,22 @@ namespace conf::types
 {
     /**
      * @typedef pieceBoards
-     * @brief 2x6 array of pieces bitboards (1 for each piece from each team)
+     * @brief 2x6 array holding each piece's bitboards from each team
      */
-    typedef std::array<std::array<engine::Bitboard, conf::enums::Piece::PIECES>, conf::enums::Team::COLORS> pieceBitboards;
+    typedef std::array<std::array<engine::Bitboard, conf::enums::Piece::PIECES>, conf::enums::Team::COLORS> piecesBitboards;
+
+    /**
+     * @typedef teamPiecesBitboards;
+     * @brief 1x6 array holding each piece's bitboard from a specific team
+     */
+    typedef std::array<engine::Bitboard, conf::enums::Piece::PIECES> teamPiecesBitboards;
+
+    /**
+     * @typedef occupancy
+     * @brief Single bitboard holding occupancy
+     */
+    typedef engine::Bitboard occupancy;
+
 } // namespace conf::types
 
 #endif // TYPES_H_
