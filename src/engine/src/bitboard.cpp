@@ -13,11 +13,5 @@
  */
 namespace engine
 {
-    constexpr Bitboard::Bitboard(const uint64_t & bb_) noexcept
-        : bb(bb_)
-        {}
 
-    constexpr Bitboard::Bitboard(const Bitboard & bitboard_) noexcept
-        : bb(bitboard_.bb)
-        {}
 } // namespace engine
