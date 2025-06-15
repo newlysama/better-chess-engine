@@ -17,9 +17,4 @@ namespace engine
     {
         return;
     }
-
-    inline constexpr uint8_t Board::getSquareIndex(uint8_t & rankIndex, uint8_t & fileIndex) noexcept
-    {
-        return (8 * rankIndex) + fileIndex;
-    }
 } // namespace engine
