@@ -1,7 +1,8 @@
 #- Source Files -#
 engine_src = files(
   'src/bitboard.cpp',
-  'src/board.cpp'
+  'src/board.cpp',
+  'src/game.cpp'
 )
 
 #- Include Dirs -#
