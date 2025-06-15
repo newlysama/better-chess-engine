@@ -2,7 +2,7 @@
  * @file logging.cpp
  * @author Thibault THOMAS
  *
- * @brief Implementation of logging system management
+ * @brief Logging system implementation.
  */
 
 /*----- System -----*/
@@ -19,7 +19,7 @@
 namespace logging
 {
 
-    // Define loggers
+    // Loggers
     static std::shared_ptr<spdlog::logger> eng_logger;
     static std::shared_ptr<spdlog::logger> app_logger;
 
@@ -27,12 +27,6 @@ namespace logging
  *                        INIT ENGINE LOGGER                         *
  *-------------------------------------------------------------------*/
 
-    /**
-     * @details
-     * Defines the engine's logger (sinks, level, output) and initialize it.
-     * If we build in release mode, log in log files defined in const.h.
-     * If we are in any other mode, log in stdout.
-     */
     void init_engine_logger()
     {
         if (eng_logger) return;
@@ -75,12 +69,6 @@ namespace logging
  *                          INIT APP LOGGER                          *
  *-------------------------------------------------------------------*/
 
-    /**
-     * @details
-     * Defines the app's logger (sinks, level, output) and initialize it.
-     * If we build in release mode, log in log files defined in const.h.
-     * If we are in any other mode, log in stdout.
-     */
     void init_application_logger()
     {
         if (app_logger) return;

@@ -2,7 +2,7 @@
  * @file logging.h
  * @author Thibault THOMAS
  *
- * @brief Logging system management
+ * @brief Logging system management.
  */
 
 #ifndef LOGGING_H_
@@ -16,18 +16,28 @@
 
 /**
  * @namespace logging
- * @brief Declares loggers initialization and access
+ * @brief Declares loggers initialization and access.
  */
 namespace logging
 {
 
     /**
-     * @brief Initialize engine's logger
+     * @brief Initialize engine's logger.
+     *
+     * @details
+     * Initialize its sinks, level, output.
+     * If we build in release mode, log in log files defined in src/conf/const.h.
+     * If we are in any other mode, log in stdout.
      */
     void init_engine_logger();
 
     /**
      * @brief Initialize app's logger
+     *
+     * @details
+     * Initialize its sinks, level, output.
+     * If we build in release mode, log in log files defined in src/conf/const.h.
+     * If we are in any other mode, log in stdout.
      */
     void init_application_logger();
 
@@ -43,9 +53,7 @@ namespace logging
 
 } // namespace logging
 
-/**
- * @brief Maccros to ensure simple access to loggers through the program
- */
+
 #define LOG_ENGINE_DEBUG(...)    SPDLOG_LOGGER_DEBUG    (logging::engine_logger(), __VA_ARGS__)
 #define LOG_ENGINE_INFO(...)     SPDLOG_LOGGER_INFO     (logging::engine_logger(), __VA_ARGS__)
 #define LOG_ENGINE_WARN(...)     SPDLOG_LOGGER_WARN     (logging::engine_logger(), __VA_ARGS__)
