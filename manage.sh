@@ -24,7 +24,7 @@ EOF
 # Globals
 NATIVE_FILE="--native-file=clang-native.ini"
 MESON_SETUP_CMD=(meson setup build)
-NINJA_CMD=(ninja -C build)
+NINJA_CMD=(ninja -C build -j"$(nproc)")
 
 # Lower-level build invoker
 env_build() {
