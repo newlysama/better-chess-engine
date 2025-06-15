@@ -31,8 +31,8 @@ namespace engine
             ~Game() noexcept = default;
 
         private:
-            uint16_t turnCount;           //< Number of played tunred
-            conf::enums::Team teamToPlay; //< Whose turn is it ? :)
+            uint16_t turnCount;               //< Number of played tunred
+            conf::enums::Colors colorsToPlay; //< Whose turn is it ? :)
 
             engine::Board board; //< Game's board
     };

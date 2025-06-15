@@ -2,7 +2,7 @@
  * @file game.cpp
  * @author Thibault THOMAS
  *
- * @brief Game class implementation
+ * @brief Game class implementation.
  */
 
 /*----- Project Headers -----*/

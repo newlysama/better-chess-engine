@@ -2,7 +2,7 @@
  * @file bitboard.cpp
  * @author Thibault THOMAS
  *
- * @brief Implementation of the Bitboard class
+ * @brief Bitboard class implementation.
  */
 
 /*----- Project Headers -----*/

@@ -2,7 +2,7 @@
  * @file board.cpp
  * @author Thibault THOMAS
  *
- * @brief Implementation of the Board class
+ * @brief Board class implementation.
  */
 
 /*----- Project Headers -----*/
