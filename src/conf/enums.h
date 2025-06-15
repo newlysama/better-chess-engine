@@ -2,7 +2,7 @@
  * @file enums.h
  * @author Thibault THOMAS
  * 
- * @brief Provides various enums
+ * @brief Provides various enums.
  */
 
 #ifndef ENUMS_H_
@@ -14,10 +14,10 @@
 namespace conf::enums
 {
     /**
-     * @enum Piece
-     * @brief Enum of pieces types
+     * @enum  Piece
+     * @brief Enum of pieces types.
      */
-    enum Piece
+    enum Pieces
     {
         PAWN   = 0,
         KNIGHT = 1,
@@ -29,10 +29,10 @@ namespace conf::enums
     };
 
     /**
-     * @enum Team
-     * @brief Enum of teams
+     * @enum  Colors
+     * @brief Enum of teams.
      */
-    enum Team
+    enum Colors
     {
         WHITE  = 0,
         BLACK  = 1,
@@ -40,8 +40,8 @@ namespace conf::enums
     };
 
     /**
-     * @enum Ranks
-     * @brief Enum of board's ranks
+     * @enum  Ranks
+     * @brief Enum of board's ranks.
      */
     enum Ranks
     {
@@ -57,8 +57,8 @@ namespace conf::enums
     };
 
     /**
-     * @enum Files
-     * @brief Enum of board's files
+     * @enum  Files
+     * @brief Enum of board's files.
      */
     enum Files
     {
@@ -71,6 +71,35 @@ namespace conf::enums
         FILE_G = 6,
         FILE_H = 7,
         FILES  = 8,
+    };
+
+    /**
+     * @enum  Directions
+     * @brief Enum of possible moves directions.
+     */
+    enum Directions
+    {
+        NORTH      = 0,
+        SOUTH      = 1,
+        EAST       = 2,
+        WEST       = 3,
+        NORTH_EAST = 4,
+        NORTH_WEST = 5,
+        SOUTH_EAST = 6,
+        SOUTH_WEST = 7,
+        DIRECTIONS = 8
+    };
+
+    /**
+     * @enum    BorderFiles
+     * @brief   Enum listing the border files.
+     * @details Used to verify that no piece goes out of the board.
+     */
+    enum BorderFiles
+    {
+        FILE_A = 0,
+        FILE_H = 1,
+        FILES  = 2
     };
 } // namespace conf::enums
 
