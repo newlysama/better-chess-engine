@@ -2,7 +2,7 @@
  * @file types.h
  * @author Thibault THOMAS
  * 
- * @brief Provides various types
+ * @brief Provides various types.
  */
 
 #ifndef TYPES_H_
@@ -21,22 +21,31 @@
 namespace conf::types
 {
     /**
-     * @typedef pieceBoards
-     * @brief 2x6 array holding each piece's bitboards from each team
+     * @typedef PieceBoards
+     * @brief   2x6 array holding each piece's bitboards from each team.
      */
-    typedef std::array<std::array<engine::Bitboard, conf::enums::Piece::PIECES>, conf::enums::Team::COLORS> piecesBitboards;
+    typedef std::array<std::array<engine::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS> PiecesBitboards;
 
     /**
-     * @typedef teamPiecesBitboards;
-     * @brief 1x6 array holding each piece's bitboard from a specific team
+     * @typedef Occupancy
+     * @brief   Single bitboard holding the board's occupancy.
      */
-    typedef std::array<engine::Bitboard, conf::enums::Piece::PIECES> teamPiecesBitboards;
+    typedef engine::Bitboard Occupancy;
 
     /**
-     * @typedef occupancy
-     * @brief Single bitboard holding occupancy
+     * @typedef BorderFilesMasks
+     * @brief   1x2 array holding the border files (A and H) masks.
+     * @details Used to prevent a piece from moving out of the board by the left / right side.
      */
-    typedef engine::Bitboard occupancy;
+    typedef std::array<engine::Bitboard, conf::enums::BorderFiles::FILES> BorderFilesMasks;
+
+    /**
+     * @typedef RanksMasks
+     * @brief   1x8 array holding each rank's mask.
+     * @details Used to check pawns promotions, etc...
+     */
+    typedef std::array<engine::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
+
 
 } // namespace conf::types
 
