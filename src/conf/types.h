@@ -37,7 +37,7 @@ namespace conf::types
      * @brief   1x2 array holding the border files (A and H) masks.
      * @details Used to prevent a piece from moving out of the board by the left / right side.
      */
-    typedef std::array<engine::Bitboard, conf::enums::BorderFiles::FILES> BorderFilesMasks;
+    typedef std::array<engine::Bitboard, conf::enums::BorderFiles::BORDER_FILES> BorderFilesMasks;
 
     /**
      * @typedef RanksMasks

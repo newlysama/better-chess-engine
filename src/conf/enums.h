@@ -97,9 +97,9 @@ namespace conf::enums
      */
     enum BorderFiles
     {
-        FILE_A = 0,
-        FILE_H = 1,
-        FILES  = 2
+        BORDER_FILE_A = 0,
+        BORDER_FILE_H = 1,
+        BORDER_FILES  = 2
     };
 } // namespace conf::enums
 
