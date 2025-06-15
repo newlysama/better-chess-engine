@@ -28,20 +28,44 @@ namespace engine
     class Bitboard
     {
         public:
-            /**
-             * @brief Constructor
-             */
-            constexpr Bitboard(const uint64_t & bb_ = 0ULL) noexcept;
 
-            /**
-             * @brief Destructor
-             */
+            // Constructors / Destructor
+            constexpr Bitboard(const uint64_t& bb_ = 0ULL) noexcept
+                : bb(bb_)
+                {}
+
+            constexpr Bitboard(const Bitboard& ) noexcept = default;
             ~Bitboard() noexcept = default;
 
-            /**
-             * @brief Copy constructor
-             */
-            constexpr Bitboard(const Bitboard & bitboard_) noexcept;
+
+            /*----------------------------------------*
+             *         COMPARAISON OPERATORS          *
+             *----------------------------------------*/
+            inline constexpr bool operator==(const Bitboard& bitboard_) const noexcept { return this->bb == bitboard_.bb; };
+            inline constexpr bool operator!=(const Bitboard& bitboard_) const noexcept { return this->bb != bitboard_.bb; };
+
+            /*----------------------------------------*
+             *           BITWISE OPERATORS            *
+             *----------------------------------------*/
+            inline constexpr Bitboard  operator&(const Bitboard& bitboard_) const noexcept { return Bitboard(this->bb & bitboard_.bb); };
+            inline constexpr Bitboard  operator|(const Bitboard& bitboard_) const noexcept { return Bitboard(this->bb | bitboard_.bb); };
+            inline constexpr Bitboard  operator~()                          const noexcept { return Bitboard(~this->bb); };
+            inline constexpr Bitboard  operator^(const Bitboard& bitboard_) const noexcept { return Bitboard(this->bb ^ bitboard_.bb); };
+            inline constexpr Bitboard  operator<<(const int & shift)        const noexcept { return Bitboard(this->bb << shift); };
+            inline constexpr Bitboard  operator>>(const int & shift)        const noexcept { return Bitboard(this->bb >> shift); };
+
+
+            /*----------------------------------------*
+             *         ASSIGNMENT OPERATORS           *
+             *----------------------------------------*/
+            inline constexpr Bitboard& operator=(const Bitboard&) noexcept = default;
+
+            inline constexpr Bitboard& operator&=(const Bitboard& bitboard_) noexcept { this->bb &= bitboard_.bb; return *this; };
+            inline constexpr Bitboard& operator|=(const Bitboard& bitboard_) noexcept { this->bb |= bitboard_.bb; return *this; };
+            inline constexpr Bitboard& operator^=(const Bitboard& bitboard_) noexcept { this->bb ^= bitboard_.bb; return *this; };
+
+            inline constexpr Bitboard& operator<<=(const int & shift) noexcept { this->bb <<= shift; return *this; };
+            inline constexpr Bitboard& operator>>=(const int & shift) noexcept { this->bb >>= shift; return *this; };
 
         private:
             // Actual bitboard hold by the instance
