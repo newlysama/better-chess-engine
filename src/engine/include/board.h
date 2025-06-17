@@ -67,16 +67,18 @@ namespace engine
 
         private:
             // Bitboards for each piece from each team
-            conf::types::PiecesBitboards piecesBBs;
+            conf::types::PiecesBitboards allPieces;
 
             // Occupancy of the board (1 general + 1 for each team)
-            conf::types::Occupancy generalOccupancyBB;
-            conf::types::Occupancy whiteOccupancyBB;
-            conf::types::Occupancy blackOccupancyBB;
+            engine::Bitboard generalOccupancy;
+            engine::Bitboard whiteOccupancy;
+            engine::Bitboard blackOccupancy;
 
             // Masks
-            const conf::types::BorderFilesMasks borderFilesMasksBBs;
+            const conf::types::BorderFilesMasks borderFilesMasks;
             const conf::types::RanksMasks ranksMasks;
+            const conf::types::DiagonalMasks diagonalMasks;
+            const conf::types::DiagonalMasks antiDiagonalMasks;
     };
 } // namespace engine
 
