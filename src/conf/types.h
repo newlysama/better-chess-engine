@@ -27,12 +27,6 @@ namespace conf::types
     typedef std::array<std::array<engine::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS> PiecesBitboards;
 
     /**
-     * @typedef Occupancy
-     * @brief   Single bitboard holding the board's occupancy.
-     */
-    typedef engine::Bitboard Occupancy;
-
-    /**
      * @typedef BorderFilesMasks
      * @brief   1x2 array holding the border files (A and H) masks.
      * @details Used to prevent a piece from moving out of the board by the left / right side.
@@ -46,6 +40,12 @@ namespace conf::types
      */
     typedef std::array<engine::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
 
+    /**
+     * @typedef DiagonalMasks
+     * @brief   1x15 array holing each diagonal's mask.
+     * @details Used to check for Bishop's and Queen's legal moves, among other things.
+     */
+    typedef std::array<engine::Bitboard, 15> DiagonalMasks;
 
 } // namespace conf::types
 
