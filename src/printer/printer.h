@@ -133,12 +133,9 @@ namespace engine
 
                 std::cout << "\n";
                 std::cout << BOARD_TAB << "  |     |     |     |     |     |     |     |     |\n";
-
-                if (rankIndex == 7)
-                {
-                    std::cout << BOARD_TAB << "  -------------------------------------------------\n";
-                }
             }
+
+            std::cout << BOARD_TAB << "  -------------------------------------------------\n";
 
             printFiles();
             std::cout << "\n\n\n";
