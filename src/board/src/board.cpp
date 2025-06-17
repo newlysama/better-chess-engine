@@ -6,15 +6,21 @@
  */
 
 /*----- Project Headers -----*/
-#include "engine/include/board.h"
+#include "board/include/board.h"
 
 /**
  * @namespace engine
  */
 namespace engine
 {
-    constexpr Board::Board() noexcept
+    /**
+     * @namespace board
+     */
+    namespace board
     {
-        return;
-    }
+        constexpr Board::Board() noexcept
+        {
+            return;
+        }
+    } // namespace board
 } // namespace engine

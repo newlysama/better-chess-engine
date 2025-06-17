@@ -6,12 +6,18 @@
  */
 
 /*----- Project Headers -----*/
-#include "engine/include/game.h"
+#include "game/include/game.h"
 
 /**
  * @namespace engine
  */
 namespace engine
 {
+    /**
+     * @namespace game
+     */
+    namespace game
+    {
 
+    } // namespace game
 } // namespace engine

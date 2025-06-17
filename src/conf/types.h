@@ -13,40 +13,47 @@
 
 /*----- Project Headers -----*/
 #include "conf/enums.h"
-#include "engine/include/bitboard.h"
+#include "board/include/bitboard.h"
 
 /**
- * @namespace conf::types
+ * @namespace engine
  */
-namespace conf::types
+namespace engine
 {
     /**
-     * @typedef PieceBoards
-     * @brief   2x6 array holding each piece's bitboards from each team.
+     * @namespace conf::types
      */
-    typedef std::array<std::array<engine::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS> PiecesBitboards;
+    namespace conf::types
+    {
+        /**
+         * @typedef PieceBoards
+         * @brief   2x6 array holding each piece's bitboards from each team.
+         */
+        typedef std::array<std::array<engine::board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS> PiecesBitboards;
 
-    /**
-     * @typedef BorderFilesMasks
-     * @brief   1x2 array holding the border files (A and H) masks.
-     * @details Used to prevent a piece from moving out of the board by the left / right side.
-     */
-    typedef std::array<engine::Bitboard, conf::enums::BorderFiles::BORDER_FILES> BorderFilesMasks;
+        /**
+         * @typedef BorderFilesMasks
+         * @brief   1x2 array holding the border files (A and H) masks.
+         * @details Used to prevent a piece from moving out of the board by the left / right side.
+         */
+        typedef std::array<engine::board::Bitboard, conf::enums::BorderFiles::BORDER_FILES> BorderFilesMasks;
 
-    /**
-     * @typedef RanksMasks
-     * @brief   1x8 array holding each rank's mask.
-     * @details Used to check pawns promotions, etc...
-     */
-    typedef std::array<engine::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
+        /**
+         * @typedef RanksMasks
+         * @brief   1x8 array holding each rank's mask.
+         * @details Used to check pawns promotions, etc...
+         */
+        typedef std::array<engine::board::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
 
-    /**
-     * @typedef DiagonalMasks
-     * @brief   1x15 array holing each diagonal's mask.
-     * @details Used to check for Bishop's and Queen's legal moves, among other things.
-     */
-    typedef std::array<engine::Bitboard, 15> DiagonalMasks;
+        /**
+         * @typedef DiagonalMasks
+         * @brief   1x15 array holing each diagonal's mask.
+         * @details Used to check for Bishop's and Queen's legal moves, among other things.
+         */
+        typedef std::array<engine::board::Bitboard, 15> DiagonalMasks;
 
-} // namespace conf::types
+    } // namespace conf::types
+} // namespace engine
+
 
 #endif // TYPES_H_

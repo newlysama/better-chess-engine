@@ -100,17 +100,9 @@ inc_src = include_directories('src')
 #           SUB DIRS           #
 #------------------------------#
 
-subdir('src/engine')
+subdir('src/board')
 subdir('src/logging')
 
 if mode not in ['test', 'benchmark']
-  subdir('src/app')
-endif
-
-if mode == 'test'
-  subdir('tests/engine_tests')
-endif
-
-if mode == 'benchmark'
-  subdir('benchmarks/engine_benchmarks')
+  subdir('src/main')
 endif

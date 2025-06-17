@@ -6,12 +6,18 @@
  */
 
 /*----- Project Headers -----*/
-#include "engine/include/bitboard.h"
+#include "board/include/bitboard.h"
 
 /**
  * @namespace engine
  */
 namespace engine
 {
+    /**
+     * @namespace board
+     */
+    namespace board
+    {
 
+    } // namespace board
 } // namespace engine

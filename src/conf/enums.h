@@ -9,98 +9,105 @@
 #define ENUMS_H_
 
 /**
- * @namespace conf::enums
+ * @namespace engine
  */
-namespace conf::enums
+namespace engine
 {
     /**
-     * @enum  Piece
-     * @brief Enum of pieces types.
+     * @namespace conf::enums
      */
-    enum Pieces
+    namespace conf::enums
     {
-        PAWN   = 0,
-        KNIGHT = 1,
-        BISHOP = 2,
-        ROOK   = 3,
-        QUEEN  = 4,
-        KING   = 5,
-        PIECES = 6
-    };
+        /**
+         * @enum  Piece
+         * @brief Enum of pieces types.
+         */
+        enum Pieces
+        {
+            PAWN   = 0,
+            KNIGHT = 1,
+            BISHOP = 2,
+            ROOK   = 3,
+            QUEEN  = 4,
+            KING   = 5,
+            PIECES = 6
+        };
 
-    /**
-     * @enum  Colors
-     * @brief Enum of teams.
-     */
-    enum Colors
-    {
-        WHITE  = 0,
-        BLACK  = 1,
-        COLORS = 2
-    };
+        /**
+         * @enum  Colors
+         * @brief Enum of teams.
+         */
+        enum Colors
+        {
+            WHITE  = 0,
+            BLACK  = 1,
+            COLORS = 2
+        };
 
-    /**
-     * @enum  Ranks
-     * @brief Enum of board's ranks.
-     */
-    enum Ranks
-    {
-        RANK_1 = 0,
-        RANK_2 = 1,
-        RANK_3 = 2,
-        RANK_4 = 3,
-        RANK_5 = 4,
-        RANK_6 = 5,
-        RANK_7 = 6,
-        RANK_8 = 7,
-        RANKS  = 8,
-    };
+        /**
+         * @enum  Ranks
+         * @brief Enum of board's ranks.
+         */
+        enum Ranks
+        {
+            RANK_1 = 0,
+            RANK_2 = 1,
+            RANK_3 = 2,
+            RANK_4 = 3,
+            RANK_5 = 4,
+            RANK_6 = 5,
+            RANK_7 = 6,
+            RANK_8 = 7,
+            RANKS  = 8,
+        };
 
-    /**
-     * @enum  Files
-     * @brief Enum of board's files.
-     */
-    enum Files
-    {
-        FILE_A = 0,
-        FILE_B = 1,
-        FILE_C = 2,
-        FILE_D = 3,
-        FILE_E = 4,
-        FILE_F = 5,
-        FILE_G = 6,
-        FILE_H = 7,
-        FILES  = 8,
-    };
+        /**
+         * @enum  Files
+         * @brief Enum of board's files.
+         */
+        enum Files
+        {
+            FILE_A = 0,
+            FILE_B = 1,
+            FILE_C = 2,
+            FILE_D = 3,
+            FILE_E = 4,
+            FILE_F = 5,
+            FILE_G = 6,
+            FILE_H = 7,
+            FILES  = 8,
+        };
 
-    /**
-     * @enum  Directions
-     * @brief Enum of possible moves directions.
-     */
-    enum Directions
-    {
-        NORTH      = 0,
-        SOUTH      = 1,
-        EAST       = 2,
-        WEST       = 3,
-        NORTH_EAST = 4,
-        NORTH_WEST = 5,
-        SOUTH_EAST = 6,
-        SOUTH_WEST = 7,
-        DIRECTIONS = 8
-    };
+        /**
+         * @enum  Directions
+         * @brief Enum of possible moves directions.
+         */
+        enum Directions
+        {
+            NORTH      = 0,
+            SOUTH      = 1,
+            EAST       = 2,
+            WEST       = 3,
+            NORTH_EAST = 4,
+            NORTH_WEST = 5,
+            SOUTH_EAST = 6,
+            SOUTH_WEST = 7,
+            DIRECTIONS = 8
+        };
 
-    /**
-     * @enum    BorderFiles
-     * @brief   Enum listing the border files.
-     * @details Used to verify that no piece goes out of the board.
-     */
-    enum BorderFiles
-    {
-        BORDER_FILE_A = 0,
-        BORDER_FILE_H = 1,
-        BORDER_FILES  = 2
-    };
-} // namespace conf::enums
+        /**
+         * @enum    BorderFiles
+         * @brief   Enum listing the border files.
+         * @details Used to verify that no piece goes out of the board.
+         */
+        enum BorderFiles
+        {
+            BORDER_FILE_A = 0,
+            BORDER_FILE_H = 1,
+            BORDER_FILES  = 2
+        };
+    } // namespace conf::enums
+} // namespace engine
+
 
 #endif // ENUMS_H_

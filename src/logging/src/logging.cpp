@@ -16,94 +16,61 @@
 #include "logging/include/logging.h"
 #include "conf/paths.h"
 
-namespace logging
+/**
+ * @namespace engine
+ */
+namespace engine
 {
-
-    // Loggers
-    static std::shared_ptr<spdlog::logger> eng_logger;
-    static std::shared_ptr<spdlog::logger> app_logger;
-
-/*-------------------------------------------------------------------*
- *                        INIT ENGINE LOGGER                         *
- *-------------------------------------------------------------------*/
-
-    void init_engine_logger()
+    /**
+     * @namespace logging
+     */
+    namespace logging
     {
-        if (eng_logger) return;
 
-        std::vector<spdlog::sink_ptr> sinks;
+        // Loggers
+        static std::shared_ptr<spdlog::logger> logger;
 
-        #if defined(BUILD_RELEASE)
-            auto path = conf::paths::engine_log_file;
+    /*-------------------------------------------------------------------*
+    *                        INIT ENGINE LOGGER                         *
+    *-------------------------------------------------------------------*/
 
-            sinks.push_back(
-                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
-            );
+        void init_logger()
+        {
+            if (logger) return;
 
-        #else
-            sinks.push_back(
-                std::make_shared<spdlog::sinks::stdout_color_sink_mt>()
-            );
+            std::vector<spdlog::sink_ptr> sinks;
 
-        #endif
+            #if defined(BUILD_RELEASE)
+                auto path = engine::conf::paths::log_file_path;
 
-        eng_logger = std::make_shared<spdlog::logger>("engine", sinks.begin(), sinks.end());
+                sinks.push_back(
+                    std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
+                );
 
-        #if defined(BUILD_DEBUG) || defined(BUILD_PROFILE) || defined(BUILD_TEST) || defined(BUILD_BENCHMARK)
-            eng_logger->set_level(spdlog::level::debug);
+            #else
+                sinks.push_back(
+                    std::make_shared<spdlog::sinks::stdout_color_sink_mt>()
+                );
 
-        #else
-            eng_logger->set_level(spdlog::level::warn);
-        #endif
+            #endif
 
-        spdlog::register_logger(eng_logger);
-    }
+            logger = std::make_shared<spdlog::logger>("engine", sinks.begin(), sinks.end());
 
-    std::shared_ptr<spdlog::logger> engine_logger()
-    {
-        init_engine_logger();
-        return eng_logger;
-    }
+            #if defined(BUILD_DEBUG) || defined(BUILD_PROFILE) || defined(BUILD_TEST) || defined(BUILD_BENCHMARK)
+                logger->set_level(spdlog::level::debug);
 
-/*-------------------------------------------------------------------*
- *                          INIT APP LOGGER                          *
- *-------------------------------------------------------------------*/
+            #else
+                logger->set_level(spdlog::level::warn);
+            #endif
 
-    void init_application_logger()
-    {
-        if (app_logger) return;
+            spdlog::register_logger(logger);
+        }
 
-        std::vector<spdlog::sink_ptr> sinks;
+        std::shared_ptr<spdlog::logger> get_logger()
+        {
+            init_logger();
+            return logger;
+        }
+    } // namespace logging
+} // namespace engine
 
-        #if defined(BUILD_RELEASE)
-            auto path = conf::paths::app_log_file;
-
-            sinks.push_back(
-                std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true)
-            );
-
-        #else
-            sinks.push_back(
-                std::make_shared<spdlog::sinks::stdout_color_sink_mt>()
-            );
-        #endif
-
-        app_logger = std::make_shared<spdlog::logger>("app", sinks.begin(), sinks.end());
-
-        #if defined(BUILD_DEBUG) || defined(BUILD_PROFILE) || defined(BUILD_TEST) || defined(BUILD_BENCHMARK)
-            app_logger->set_level(spdlog::level::debug);
-
-        #else
-            app_logger->set_level(spdlog::level::warn);
-        #endif
-
-        spdlog::register_logger(app_logger);
-    }
-
-    std::shared_ptr<spdlog::logger> application_logger()
-    {
-        init_application_logger();
-        return app_logger;
-    }
-
-} // namespace logging

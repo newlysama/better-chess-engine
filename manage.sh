@@ -78,7 +78,7 @@ build() {
 
 # Run wrapper
 run() {
-  local exe="build/src/app/chess"
+  local exe="build/src/main/chess"
 
   if [[ ! -x "$exe" ]]; then
     echo "[ERROR] Executable not found: $exe" >&2
