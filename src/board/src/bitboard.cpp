@@ -18,6 +18,5 @@ namespace engine
      */
     namespace board
     {
-
     } // namespace board
 } // namespace engine

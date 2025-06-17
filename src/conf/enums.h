@@ -94,18 +94,6 @@ namespace engine
             SOUTH_WEST = 7,
             DIRECTIONS = 8
         };
-
-        /**
-         * @enum    BorderFiles
-         * @brief   Enum listing the border files.
-         * @details Used to verify that no piece goes out of the board.
-         */
-        enum BorderFiles
-        {
-            BORDER_FILE_A = 0,
-            BORDER_FILE_H = 1,
-            BORDER_FILES  = 2
-        };
     } // namespace conf::enums
 } // namespace engine
 

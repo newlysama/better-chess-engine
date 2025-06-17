@@ -73,8 +73,8 @@ namespace engine
                 inline constexpr Bitboard  operator|(const Bitboard& bitboard_) const noexcept { return Bitboard(this->data | bitboard_.data); };
                 inline constexpr Bitboard  operator~()                          const noexcept { return Bitboard(~this->data); };
                 inline constexpr Bitboard  operator^(const Bitboard& bitboard_) const noexcept { return Bitboard(this->data ^ bitboard_.data); };
-                inline constexpr Bitboard  operator<<(const int & shift)        const noexcept { return Bitboard(this->data << shift); };
-                inline constexpr Bitboard  operator>>(const int & shift)        const noexcept { return Bitboard(this->data >> shift); };
+                inline constexpr Bitboard  operator<<(const int shift)          const noexcept { return Bitboard(this->data << shift); };
+                inline constexpr Bitboard  operator>>(const int shift)          const noexcept { return Bitboard(this->data >> shift); };
 
 
                 /*----------------------------------------*
@@ -86,8 +86,8 @@ namespace engine
                 inline constexpr Bitboard& operator|=(const Bitboard& bitboard_) noexcept { this->data |= bitboard_.data; return *this; };
                 inline constexpr Bitboard& operator^=(const Bitboard& bitboard_) noexcept { this->data ^= bitboard_.data; return *this; };
 
-                inline constexpr Bitboard& operator<<=(const int & shift) noexcept { this->data <<= shift; return *this; };
-                inline constexpr Bitboard& operator>>=(const int & shift) noexcept { this->data >>= shift; return *this; };
+                inline constexpr Bitboard& operator<<=(const int shift) noexcept { this->data <<= shift; return *this; };
+                inline constexpr Bitboard& operator>>=(const int shift) noexcept { this->data >>= shift; return *this; };
 
 
                 /*----------------------------------------*
@@ -99,7 +99,7 @@ namespace engine
                  *
                  * @return uint64_t : the actual bitboard
                  */
-                inline constexpr uint8_t getData() const noexcept { return this->data; };
+                inline constexpr uint64_t getData() const noexcept { return this->data; };
 
                 /**
                  * @brief  Get the number of bits set to 1.

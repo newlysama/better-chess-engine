@@ -6,16 +6,18 @@
  */
 
 /*----- Project Headers -----*/
-#include "logging/include/logging.h"
 #include "board/include/board.h"
+#include "logging/include/logging.h"
+#include "printer/printer.h"
 
 int main(int argc, char* argv[])
 {
     // Initialize loggers
     engine::logging::init_logger();
 
-    LOG_DEBUG("Engine debug");
-    LOG_ERROR("Engine error");
+    engine::board::Board board;
+
+    engine::printer::printBoard(board);
 
     return 0;
 }
