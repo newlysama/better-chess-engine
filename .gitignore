@@ -3,6 +3,7 @@
 
 # Build
 build/
+builddir/
 
 # Deps
 subprojects/benchmark-1.8.4
