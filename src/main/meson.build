@@ -9,5 +9,5 @@ executable(
   'chess',
   app_src,
   include_directories: incs,
-  dependencies: [board_dep, logging_dep]
+  dependencies: [logging_dep, game_dep]
 )
