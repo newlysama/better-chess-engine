@@ -48,10 +48,10 @@ namespace engine
         blackOccupancy{}
         {
             // construit les bitboards d'occupancy
-            for (size_t piece = 0; piece < static_cast<size_t>(conf::enums::Pieces::PIECES); piece++)
+            for (size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
             {
-                whiteOccupancy |= allPieces[static_cast<size_t>(conf::enums::Colors::WHITE)][piece];
-                blackOccupancy |= allPieces[static_cast<size_t>(conf::enums::Colors::BLACK)][piece];
+                whiteOccupancy |= allPieces[conf::enums::Colors::WHITE][piece];
+                blackOccupancy |= allPieces[conf::enums::Colors::BLACK][piece];
             }
             generalOccupancy = whiteOccupancy | blackOccupancy;
         }
