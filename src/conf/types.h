@@ -59,10 +59,10 @@ namespace engine
          */
         typedef struct Move
         {
-            uint8_t squareFrom; //< Start square
-            uint8_t squareTo;   //< End square
+            uint8_t squareFrom; // Start square
+            uint8_t squareTo;   // End square
 
-            conf::enums::MoveTypes moveType; //< Move type (Capture, EnPassant, etc...)
+            conf::enums::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
 
             /**
              * @brief Constructor.
