@@ -55,7 +55,7 @@ namespace engine
 
         /**
          * @typedef Move
-         * @brief Structure representing a move.
+         * @brief   Structure representing a move.
          */
         typedef struct Move
         {
