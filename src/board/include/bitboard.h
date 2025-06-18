@@ -130,7 +130,7 @@ namespace engine
                 inline constexpr uint8_t msbIndex() const noexcept { return 63 - std::countr_zero(this->data); };
 
             private:
-                uint64_t data; //< Actual bitboard
+                uint64_t data; // Actual bitboard
         };
     } // namespace board
 } // namespace engine
