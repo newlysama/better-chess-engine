@@ -94,6 +94,20 @@ namespace engine
             SOUTH_WEST = 7,
             DIRECTIONS = 8
         };
+
+        /**
+         * @enum MoveTypes
+         * @brief Enum of possible move types.
+         */
+        enum MoveTypes
+        {
+            QUIET      = 0,
+            CAPTURE    = 1,
+            PROMOTION  = 2,
+            CASTLE     = 3,
+            ENPASSANT  = 4,
+            MOVE_TYPES = 5
+        };
     } // namespace conf::enums
 } // namespace engine
 
