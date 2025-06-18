@@ -11,13 +11,11 @@ incs = [inc_src]
 board_lib = library(
   'board',
   board_src,
-  include_directories: incs,
-  dependencies: [spdlog_dep]
+  include_directories: incs
 )
 
 #- Exportable Module -#
 board_dep = declare_dependency(
   link_with: board_lib,
-  include_directories: incs,
-  dependencies: [spdlog_dep]
+  include_directories: incs
 )
