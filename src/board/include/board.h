@@ -8,11 +8,12 @@
 #ifndef BOARD_H_
 #define BOARD_H_
 
-/*----- System--*/
+/*----- System -----*/
 #include <cstdint>
 #include <memory>
 
-/*----- Project Headers--*/
+/*----- Project Headers -----*/
+#include "board/include/bitboard.h"
 #include "conf/types.h"
 
 /**
