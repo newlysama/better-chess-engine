@@ -1,3 +1,10 @@
+/**
+ * @file printer.h
+ * @author Thibault THOMAS
+ *
+ * @brief Allows to print the game state in stdout.
+ */
+
 #ifndef PRINT_GAME_H
 #define PRINT_GAME_H
 
@@ -17,7 +24,6 @@ namespace engine
      */
     namespace printer
     {
-
 
         // Print colors
         inline constexpr std::string_view RESET = "\033[0m";
@@ -92,9 +98,9 @@ namespace engine
          */
         inline constexpr std::string_view getPiece(const board::Board& board, int squareIndex)
         {
-            for (size_t color = 0; color < conf::enums::Colors::COLORS; color++)
+            for (std::size_t color = 0; color < conf::enums::Colors::COLORS; color++)
             {
-                for (size_t piece = 0; piece < static_cast<size_t>(conf::enums::Pieces::PIECES); piece++)
+                for (std::size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
                 {
                     // If allPieces[color][piece] is set to 1 (piece is present)
                     if ( (board.allPieces[color][piece].getData() >> squareIndex) & 1ULL )
