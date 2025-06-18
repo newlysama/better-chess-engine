@@ -10,6 +10,7 @@
 
 /*----- System -----*/
 #include <array>
+#include <vector>
 
 /*----- Project Headers -----*/
 #include "conf/enums.h"
@@ -51,6 +52,33 @@ namespace engine
          * @details Used to check for Bishop's and Queen's legal moves, among other things.
          */
         typedef std::array<board::Bitboard, 15> DiagonalMasks;
+
+        /**
+         * @typedef Move
+         * @brief Structure representing a move.
+         */
+        typedef struct Move
+        {
+            uint8_t squareFrom; //< Start square
+            uint8_t squareTo;   //< End square
+
+            conf::enums::MoveTypes moveType; //< Move type (Capture, EnPassant, etc...)
+
+            /**
+             * @brief Constructor.
+             */
+            Move(const uint8_t from, const uint8_t to, conf::enums::MoveTypes type) noexcept
+            : squareFrom(from)
+            , squareTo(to)
+            , moveType(type)
+            {}
+        } Move;
+
+        /**
+         * @typedef LegalMoves
+         * @brief   1x5 array storing vectors of legal moves for each move type.
+         */
+        typedef std::array<std::vector<Move>, conf::enums::MoveTypes::MOVE_TYPES> LegalMoves;
 
     } // namespace conf::types
 } // namespace engine
