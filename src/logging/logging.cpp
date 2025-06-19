@@ -23,10 +23,10 @@ namespace engine
      */
     namespace logging
     {
-        bool isRelease = false;
-
 #if defined(BUILD_RELEASE)
-        isRelease = true;
+        bool isRelease = true;
+#else
+        bool isRelease = false;
 #endif
 
         // Loggers
