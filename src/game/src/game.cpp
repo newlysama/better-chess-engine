@@ -18,20 +18,30 @@ namespace engine
      */
     namespace game
     {
-        Game::Game() noexcept
-            : turnCount(0)
-            , colorToPlay(conf::enums::Colors::WHITE)
-            , board(board::Board())
-            , legalMoves{}
-            {
-                using namespace conf::enums;
 
+        using namespace conf::enums;
+
+        Game::Game() noexcept
+            : turnCount(0),
+              colorToPlay(conf::enums::Colors::WHITE),
+              board(board::Board()),
+              legalMoves{}
+            {
                 // Reserve predertermined space for our vectors of legal moves
-                legalMoves[MoveTypes::QUIET]     .reserve(RESERVE_QUIET);
-                legalMoves[MoveTypes::CAPTURE]   .reserve(RESERVE_CAPTURES);
-                legalMoves[MoveTypes::PROMOTION] .reserve(RESERVE_PROMOTIONS);
-                legalMoves[MoveTypes::CASTLE]    .reserve(RESERVE_CASTLES);
-                legalMoves[MoveTypes::ENPASSANT] .reserve(RESERVE_ENPASSANT);
+                this->legalMoves[MoveTypes::QUIET]     .reserve(RESERVE_QUIET);
+                this->legalMoves[MoveTypes::CAPTURE]   .reserve(RESERVE_CAPTURES);
+                this->legalMoves[MoveTypes::PROMOTION] .reserve(RESERVE_PROMOTIONS);
+                this->legalMoves[MoveTypes::CASTLE]    .reserve(RESERVE_CASTLES);
+                this->legalMoves[MoveTypes::ENPASSANT] .reserve(RESERVE_ENPASSANT);
             }
+
+        inline void Game::clearLegalMoves() noexcept
+        {
+            this->legalMoves[MoveTypes::QUIET]     .clear();
+            this->legalMoves[MoveTypes::CAPTURE]   .clear();
+            this->legalMoves[MoveTypes::PROMOTION] .clear();
+            this->legalMoves[MoveTypes::CASTLE]    .clear();
+            this->legalMoves[MoveTypes::ENPASSANT] .clear();
+        }
     } // namespace game
 } // namespace engine

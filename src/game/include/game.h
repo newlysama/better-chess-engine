@@ -50,6 +50,11 @@ namespace engine
                  */
                 ~Game() noexcept = default;
 
+                /**
+                 * @brief Clears the vectors of legal moves.
+                 */
+                inline void clearLegalMoves() noexcept;
+
 
             private:
                 uint16_t turnCount;              // Number of played tunred
