@@ -34,12 +34,12 @@ namespace engine
             /**
              * @brief Constructor.
              */
-            constexpr Board() noexcept;
+            Board() noexcept;
 
             /**
              * @brief Constructor from FEN notation.
              */
-            constexpr Board(const std::string fenNotation) noexcept;
+            Board(const std::string fenNotation) noexcept;
 
             /**
              * @brief Destructor.
