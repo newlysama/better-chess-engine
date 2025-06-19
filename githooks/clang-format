@@ -1,0 +1,11 @@
+#!/bin/sh
+echo "Running clang-format on C++ sources…"
+
+# Get modified files
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(h|cpp)$')
+
+# Apply clang-format to them
+if [ -n "$files" ]; then
+  echo "$files" | xargs -r clang-format --style=file -i
+  echo "$files" | xargs -r git add
+fi
