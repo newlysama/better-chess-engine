@@ -102,7 +102,6 @@ inc_src = include_directories('src')
 
 subdir('src/logging')
 subdir('src/board')
-subdir('src/move')
 subdir('src/game')
 
 if mode not in ['test', 'benchmark']

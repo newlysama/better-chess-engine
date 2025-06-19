@@ -1,5 +1,5 @@
 #- Source Files -#
-logging_src = files('src/logging.cpp')
+logging_src = files('logging.cpp')
 
 #- Include Dirs -#
 incs = [inc_src]

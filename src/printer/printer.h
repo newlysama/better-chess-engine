@@ -8,11 +8,9 @@
 #ifndef PRINT_GAME_H
 #define PRINT_GAME_H
 
-/*----- System -----*/
 #include <iostream>
 
-/*----- Project Headers -----*/
-#include "board/include/board.h"
+#include "board/board.h"
 
 /**
  * @namespace engine
@@ -27,36 +25,22 @@ namespace engine
 
         // Print colors
         inline constexpr std::string_view RESET = "\033[0m";
-        inline constexpr std::string_view RED   = "\033[31m";
+        inline constexpr std::string_view RED = "\033[31m";
         inline constexpr std::string_view GREEN = "\033[32m";
 
         // Array [color][piece] for colored pieces printing
         //  color 0 = black, 1 = white
-        inline constexpr std::array<std::array<std::string_view, 6>, 2> PIECE_STR =
-        {
-            {
-                { // black:   p n b r q k
-                    "\033[31mp\033[0m",
-                    "\033[31mn\033[0m",
-                    "\033[31mb\033[0m",
-                    "\033[31mr\033[0m",
-                    "\033[31mq\033[0m",
-                    "\033[31mk\033[0m"
-                },
-                { // white:   P N B R Q K
-                    "\033[32mP\033[0m",
-                    "\033[32mN\033[0m",
-                    "\033[32mB\033[0m",
-                    "\033[32mR\033[0m",
-                    "\033[32mQ\033[0m",
-                    "\033[32mK\033[0m"
-                }
-            }
-        };
+        inline constexpr std::array<std::array<std::string_view, 6>, 2> PIECE_STR = {
+            {{// black:   p n b r q k
+              "\033[31mp\033[0m", "\033[31mn\033[0m", "\033[31mb\033[0m", "\033[31mr\033[0m", "\033[31mq\033[0m",
+              "\033[31mk\033[0m"},
+             {// white:   P N B R Q K
+              "\033[32mP\033[0m", "\033[32mN\033[0m", "\033[32mB\033[0m", "\033[32mR\033[0m", "\033[32mQ\033[0m",
+              "\033[32mK\033[0m"}}};
 
         // Tabs to center a bit the board and the header on the terminal
         const std::string HEADER_TAB = "                        ";
-        const std::string BOARD_TAB  = "              ";
+        const std::string BOARD_TAB = "              ";
 
         /**
          * @brief Prints the board's print function header.
@@ -96,14 +80,14 @@ namespace engine
         /**
          * @brief Get a colored string representing a piece on a specific square.
          */
-        inline constexpr std::string_view getPiece(const board::Board& board, int squareIndex)
+        inline constexpr std::string_view getPiece(const board::Board &board, int squareIndex)
         {
             for (std::size_t color = 0; color < conf::enums::Colors::COLORS; color++)
             {
                 for (std::size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
                 {
                     // If allPieces[color][piece] is set to 1 (piece is present)
-                    if ( (board.allPieces[color][piece].getData() >> squareIndex) & 1ULL )
+                    if ((board.allPieces[color][piece].getData() >> squareIndex) & 1ULL)
                     {
                         return PIECE_STR[color][piece];
                     }
@@ -117,7 +101,7 @@ namespace engine
         /**
          * @brief Prints the board.
          */
-        inline const void printBoard(const board::Board& board) noexcept
+        inline const void printBoard(const board::Board &board) noexcept
         {
             printHeader();
 
@@ -128,7 +112,7 @@ namespace engine
 
                 printRankStart(rankIndex);
 
-                for(int fileIndex = 0; fileIndex < 8; fileIndex++)
+                for (int fileIndex = 0; fileIndex < 8; fileIndex++)
                 {
                     // Get the piece to print
                     int squareIndex = board::Board::getSquareIndex(rankIndex, fileIndex);
@@ -146,7 +130,7 @@ namespace engine
             printFiles();
             std::cout << "\n\n\n";
         }
-    }
-}
+    } // namespace printer
+} // namespace engine
 
 #endif // PRINT_GAME_H

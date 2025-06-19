@@ -1,0 +1,19 @@
+BasedOnStyle: Microsoft
+Language: Cpp
+
+# Indentation
+IndentWidth: 4
+NamespaceIndentation: All
+IndentPPDirectives: AfterHash
+
+# Include sorting
+SortIncludes:       true
+IncludeBlocks:      Regroup
+IncludeCategories:
+  # System / Libs includes
+  - Regex: '^<.*>'
+    Priority: 1
+  # Project headers
+  - Regex: '^".*"'
+    Priority: 2
+

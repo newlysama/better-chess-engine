@@ -1,20 +1,18 @@
 /**
  * @file types.h
  * @author Thibault THOMAS
- * 
+ *
  * @brief Provides various types.
  */
 
 #ifndef TYPES_H_
 #define TYPES_H_
 
-/*----- System -----*/
 #include <array>
 #include <vector>
 
-/*----- Project Headers -----*/
+#include "board/bitboard.h"
 #include "conf/enums.h"
-#include "board/include/bitboard.h"
 
 /**
  * @namespace engine
@@ -30,7 +28,8 @@ namespace engine
          * @typedef PieceBoards
          * @brief   2x6 array holding each piece's bitboards from each team.
          */
-        typedef std::array<std::array<board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS> PiecesBitboards;
+        typedef std::array<std::array<board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS>
+            PiecesBitboards;
 
         /**
          * @typedef BorderFilesMasks
@@ -68,10 +67,9 @@ namespace engine
              * @brief Constructor.
              */
             Move(const uint8_t from, const uint8_t to, conf::enums::MoveTypes type) noexcept
-            : squareFrom(from)
-            , squareTo(to)
-            , moveType(type)
-            {}
+                : squareFrom(from), squareTo(to), moveType(type)
+            {
+            }
         } Move;
 
         /**
@@ -82,6 +80,5 @@ namespace engine
 
     } // namespace conf::types
 } // namespace engine
-
 
 #endif // TYPES_H_

@@ -1,8 +1,5 @@
 #- Source Files -#
-board_src = files(
-  'src/bitboard.cpp',
-  'src/board.cpp',
-)
+board_src = files('board.cpp')
 
 #- Include Dirs -#
 incs = [inc_src]

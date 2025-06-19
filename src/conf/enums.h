@@ -1,7 +1,7 @@
 /**
  * @file enums.h
  * @author Thibault THOMAS
- * 
+ *
  * @brief Provides various enums.
  */
 
@@ -24,12 +24,12 @@ namespace engine
          */
         enum Pieces
         {
-            PAWN   = 0,
+            PAWN = 0,
             KNIGHT = 1,
             BISHOP = 2,
-            ROOK   = 3,
-            QUEEN  = 4,
-            KING   = 5,
+            ROOK = 3,
+            QUEEN = 4,
+            KING = 5,
             PIECES = 6
         };
 
@@ -39,8 +39,8 @@ namespace engine
          */
         enum Colors
         {
-            WHITE  = 0,
-            BLACK  = 1,
+            WHITE = 0,
+            BLACK = 1,
             COLORS = 2
         };
 
@@ -58,7 +58,7 @@ namespace engine
             RANK_6 = 5,
             RANK_7 = 6,
             RANK_8 = 7,
-            RANKS  = 8,
+            RANKS = 8,
         };
 
         /**
@@ -75,7 +75,7 @@ namespace engine
             FILE_F = 5,
             FILE_G = 6,
             FILE_H = 7,
-            FILES  = 8,
+            FILES = 8,
         };
 
         /**
@@ -84,10 +84,10 @@ namespace engine
          */
         enum Directions
         {
-            NORTH      = 0,
-            SOUTH      = 1,
-            EAST       = 2,
-            WEST       = 3,
+            NORTH = 0,
+            SOUTH = 1,
+            EAST = 2,
+            WEST = 3,
             NORTH_EAST = 4,
             NORTH_WEST = 5,
             SOUTH_EAST = 6,
@@ -101,15 +101,14 @@ namespace engine
          */
         enum MoveTypes
         {
-            QUIET      = 0,
-            CAPTURE    = 1,
-            PROMOTION  = 2,
-            CASTLE     = 3,
-            ENPASSANT  = 4,
+            QUIET = 0,
+            CAPTURE = 1,
+            PROMOTION = 2,
+            CASTLE = 3,
+            ENPASSANT = 4,
             MOVE_TYPES = 5
         };
     } // namespace conf::enums
 } // namespace engine
-
 
 #endif // ENUMS_H_
