@@ -14,30 +14,33 @@ mode = get_option('mode')
 
 if mode == 'debug'
   add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_DEBUG',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     language: 'cpp'
   )
 
 elif mode == 'profile'
   add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_PROFILE',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     language: 'cpp'
   )
 
 elif mode == 'release'
   add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_RELEASE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     language: 'cpp'
   )
 
 elif mode == 'test'
   add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_TEST',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     language: 'cpp'
   )
 
@@ -48,6 +51,7 @@ elif mode == 'test'
 
 elif mode == 'benchmark'
   add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_BENCHMARK',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
     language: 'cpp'
