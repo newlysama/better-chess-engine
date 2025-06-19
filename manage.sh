@@ -57,7 +57,7 @@ build() {
   for arg in "$@"; do
     case "$arg" in
       --debug)      mode=debug;     opts+=("-Db_sanitize=address" "-Db_lundef=false" "-Doptimization=0") ;;
-      --profile)    mode=profile;   opts+=("-Doptimization=2") ;;
+      --profile)    mode=profile;   opts+=("-Doptimization=3") ;;
       --release)    mode=release;   opts+=("-Doptimization=3") ;;
       --test)       mode=test;      opts+=("-Db_sanitize=address" "-Db_lundef=false" "-Doptimization=0") ;;
       --benchmark)  mode=benchmark; opts+=("-Doptimization=3") ;;
