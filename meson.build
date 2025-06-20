@@ -3,6 +3,8 @@ project('chess', 'cpp',
   default_options: [
     'cpp_std=c++20',
     'wrap_mode=forcefallback',
+    'warning_level=3',
+    'default_library=static',
     ]
 )
 
@@ -17,6 +19,9 @@ if mode == 'debug'
     '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_DEBUG',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    '-Db_sanitize=address',
+    '-Db_lundef=false',
+    '-Doptimization=0',
     language: 'cpp'
   )
 
@@ -25,6 +30,7 @@ elif mode == 'profile'
     '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_PROFILE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    '-Doptimization=3',
     language: 'cpp'
   )
 
@@ -33,6 +39,7 @@ elif mode == 'release'
     '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_RELEASE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
+    '-Doptimization=3',
     language: 'cpp'
   )
 
@@ -41,6 +48,9 @@ elif mode == 'test'
     '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_TEST',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    '-Db_sanitize=address',
+    '-Db_lundef=false',
+    '-Doptimization=0',
     language: 'cpp'
   )
 
@@ -54,6 +64,7 @@ elif mode == 'benchmark'
     '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_BENCHMARK',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
+    '-Doptimization=3',
     language: 'cpp'
   )
 
