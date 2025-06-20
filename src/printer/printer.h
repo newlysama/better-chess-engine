@@ -45,7 +45,7 @@ namespace engine
         /**
          * @brief Prints the board's print function header.
          */
-        const inline void printHeader() noexcept
+        inline void printHeader() noexcept
         {
             std::cout << HEADER_TAB << "   ________  __________________\n";
             std::cout << HEADER_TAB << "  / ____/ / / / ____/ ___/ ___/\n";
@@ -59,7 +59,7 @@ namespace engine
         /**
          * @brief Prints the tab before the board, the rank's number and the opening border.
          */
-        const inline void printRankStart(const int rankIndex) noexcept
+        inline void printRankStart(const int rankIndex) noexcept
         {
             std::cout << BOARD_TAB << rankIndex << " |";
         }
@@ -67,7 +67,7 @@ namespace engine
         /**
          * @brief Prints the files letters.
          */
-        const inline void printFiles() noexcept
+        inline void printFiles() noexcept
         {
             std::cout << BOARD_TAB << "  ";
 
@@ -101,7 +101,7 @@ namespace engine
         /**
          * @brief Prints the board.
          */
-        inline const void printBoard(const board::Board &board) noexcept
+        inline void printBoard(const board::Board &board) noexcept
         {
             printHeader();
 
