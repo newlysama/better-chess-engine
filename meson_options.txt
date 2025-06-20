@@ -1,4 +1,4 @@
-# Build mod
+# Build mode
 option(
     'mode',
     type        : 'combo',
