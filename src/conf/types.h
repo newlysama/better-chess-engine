@@ -33,7 +33,7 @@ namespace engine
 
         /**
          * @typedef BorderFilesMasks
-         * @brief   1x2 array holding the border files (A and H) masks.
+         * @brief   1x8 array holding each file's mask.
          * @details Used to prevent a piece from moving out of the board by the left / right side.
          */
         typedef std::array<board::Bitboard, conf::enums::Files::FILES> FilesMasks;
