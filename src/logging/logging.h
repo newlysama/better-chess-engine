@@ -1,6 +1,8 @@
 /**
- * @file logging.h
- * @author Thibault THOMAS
+ * @file      logging.h
+ * @author    Thibault THOMAS
+ * @copyright Copyright 2025 Better Chess Engine
+ * @par       This project is released under the MIT License
  *
  * @brief Logging system management.
  */

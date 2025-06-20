@@ -1,6 +1,8 @@
 /**
- * @file const.h
- * @author Thibault THOMAS
+ * @file      const.h
+ * @author    Thibault THOMAS
+ * @copyright Copyright 2025 Better Chess Engine
+ * @par       This project is released under the MIT License
  *
  * @brief Defines various paths.
  */
