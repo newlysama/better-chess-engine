@@ -1,19 +1,21 @@
-BasedOnStyle: Microsoft
-Language: Cpp
+BasedOnStyle:  Microsoft
+Language:      Cpp
 
 # Indentation
-IndentWidth: 4
-NamespaceIndentation: All
-IndentPPDirectives: AfterHash
+IndentWidth:           4
+NamespaceIndentation:  All
+IndentPPDirectives:    AfterHash
 
 # Include sorting
 SortIncludes:       true
 IncludeBlocks:      Regroup
 IncludeCategories:
   # System / Libs includes
-  - Regex: '^<.*>'
-    Priority: 1
+  - Regex:     '^<.*>'
+    Priority:  1
   # Project headers
-  - Regex: '^".*"'
-    Priority: 2
+  - Regex:     '^".*"'
+    Priority:  2
 
+# Puts template declaration above functions, not on the same line
+BreakTemplateDeclarations: Yes
