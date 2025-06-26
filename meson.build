@@ -116,8 +116,8 @@ inc_src = include_directories('src')
 #------------------------------#
 
 subdir('src/logging')
-subdir('src/board')
-subdir('src/game')
+subdir('src/engine/board')
+subdir('src/engine/game')
 
 if mode not in ['test', 'benchmark']
   subdir('src/main')
