@@ -191,7 +191,7 @@ namespace engine
              */
             inline constexpr uint8_t msbIndex() const noexcept
             {
-                return 63 - std::countr_zero(this->data);
+                return 63 - std::countl_zero(this->data);
             };
 
           private:
