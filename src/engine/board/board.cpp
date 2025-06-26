@@ -7,7 +7,7 @@
  * @brief Board class implementation.
  */
 
-#include "board/board.h"
+#include "engine/board/board.h"
 
 /**
  * @namespace engine

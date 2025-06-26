@@ -12,8 +12,8 @@
 
 #include <cstdint>
 
-#include "board/board.h"
 #include "conf/types.h"
+#include "engine/board/board.h"
 
 /**
  * @namespace engine

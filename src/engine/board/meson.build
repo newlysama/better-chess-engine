@@ -1,5 +1,7 @@
 #- Source Files -#
-board_src = files('board.cpp')
+board_src = files(
+  'board.cpp',
+  'mask.cpp')
 
 #- Include Dirs -#
 incs = [inc_src]

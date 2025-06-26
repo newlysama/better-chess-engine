@@ -16,53 +16,47 @@
 #include "conf/paths.h"
 
 /**
- * @namespace engine
+ * @namespace logging
  */
-namespace engine
+namespace logging
 {
-    /**
-     * @namespace logging
-     */
-    namespace logging
-    {
 #if defined(BUILD_RELEASE)
-        bool isRelease = true;
+    bool isRelease = true;
 #else
-        bool isRelease = false;
+    bool isRelease = false;
 #endif
 
-        // Loggers
-        static std::shared_ptr<spdlog::logger> logger;
+    // Loggers
+    static std::shared_ptr<spdlog::logger> logger;
 
-        void init_logger()
+    void init_logger()
+    {
+        if (logger)
+            return;
+
+        // Create empty sink_ptr
+        spdlog::sink_ptr sink;
+
+        // Fill sink depending on the build mode
+        if (isRelease)
         {
-            if (logger)
-                return;
-
-            // Create empty sink_ptr
-            spdlog::sink_ptr sink;
-
-            // Fill sink depending on the build mode
-            if (isRelease)
-            {
-                sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(engine::conf::paths::log_file_path, true);
-            }
-
-            else
-            {
-                sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-            }
-
-            // Create and configure logger
-            logger = std::make_shared<spdlog::logger>("engine", std::initializer_list<spdlog::sink_ptr>{sink});
-            logger->set_level(isRelease ? spdlog::level::info : spdlog::level::trace);
-            spdlog::register_logger(logger);
+            sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(conf::paths::log_file_path, true);
         }
 
-        std::shared_ptr<spdlog::logger> get_logger()
+        else
         {
-            init_logger();
-            return logger;
+            sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         }
-    } // namespace logging
-} // namespace engine
+
+        // Create and configure logger
+        logger = std::make_shared<spdlog::logger>("engine", std::initializer_list<spdlog::sink_ptr>{sink});
+        logger->set_level(isRelease ? spdlog::level::info : spdlog::level::trace);
+        spdlog::register_logger(logger);
+    }
+
+    std::shared_ptr<spdlog::logger> get_logger()
+    {
+        init_logger();
+        return logger;
+    }
+} // namespace logging

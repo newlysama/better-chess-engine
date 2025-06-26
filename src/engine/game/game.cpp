@@ -7,7 +7,7 @@
  * @brief Game class implementation.
  */
 
-#include "game/game.h"
+#include "engine/game/game.h"
 
 /**
  * @namespace engine

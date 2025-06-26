@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#include "board/board.h"
+#include "engine/board/board.h"
 
 /**
  * @namespace engine

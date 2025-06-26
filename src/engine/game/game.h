@@ -12,10 +12,10 @@
 
 #include <cstdint>
 
-#include "board/board.h"
 #include "conf/enums.h"
 #include "conf/types.h"
-#include "game/move_generator.h"
+#include "engine/board/board.h"
+#include "engine/game/move_generator.h"
 
 /**
  * @namespace engine

@@ -14,34 +14,28 @@
 #include <spdlog/spdlog.h>
 
 /**
- * @namespace engine
+ * @namespace logging
+ * @brief Declares loggers initialization and access.
  */
-namespace engine
+namespace logging
 {
+
     /**
-     * @namespace logging
-     * @brief Declares loggers initialization and access.
+     * @brief Initialize logger.
+     *
+     * @details
+     * Initialize its sinks, level, output.
+     * If we build in release mode, log in log files defined in src/conf/const.h.
+     * If we are in any other mode, log in stdout.
      */
-    namespace logging
-    {
+    void init_logger();
 
-        /**
-         * @brief Initialize logger.
-         *
-         * @details
-         * Initialize its sinks, level, output.
-         * If we build in release mode, log in log files defined in src/conf/const.h.
-         * If we are in any other mode, log in stdout.
-         */
-        void init_logger();
+    /**
+     * @brief Allows logger access
+     */
+    std::shared_ptr<spdlog::logger> get_logger();
 
-        /**
-         * @brief Allows logger access
-         */
-        std::shared_ptr<spdlog::logger> get_logger();
-
-    } // namespace logging
-} // namespace engine
+} // namespace logging
 
 #define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(engine::logging::get_logger(), __VA_ARGS__)
 #define LOG_INFO(...) SPDLOG_LOGGER_INFO(engine::logging::get_logger(), __VA_ARGS__)

@@ -13,74 +13,93 @@
 #include <array>
 #include <vector>
 
-#include "board/bitboard.h"
 #include "conf/enums.h"
+#include "engine/board/bitboard.h"
 
 /**
- * @namespace engine
+ * @namespace conf::types
  */
-namespace engine
+namespace conf::types
 {
     /**
-     * @namespace conf::types
+     * @typedef PieceBoards
+     * @brief   2x6 array holding each piece's bitboards from each team.
      */
-    namespace conf::types
+    typedef std::array<std::array<engine::board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS>
+        PiecesBitboards;
+
+    /**
+     * @typedef Move
+     * @brief   Structure representing a move.
+     */
+    typedef struct Move
     {
-        /**
-         * @typedef PieceBoards
-         * @brief   2x6 array holding each piece's bitboards from each team.
-         */
-        typedef std::array<std::array<board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS>
-            PiecesBitboards;
+        uint8_t squareFrom; // Start square
+        uint8_t squareTo;   // End square
+
+        conf::enums::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
 
         /**
-         * @typedef BorderFilesMasks
-         * @brief   1x8 array holding each file's mask.
-         * @details Used to prevent a piece from moving out of the board by the left / right side.
+         * @brief Constructor.
          */
-        typedef std::array<board::Bitboard, conf::enums::Files::FILES> FilesMasks;
-
-        /**
-         * @typedef RanksMasks
-         * @brief   1x8 array holding each rank's mask.
-         * @details Used to check pawns promotions, etc...
-         */
-        typedef std::array<board::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
-
-        /**
-         * @typedef DiagonalMasks
-         * @brief   1x15 array holing each diagonal's mask.
-         * @details Used to check for Bishop's and Queen's legal moves, among other things.
-         */
-        typedef std::array<board::Bitboard, 15> DiagonalMasks;
-
-        /**
-         * @typedef Move
-         * @brief   Structure representing a move.
-         */
-        typedef struct Move
+        Move(const uint8_t from, const uint8_t to, const conf::enums::MoveTypes type) noexcept
+            : squareFrom(from), squareTo(to), moveType(type)
         {
-            uint8_t squareFrom; // Start square
-            uint8_t squareTo;   // End square
+        }
+    } Move;
 
-            conf::enums::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
+    /**
+     * @typedef LegalMoves
+     * @brief   1x5 array storing vectors of legal moves for each move type.
+     */
+    typedef std::array<std::vector<Move>, conf::enums::MoveTypes::MOVE_TYPES> LegalMoves;
 
-            /**
-             * @brief Constructor.
-             */
-            Move(const uint8_t from, const uint8_t to, conf::enums::MoveTypes type) noexcept
-                : squareFrom(from), squareTo(to), moveType(type)
-            {
-            }
-        } Move;
+    /*----------------------------------*
+     *              MASKS               *
+     *----------------------------------*/
 
-        /**
-         * @typedef LegalMoves
-         * @brief   1x5 array storing vectors of legal moves for each move type.
-         */
-        typedef std::array<std::vector<Move>, conf::enums::MoveTypes::MOVE_TYPES> LegalMoves;
+    /**
+     * @typedef BorderFilesMasks
+     * @brief   1x8 array holding each file's mask.
+     */
+    typedef std::array<engine::board::Bitboard, conf::enums::Files::FILES> FilesMasks;
 
-    } // namespace conf::types
-} // namespace engine
+    /**
+     * @typedef RanksMasks
+     * @brief   1x8 array holding each rank's mask.
+     */
+    typedef std::array<engine::board::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
+
+    /**
+     * @typedef DiagonalMasks
+     * @brief   1x15 array holing each diagonal's mask.
+     */
+    typedef std::array<engine::board::Bitboard, 15> DiagonalMasks;
+
+    /**
+     * @typedef AttackMasks
+     * @brief   Attack masks for each piece.
+     */
+    typedef std::array<engine::board::Bitboard, 64> AttackMasks;
+
+    /**
+     * @typedef CastlingMasks
+     * @brief   Castling masks: one mask per castling right (e.g., White King-side, White Queen-side, ...).
+     */
+    typedef std::array<engine::board::Bitboard, conf::enums::Castlings::CASTLINGS> CastlingMasks;
+
+    /**
+     * @typedef BetweenMasks
+     * @brief   Masks of squares strictly between any two squares (for line checks, pinned pieces, ...).
+     */
+    typedef std::array<std::array<engine::board::Bitboard, 64>, 64> BetweenMasks;
+
+    /**
+     * @typedef SlidingAttackTable
+     * @brief   Attack Tables for sliding pieces.
+     */
+    typedef std::array<std::vector<engine::board::Bitboard>, 64> SlidingAttackTable;
+
+} // namespace conf::types
 
 #endif // TYPES_H_
