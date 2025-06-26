@@ -86,73 +86,254 @@ namespace engine
         inline constexpr board::Bitboard notGHMask = ~(filesMasks[6] | filesMasks[7]);
 
         /**
-         * @brief Build diagonals masks.
+         * @brief   Build diagonals masks.
          */
-        inline constexpr conf::types::DiagonalMasks makeDiagonalsMasks() noexcept;
+        inline constexpr conf::types::DiagonalMasks makeDiagonalsMasks() noexcept
+        {
+            conf::types::DiagonalMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
+            {
+                // file's index - rank's index + 7 -> range [0,14]
+                uint8_t file = board::Board::getFileIndex(squareIndex);
+                uint8_t rank = board::Board::getRankIndex(squareIndex);
+
+                uint8_t maskIndex = static_cast<uint8_t>(static_cast<int>(file) - static_cast<int>(rank) + 7);
+
+                masks[maskIndex] |= board::Bitboard(1ULL << squareIndex);
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds anti-diagonals masks.
          */
-        inline constexpr conf::types::DiagonalMasks makeAntiDiagonalsMasks() noexcept;
+        inline constexpr conf::types::DiagonalMasks makeAntiDiagonalsMasks() noexcept
+        {
+            conf::types::DiagonalMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
+            {
+                uint8_t file = board::Board::getFileIndex(squareIndex);
+                uint8_t rank = board::Board::getRankIndex(squareIndex);
+
+                // file's index + rank's index -> range [0,14]
+                uint8_t maskIndex = file + rank;
+
+                masks[maskIndex] |= board::Bitboard(1ULL << squareIndex);
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds pawns attacks masks, depending on the color.
          */
-        template <conf::enums::Colors Color> inline constexpr conf::types::AttackMasks makePawnsAttacksMasks() noexcept;
+        template <conf::enums::Colors Color> inline constexpr conf::types::AttackMasks makePawnsAttacksMasks() noexcept
+        {
+            conf::types::AttackMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
+            {
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+
+                if constexpr (Color == conf::enums::Colors::WHITE)
+                {
+                    // North-West (<<7) excludes file A, North-East (<<9) excludes file H
+                    masks[squareIndex] = ((mask << 7) & notAMask) | ((mask << 9) & notHMask);
+                }
+                else
+                {
+                    // South-East (>>7) excludes file H, South-West (>>9) excludes file A
+                    masks[squareIndex] = ((mask >> 7) & notHMask) | ((mask >> 9) & notAMask);
+                }
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds pawns pushes masks, depending on the color.
          */
-        template <conf::enums::Colors Color> inline constexpr conf::types::AttackMasks makePawnsPushesMasks() noexcept;
+        template <conf::enums::Colors Color> inline constexpr conf::types::AttackMasks makePawnsPushesMasks() noexcept
+        {
+            conf::types::AttackMasks pushes{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
+            {
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+
+                if constexpr (Color == conf::enums::Colors::WHITE)
+                {
+                    // One step north or two steps from rank 2
+                    pushes[squareIndex] = (mask << 8) | ((mask & ranksMasks[1]) << 16);
+                }
+                else
+                {
+                    // One step south or two steps from rank 7
+                    pushes[squareIndex] = (mask >> 8) | ((mask & ranksMasks[6]) >> 16);
+                }
+            }
+
+            return pushes;
+        }
 
         /**
          * @brief Builds knights attacks masks.
          */
-        inline constexpr conf::types::AttackMasks makeKnightsAttacksMasks() noexcept;
+        inline constexpr conf::types::AttackMasks makeKnightsAttacksMasks() noexcept
+        {
+            conf::types::AttackMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+            {
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+
+                masks[squareIndex] = ((mask << 17) & notAMask)    // +2 North / +1 West
+                                     | ((mask << 15) & notHMask)  // +2 North / +1 East
+                                     | ((mask << 10) & notGHMask) // +1 North / +2 West
+                                     | ((mask >> 6) & notGHMask)  // +1 South / +2 West
+                                     | ((mask << 6) & notABMask)  // +1 North / +2 East
+                                     | ((mask >> 10) & notABMask) // +1 South / +2 East
+                                     | ((mask >> 15) & notAMask)  // +2 South / +1 West
+                                     | ((mask >> 17) & notHMask); // +2 South / +1 East
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds kings attacks masks.
          */
-        inline constexpr conf::types::AttackMasks makeKingsAttacksMasks() noexcept;
+        inline constexpr conf::types::AttackMasks makeKingsAttacksMasks() noexcept
+        {
+            conf::types::AttackMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+            {
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+
+                masks[squareIndex] = (mask << 8)                 // North
+                                     | (mask >> 8)               // South
+                                     | ((mask << 1) & notAMask)  // East
+                                     | ((mask >> 1) & notHMask)  // West
+                                     | ((mask << 9) & notAMask)  // North-East
+                                     | ((mask << 7) & notHMask)  // North-West
+                                     | ((mask >> 7) & notAMask)  // South-East
+                                     | ((mask >> 9) & notHMask); // South-West
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds rooks attacks masks.
          */
-        inline constexpr conf::types::AttackMasks makeRooksAttacksMasks() noexcept;
+        inline constexpr conf::types::AttackMasks makeRooksAttacksMasks() noexcept
+        {
+            conf::types::AttackMasks masks{};
+
+            for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+            {
+                uint8_t file = board::Board::getFileIndex(squareIndex);
+                uint8_t rank = board::Board::getRankIndex(squareIndex);
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+
+                // Same file and same rank without the square itself
+                board::Bitboard byFile = filesMasks[file] ^ mask;
+                board::Bitboard byRank = ranksMasks[rank] ^ mask;
+
+                masks[squareIndex] = byFile | byRank;
+            }
+
+            return masks;
+        }
 
         /**
          * @brief Builds bishop attacks masks.
          */
-        inline constexpr conf::types::AttackMasks makeBishopsAttacksMasks() noexcept;
+        inline constexpr conf::types::AttackMasks makeBishopsAttacksMasks() noexcept
+        {
+            conf::types::AttackMasks masks{};
 
-        inline constexpr conf::types::DiagonalMasks diagonalsMasks = makeDiagonalsMasks();
-        inline constexpr conf::types::DiagonalMasks antiDiagonalsMasks = makeAntiDiagonalsMasks();
+            for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+            {
+                uint8_t file = board::Board::getFileIndex(squareIndex);
+                uint8_t rank = board::Board::getRankIndex(squareIndex);
 
-        inline constexpr conf::types::AttackMasks whitePawnsAttacksMasks =
-            makePawnsAttacksMasks<conf::enums::Colors::WHITE>();
+                uint8_t diag = static_cast<uint8_t>(static_cast<int>(file) - static_cast<int>(rank) + 7);
+                uint8_t antiDiag = file + rank;
 
-        inline constexpr conf::types::AttackMasks blackPawnsAttacksMasks =
-            makePawnsAttacksMasks<conf::enums::Colors::BLACK>();
+                board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
+                board::Bitboard diag1 = diagonalsMasks[diag] ^ mask;
+                board::Bitboard diag2 = antiDiagonalsMasks[antiDiag] ^ mask;
 
-        inline constexpr conf::types::AttackMasks whitePawnsPushesMasks =
-            makePawnsPushesMasks<conf::enums::Colors::WHITE>();
+                masks[squareIndex] = diag1 | diag2;
+            }
 
-        inline constexpr conf::types::AttackMasks blackPawnsPushesMasks =
-            makePawnsPushesMasks<conf::enums::Colors::BLACK>();
+            /**
+             * @brief Diagonals masks.
+             */
+            inline constexpr conf::types::DiagonalMasks diagonalsMasks = makeDiagonalsMasks();
 
-        inline constexpr conf::types::AttackMasks knightsAttacksMasks = makeKnightsAttacksMasks();
-        inline constexpr conf::types::AttackMasks kingsAttacksMasks = makeKingsAttacksMasks();
+            /**
+             * @brief Anti-diagonals masks.
+             */
+            inline constexpr conf::types::DiagonalMasks antiDiagonalsMasks = makeAntiDiagonalsMasks();
 
-        inline constexpr conf::types::AttackMasks rooksAttacksMasks = makeRooksAttacksMasks();
-        inline constexpr conf::types::AttackMasks bishopAttacksMasks = makeBishopsAttacksMasks();
+            /**
+             * @brief White pawns attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks whitePawnsAttacksMasks =
+                makePawnsAttacksMasks<conf::enums::Colors::WHITE>();
 
-        /**
-         * @brief Castling rights masks.
-         */
-        inline constexpr conf::types::CastlingMasks castlingMasks = {
-            board::Bitboard((1ULL << 5) | (1ULL << 6)), board::Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
-            board::Bitboard((1ULL << 61) | (1ULL << 62)), board::Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
-    } // namespace mask
-} // namespace engine
+            /**
+             * @brief Back pawns attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks blackPawnsAttacksMasks =
+                makePawnsAttacksMasks<conf::enums::Colors::BLACK>();
+
+            /**
+             * @brief White pawns pushes masks.
+             */
+            inline constexpr conf::types::AttackMasks whitePawnsPushesMasks =
+                makePawnsPushesMasks<conf::enums::Colors::WHITE>();
+
+            /**
+             * @brief Black pawns pushes masks.
+             */
+            inline constexpr conf::types::AttackMasks blackPawnsPushesMasks =
+                makePawnsPushesMasks<conf::enums::Colors::BLACK>();
+
+            /**
+             * @brief Knights attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks knightsAttacksMasks = makeKnightsAttacksMasks();
+
+            /**
+             * @brief Kings attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks kingsAttacksMasks = makeKingsAttacksMasks();
+
+            /**
+             * @brief Rooks attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks rooksAttacksMasks = makeRooksAttacksMasks();
+
+            /**
+             * @brief Bishops attacks masks.
+             */
+            inline constexpr conf::types::AttackMasks bishopAttacksMasks = makeBishopsAttacksMasks();
+
+            /**
+             * @brief Castling rights masks.
+             */
+            inline constexpr conf::types::CastlingMasks castlingMasks = {
+                board::Bitboard((1ULL << 5) | (1ULL << 6)), board::Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
+                board::Bitboard((1ULL << 61) | (1ULL << 62)),
+                board::Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
+        } // namespace mask
+    } // namespace engine
 
 #endif // MASKS_H_
