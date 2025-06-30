@@ -77,10 +77,10 @@ namespace conf::types
     typedef std::array<engine::board::Bitboard, 15> DiagonalMasks;
 
     /**
-     * @typedef AttackMasks
-     * @brief   Attack masks for each piece.
+     * @typedef BitboardTable
+     * @brief   x64 array holding masks for each square.
      */
-    typedef std::array<engine::board::Bitboard, 64> AttackMasks;
+    typedef std::array<engine::board::Bitboard, 64> BitboardTable;
 
     /**
      * @typedef CastlingMasks
