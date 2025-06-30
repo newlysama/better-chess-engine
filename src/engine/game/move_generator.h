@@ -16,81 +16,73 @@
 #include "engine/board/board.h"
 
 /**
- * @namespace engine
+ * @namespace engine::move
  */
-namespace engine
+namespace engine::move
 {
     /**
-     * @namespace move
+     * @brief Make a move.
+     *
+     * @param [in] board : The board to make the move on
+     * @param [in] move  : The move to make
      */
-    namespace move
-    {
-        /**
-         * @brief Make a move.
-         *
-         * @param [in] board : The board to make the move on
-         * @param [in] move  : The move to make
-         */
-        static inline void makeMove(board::Board &board, const conf::types::Move move) noexcept;
+    static inline void makeMove(board::Board &board, const conf::types::Move move) noexcept;
 
-        /**
-         * @brief Unmake a move.
-         *
-         * @param [in] board : The board to unmake the move on
-         * @param [in] move  : The move to unmake
-         */
-        static inline void unmakeMove(board::Board &board, const conf::types::Move move) noexcept;
+    /**
+     * @brief Unmake a move.
+     *
+     * @param [in] board : The board to unmake the move on
+     * @param [in] move  : The move to unmake
+     */
+    static inline void unmakeMove(board::Board &board, const conf::types::Move move) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal Pawns moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generatePawnsMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
+    /**
+     * @brief Generates pseudo-legal Pawns moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generatePawnsMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal Knights moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generateKnightsMoves(const board::Board &board,
-                                                conf::types::LegalMoves &legalMoves) noexcept;
+    /**
+     * @brief Generates pseudo-legal Knights moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generateKnightsMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal Bishops moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generateBishopsMoves(const board::Board &board,
-                                                conf::types::LegalMoves &legalMoves) noexcept;
+    /**
+     * @brief Generates pseudo-legal Bishops moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generateBishopsMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal Rooks moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generateRooksMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
+    /**
+     * @brief Generates pseudo-legal Rooks moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generateRooksMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal Queen moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generateQueenMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
+    /**
+     * @brief Generates pseudo-legal Queen moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generateQueenMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
 
-        /**
-         * @brief Generates pseudo-legal King moves.
-         *
-         * @param [in]  board      : The board to work with
-         * @param [out] legalMoves : The vector of legal moves to fill
-         */
-        static inline void generateKingMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
-    } // namespace move
-} // namespace engine
+    /**
+     * @brief Generates pseudo-legal King moves.
+     *
+     * @param [in]  board      : The board to work with
+     * @param [out] legalMoves : The vector of legal moves to fill
+     */
+    static inline void generateKingMoves(const board::Board &board, conf::types::LegalMoves &legalMoves) noexcept;
+} // namespace engine::move
 
 #endif // MOVE_GENERATOR_H_
