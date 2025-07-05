@@ -16,13 +16,10 @@
 #include "conf/types.h"
 
 /**
- * @namespace engine::mask
+ * @namespace engine::board::mask
  */
-namespace engine::mask
+namespace engine::board::mask
 {
-    /**
-     * @brief Files masks.
-     */
     inline constexpr conf::types::FilesMasks filesMasks = {
         board::Bitboard{0x0101'0101'0101'0101ULL}, // file A
         board::Bitboard{0x0202'0202'0202'0202ULL}, // file B
@@ -34,9 +31,6 @@ namespace engine::mask
         board::Bitboard{0x8080'8080'8080'8080ULL}  // file H
     };
 
-    /**
-     * @brief Ranks masks.
-     */
     inline constexpr conf::types::RanksMasks ranksMasks = {
         board::Bitboard{0x0000'0000'0000'00FFULL}, // rank 1
         board::Bitboard{0x0000'0000'0000'FF00ULL}, // rank 2
@@ -48,31 +42,23 @@ namespace engine::mask
         board::Bitboard{0xFF00'0000'0000'0000ULL}  // rank 8
     };
 
-    /**
-     * @brief Corners masks.
-     */
+    // Corners masks
     inline constexpr board::Bitboard A1Mask = filesMasks[0] & ranksMasks[0];
     inline constexpr board::Bitboard H8Mask = filesMasks[7] & ranksMasks[7];
     inline constexpr board::Bitboard A8Mask = filesMasks[0] & ranksMasks[7];
     inline constexpr board::Bitboard H1Mask = filesMasks[7] & ranksMasks[0];
 
-    /**
-     * @brief 'Not edge' masks.
-     */
+    // 'Not edge' masks
     inline constexpr board::Bitboard notRankEdgesMask = ~(ranksMasks[0] | ranksMasks[7]);
     inline constexpr board::Bitboard notFileEdgesMask = ~(filesMasks[0] | filesMasks[7]);
 
-    /**
-     * @brief 'Not corner' masks.
-     */
+    // 'Not corner' masks.
     inline constexpr board::Bitboard notA1Mask = ~A1Mask;
     inline constexpr board::Bitboard notH8Mask = ~H8Mask;
     inline constexpr board::Bitboard notA8Mask = ~A8Mask;
     inline constexpr board::Bitboard notH1Mask = ~H1Mask;
 
-    /**
-     * @brief 'Not file' masks.
-     */
+    // 'Not file' masks
     inline constexpr board::Bitboard notAMask = ~filesMasks[0];
     inline constexpr board::Bitboard notBMask = ~filesMasks[1];
     inline constexpr board::Bitboard notGMask = ~filesMasks[6];
@@ -81,17 +67,17 @@ namespace engine::mask
     inline constexpr board::Bitboard notGHMask = ~(filesMasks[6] | filesMasks[7]);
 
     /**
-     * @brief   Build diagonals masks.
+     * @brief Builds diagonals masks.
      */
-    inline constexpr conf::types::DiagonalMasks initDiagonalsMasks() noexcept
+    inline consteval conf::types::DiagonalMasks initDiagonalsMasks() noexcept
     {
         conf::types::DiagonalMasks masks{};
 
         for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             // file's index - rank's index + 7 -> range [0,14]
-            uint8_t file = board::Board::getFileIndex(squareIndex);
-            uint8_t rank = board::Board::getRankIndex(squareIndex);
+            uint8_t file = squareIndex & 7;
+            uint8_t rank = squareIndex >> 3;
 
             uint8_t maskIndex = static_cast<uint8_t>(static_cast<int>(file) - static_cast<int>(rank) + 7);
 
@@ -100,18 +86,19 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::DiagonalMasks diagonalsMasks = initDiagonalsMasks();
 
     /**
      * @brief Builds anti-diagonals masks.
      */
-    inline constexpr conf::types::DiagonalMasks initAntiDiagonalsMasks() noexcept
+    inline consteval conf::types::DiagonalMasks initAntiDiagonalsMasks() noexcept
     {
         conf::types::DiagonalMasks masks{};
 
         for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            uint8_t file = board::Board::getFileIndex(squareIndex);
-            uint8_t rank = board::Board::getRankIndex(squareIndex);
+            uint8_t file = squareIndex & 7;
+            uint8_t rank = squareIndex >> 3;
 
             // file's index + rank's index -> range [0,14]
             uint8_t maskIndex = file + rank;
@@ -121,12 +108,13 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::DiagonalMasks antiDiagonalsMasks = initAntiDiagonalsMasks();
 
     /**
      * @brief Builds pawns attacks masks, depending on the color.
      */
     template <conf::enums::Colors Color>
-    inline constexpr conf::types::BitboardTable initPawnAttacksMasks() noexcept
+    inline consteval conf::types::BitboardTable initPawnAttacksMasks() noexcept
     {
         conf::types::BitboardTable masks{};
 
@@ -148,14 +136,18 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::BitboardTable whitePawnAttacksMasks =
+        initPawnAttacksMasks<conf::enums::Colors::WHITE>();
+    inline constexpr conf::types::BitboardTable blackPawnAttacksMasks =
+        initPawnAttacksMasks<conf::enums::Colors::BLACK>();
 
     /**
      * @brief Builds pawns pushes masks, depending on the color.
      */
     template <conf::enums::Colors Color>
-    inline constexpr conf::types::BitboardTable initPawnPushesMasks() noexcept
+    inline consteval conf::types::BitboardTable initPawnPushesMasks() noexcept
     {
-        conf::types::BitboardTable pushes{};
+        conf::types::BitboardTable masks{};
 
         for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -164,26 +156,30 @@ namespace engine::mask
             if constexpr (Color == conf::enums::Colors::WHITE)
             {
                 // One step north or two steps from rank 2
-                pushes[squareIndex] = (mask << 8) | ((mask & ranksMasks[1]) << 16);
+                masks[squareIndex] = (mask << 8) | ((mask & ranksMasks[1]) << 16);
             }
             else
             {
                 // One step south or two steps from rank 7
-                pushes[squareIndex] = (mask >> 8) | ((mask & ranksMasks[6]) >> 16);
+                masks[squareIndex] = (mask >> 8) | ((mask & ranksMasks[6]) >> 16);
             }
         }
 
-        return pushes;
+        return masks;
     }
+    inline constexpr conf::types::BitboardTable whitePawnPushesMasks =
+        initPawnPushesMasks<conf::enums::Colors::WHITE>();
+    inline constexpr conf::types::BitboardTable blackPawnPushesMasks =
+        initPawnPushesMasks<conf::enums::Colors::BLACK>();
 
     /**
      * @brief Builds knights attacks masks.
      */
-    inline constexpr conf::types::BitboardTable initKnightAttacksMasks() noexcept
+    inline consteval conf::types::BitboardTable initKnightAttacksMasks() noexcept
     {
         conf::types::BitboardTable masks{};
 
-        for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
 
@@ -199,15 +195,16 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::BitboardTable knightAttacksMasks = initKnightAttacksMasks();
 
     /**
      * @brief Builds kings attacks masks.
      */
-    inline constexpr conf::types::BitboardTable initKingAttacksMasks() noexcept
+    inline consteval conf::types::BitboardTable initKingAttacksMasks() noexcept
     {
         conf::types::BitboardTable masks{};
 
-        for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
 
@@ -223,18 +220,19 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::BitboardTable kingAttacksMasks = initKingAttacksMasks();
 
     /**
      * @brief Builds rooks attacks masks.
      */
-    inline constexpr conf::types::BitboardTable initRookAttacksMasks() noexcept
+    inline consteval conf::types::BitboardTable initRookAttacksMasks() noexcept
     {
         conf::types::BitboardTable masks{};
 
-        for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            uint8_t file = board::Board::getFileIndex(squareIndex);
-            uint8_t rank = board::Board::getRankIndex(squareIndex);
+            uint8_t file = squareIndex & 7;
+            uint8_t rank = squareIndex >> 3;
             board::Bitboard mask = board::Bitboard(1ULL << squareIndex);
 
             // Same file and same rank without the square itself
@@ -246,18 +244,19 @@ namespace engine::mask
 
         return masks;
     }
+    inline constexpr conf::types::BitboardTable rookAttacksMasks = initRookAttacksMasks();
 
     /**
      * @brief Builds bishop attacks masks.
      */
-    inline constexpr conf::types::BitboardTable initBishopAttacksMasks() noexcept
+    inline consteval conf::types::BitboardTable initBishopAttacksMasks() noexcept
     {
         conf::types::BitboardTable masks{};
 
-        for (uint8_t squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            uint8_t file = board::Board::getFileIndex(squareIndex);
-            uint8_t rank = board::Board::getRankIndex(squareIndex);
+            uint8_t file = squareIndex & 7;
+            uint8_t rank = squareIndex >> 3;
 
             uint8_t diag = static_cast<uint8_t>(static_cast<int>(file) - static_cast<int>(rank) + 7);
             uint8_t antiDiag = file + rank;
@@ -268,11 +267,33 @@ namespace engine::mask
 
             masks[squareIndex] = diag1 | diag2;
         }
-    }
 
-    inline constexpr conf::types::BetweenMasks initBetweenMasks()
+        return masks;
+    }
+    inline constexpr conf::types::BitboardTable bishopAttacksMasks = initBishopAttacksMasks();
+
+    /**
+     * @brief Builds queens attacks masks.
+     */
+    inline consteval conf::types::BitboardTable initQueenAttacksMasks() noexcept
     {
-        conf::types::BetweenMasks betweenMask{};
+        conf::types::BitboardTable masks{};
+
+        for (uint8_t squareIndex = 0; squareIndex < 64; squareIndex++)
+        {
+            masks[squareIndex] = rookAttacksMasks[squareIndex] | bishopAttacksMasks[squareIndex];
+        }
+
+        return masks;
+    }
+    inline constexpr conf::types::BitboardTable queenAttacksMasks = initQueenAttacksMasks();
+
+    /**
+     * @brief Builds 'between 2 squares' masks.
+     */
+    inline consteval conf::types::BetweenMasks initBetweenMasks() noexcept
+    {
+        conf::types::BetweenMasks masks{};
 
         for (uint8_t fromSquare = 0; fromSquare < 64; fromSquare++)
         {
@@ -289,82 +310,18 @@ namespace engine::mask
                 // Keeps only squares strictly between 'fromSquare' and 'toSquare'
                 board::Bitboard both = (board::Bitboard{1ULL << fromSquare} | board::Bitboard{1ULL << toSquare});
 
-                betweenMask[fromSquare][toSquare] = mask & ~both;
+                masks[fromSquare][toSquare] = mask & ~both;
             }
         }
 
-        return betweenMask;
+        return masks;
     }
-
-    /**
-     * @brief Diagonals masks.
-     */
-    inline constexpr conf::types::DiagonalMasks diagonalsMasks = initDiagonalsMasks();
-
-    /**
-     * @brief Anti-diagonals masks.
-     */
-    inline constexpr conf::types::DiagonalMasks antiDiagonalsMasks = initAntiDiagonalsMasks();
-
-    /**
-     * @brief White pawn attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable whitePawnAttacksMasks =
-        initPawnAttacksMasks<conf::enums::Colors::WHITE>();
-
-    /**
-     * @brief Back pawn attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable blackPawnAttacksMasks =
-        initPawnAttacksMasks<conf::enums::Colors::BLACK>();
-
-    /**
-     * @brief White pawn pushes masks.
-     */
-    inline constexpr conf::types::BitboardTable whitePawnPushesMasks = initPawnPusheMasks<conf::enums::Colors::WHITE>();
-
-    /**
-     * @brief Black pawn pushes masks.
-     */
-    inline constexpr conf::types::BitboardTable blackPawnPushesMasks = initPawnPusheMasks<conf::enums::Colors::BLACK>();
-
-    /**
-     * @brief Knight attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable knightAttacksMasks = initKnightAttacksMasks();
-
-    /**
-     * @brief King attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable kingAttacksMasks = initKingAttacksMasks();
-
-    /**
-     * @brief Rook attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable rookAttacksMasks = initRookAttacksMasks();
-
-    /**
-     * @brief Bishop attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable bishopAttacksMasks = initBishopAttacksMasks();
-
-    /**
-     * @brief Queen attacks masks.
-     */
-    inline constexpr conf::types::BitboardTable queenAttacksMasks = rooksAttacksMasks | bishopAttacksMasks;
-
-    /**
-     * @brief Between squares masks.
-     */
     inline constexpr conf::types::BetweenMasks betweenMasks = initBetweenMasks();
 
-    /**
-     * @brief Castling rights masks.
-     */
     inline constexpr conf::types::CastlingMasks castlingMasks = {
         board::Bitboard((1ULL << 5) | (1ULL << 6)), board::Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
         board::Bitboard((1ULL << 61) | (1ULL << 62)), board::Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
 
-} // namespace engine::mask
+} // namespace engine::board::mask
 
 #endif // MASKS_H_
