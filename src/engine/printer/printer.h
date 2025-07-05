@@ -77,7 +77,7 @@ namespace engine::printer
     /**
      * @brief Get a colored string representing a piece on a specific square.
      */
-    inline constexpr std::string_view getPiece(const board::Board &board, int squareIndex)
+    inline constexpr std::string_view getPiece(const board::Board& board, int squareIndex)
     {
         for (std::size_t color = 0; color < conf::enums::Colors::COLORS; color++)
         {
@@ -98,7 +98,7 @@ namespace engine::printer
     /**
      * @brief Prints the board.
      */
-    inline void printBoard(const board::Board &board) noexcept
+    inline void printBoard(const board::Board& board) noexcept
     {
         printHeader();
 

@@ -38,7 +38,7 @@ namespace engine::board
          *
          * @param [in] data_ : Value to initialize data member
          */
-        constexpr Bitboard(const uint64_t &data_ = 0ULL) noexcept : data(data_)
+        constexpr Bitboard(const uint64_t& data_ = 0ULL) noexcept : data(data_)
         {
         }
 
@@ -47,7 +47,7 @@ namespace engine::board
          *
          * @param [in] : Bitboard instance to copy
          */
-        constexpr Bitboard(const Bitboard &) noexcept = default;
+        constexpr Bitboard(const Bitboard&) noexcept = default;
 
         /**
          * @brief Default destructor.
@@ -57,12 +57,12 @@ namespace engine::board
         /*----------------------------------------*
          *         COMPARAISON OPERATORS          *
          *----------------------------------------*/
-        inline constexpr bool operator==(const Bitboard &bitboard_) const noexcept
+        inline constexpr bool operator==(const Bitboard& bitboard_) const noexcept
         {
             return this->data == bitboard_.data;
         };
 
-        inline constexpr bool operator!=(const Bitboard &bitboard_) const noexcept
+        inline constexpr bool operator!=(const Bitboard& bitboard_) const noexcept
         {
             return this->data != bitboard_.data;
         };
@@ -70,12 +70,12 @@ namespace engine::board
         /*----------------------------------------*
          *           BITWISE OPERATORS            *
          *----------------------------------------*/
-        inline constexpr Bitboard operator&(const Bitboard &bitboard_) const noexcept
+        inline constexpr Bitboard operator&(const Bitboard& bitboard_) const noexcept
         {
             return Bitboard(this->data & bitboard_.data);
         };
 
-        inline constexpr Bitboard operator|(const Bitboard &bitboard_) const noexcept
+        inline constexpr Bitboard operator|(const Bitboard& bitboard_) const noexcept
         {
             return Bitboard(this->data | bitboard_.data);
         };
@@ -85,7 +85,7 @@ namespace engine::board
             return Bitboard(~this->data);
         };
 
-        inline constexpr Bitboard operator^(const Bitboard &bitboard_) const noexcept
+        inline constexpr Bitboard operator^(const Bitboard& bitboard_) const noexcept
         {
             return Bitboard(this->data ^ bitboard_.data);
         };
@@ -103,33 +103,33 @@ namespace engine::board
         /*----------------------------------------*
          *         ASSIGNMENT OPERATORS           *
          *----------------------------------------*/
-        inline constexpr Bitboard &operator=(const Bitboard &) noexcept = default;
+        inline constexpr Bitboard& operator=(const Bitboard&) noexcept = default;
 
-        inline constexpr Bitboard &operator&=(const Bitboard &bitboard_) noexcept
+        inline constexpr Bitboard& operator&=(const Bitboard& bitboard_) noexcept
         {
             this->data &= bitboard_.data;
             return *this;
         };
 
-        inline constexpr Bitboard &operator|=(const Bitboard &bitboard_) noexcept
+        inline constexpr Bitboard& operator|=(const Bitboard& bitboard_) noexcept
         {
             this->data |= bitboard_.data;
             return *this;
         };
 
-        inline constexpr Bitboard &operator^=(const Bitboard &bitboard_) noexcept
+        inline constexpr Bitboard& operator^=(const Bitboard& bitboard_) noexcept
         {
             this->data ^= bitboard_.data;
             return *this;
         };
 
-        inline constexpr Bitboard &operator<<=(const int shift) noexcept
+        inline constexpr Bitboard& operator<<=(const int shift) noexcept
         {
             this->data <<= shift;
             return *this;
         };
 
-        inline constexpr Bitboard &operator>>=(const int shift) noexcept
+        inline constexpr Bitboard& operator>>=(const int shift) noexcept
         {
             this->data >>= shift;
             return *this;

@@ -51,7 +51,7 @@ namespace engine::board
          * @param [in] fileIndex : file's index
          * @return uint8_t : the square's index
          */
-        static inline consteval uint8_t getSquareIndex(const uint8_t rankIndex, const uint8_t fileIndex) noexcept
+        static inline constexpr uint8_t getSquareIndex(const uint8_t rankIndex, const uint8_t fileIndex) noexcept
         {
             return (8 * rankIndex) + fileIndex;
         };
@@ -62,7 +62,7 @@ namespace engine::board
          * @param [in] squareIndex : square's index
          * @return uint8_t : the rank's index
          */
-        static inline consteval uint8_t getRankIndex(const uint8_t squareIndex) noexcept
+        static inline constexpr uint8_t getRankIndex(const uint8_t squareIndex) noexcept
         {
             return squareIndex >> 3;
         };
@@ -73,7 +73,7 @@ namespace engine::board
          * @param [in] squareIndex : square's index
          * @return uint8_t : the file's index
          */
-        static inline consteval uint8_t getFileIndex(const uint8_t squareIndex) noexcept
+        static inline constexpr uint8_t getFileIndex(const uint8_t squareIndex) noexcept
         {
             return squareIndex & 7;
         };

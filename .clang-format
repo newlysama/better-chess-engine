@@ -19,3 +19,6 @@ IncludeCategories:
 
 # Puts template declaration above functions, not on the same line
 BreakTemplateDeclarations: Yes
+
+# Pointers and references alignment style
+PointerAlignment: Left
