@@ -72,6 +72,20 @@ elif mode == 'benchmark'
     '-pthread',
     language: 'cpp'
   )
+
+elif mode == 'generate_magics'
+  add_project_arguments(
+    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
+    '-DBUILD_GENERATE_MAGICS',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    '-Doptimization=3',
+    language: 'cpp'
+  )
+
+  add_project_link_arguments(
+    '-fopenmp',
+    language: 'cpp'
+  )
 endif
 
 

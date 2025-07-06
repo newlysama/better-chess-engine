@@ -2,7 +2,7 @@
 option(
     'mode',
     type        : 'combo',
-    choices     : ['debug', 'profile', 'release', 'test', 'benchmark'],
+    choices     : ['debug', 'profile', 'release', 'test', 'benchmark', 'generate_magics'],
     value       : 'debug',
-    description : 'Build mode: debug, profile, release, test or benchmark'
+    description : 'Build mode: debug, profile, release, test, benchmark or generate_magics'
 )
