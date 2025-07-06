@@ -6,6 +6,30 @@ IndentWidth:           4
 NamespaceIndentation:  All
 IndentPPDirectives:    AfterHash
 
+# Alignment
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments:
+  Enabled: false
+AlignConsecutiveBitFields:
+  Enabled: true
+AlignConsecutiveDeclarations:
+  Enabled: false
+AlignConsecutiveMacros:
+  Enabled: true
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+AlignConsecutiveTableGenBreakingDAGArgColons:
+  Enabled: true
+AlignConsecutiveTableGenCondOperatorColons:
+  Enabled: true
+AlignConsecutiveTableGenDefinitionColons:
+  Enabled: true
+AlignEscapedNewlines: LeftWithLastLine
+AlignOperands: AlignAfterOperator
+AlignTrailingComments: Always
+
+
+
 # Include sorting
 SortIncludes:       true
 IncludeBlocks:      Regroup
