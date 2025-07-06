@@ -37,7 +37,7 @@ namespace engine::game
         /**
          * @brief Constructor from FEN notation.
          */
-        Game(const std::string fenNotation) noexcept;
+        Game(const std::string_view fenNotation) noexcept;
 
         /**
          * @brief Default destructor.
