@@ -89,7 +89,9 @@ namespace conf::enums
         NORTH_WEST = 5,
         SOUTH_EAST = 6,
         SOUTH_WEST = 7,
-        DIRECTIONS = 8
+        NORTH_NORTH = 8,
+        SOUTH_SOUTH = 9,
+        DIRECTIONS = 10
     };
 
     /**
