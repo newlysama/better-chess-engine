@@ -33,7 +33,8 @@ namespace engine::printer
           "\033[31m󰡚\033[0m", "\033[31m󰡗\033[0m"},
          {// white:   P N B R Q K
           "\033[32m\033[0m", "\033[32m\033[0m", "\033[32m󰡜\033[0m", "\033[32m󰡛\033[0m",
-          "\033[32m󰡚\033[0m", "\033[32m󰡗\033[0m"}}};
+          "\033[32m󰡚\033[0m", "\033[32m󰡗\033[0m"}}
+    };
 
     // Tabs to center a bit the board and the header on the terminal
     const std::string HEADER_TAB = "                        ";
