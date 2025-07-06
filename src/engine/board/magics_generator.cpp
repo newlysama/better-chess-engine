@@ -59,21 +59,21 @@ namespace engine::board::magics_generator
         Bitboard byAntiDiag =
             mask::ANTI_DIAGONALS_MASKS[antiDiag] & mask::NOT_FILE_EDGES_MASK & mask::NOT_RANK_EDGES_MASK;
 
-        // on retire la case sq
+        // remove squareIndex
         return (byDiag | byAntiDiag) ^ Bitboard(1ULL << squareIndex);
     }
 
-    Bitboard slidingAttackRook(int squareIndex, Bitboard occ) noexcept
+    Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occMasked = occ & getRookMaskAt(squareIndex);
+        Bitboard occupancyMasked = occupancy & getRookMaskAt(squareIndex);
 
         // North
         Bitboard ray = Board::shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::NORTH>(ray);
@@ -84,7 +84,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::SOUTH>(ray);
@@ -95,7 +95,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::EAST>(ray);
@@ -106,7 +106,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::WEST>(ray);
@@ -115,17 +115,17 @@ namespace engine::board::magics_generator
         return attacks;
     }
 
-    Bitboard slidingAttackBishop(int squareIndex, Bitboard occ) noexcept
+    Bitboard slidingAttackBishop(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occMasked = occ & getBishopMaskAt(squareIndex);
+        Bitboard occupancyMasked = occupancy & getBishopMaskAt(squareIndex);
 
         // NE
         Bitboard ray = Board::shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::NORTH_EAST>(ray);
@@ -136,7 +136,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::NORTH_WEST>(ray);
@@ -147,7 +147,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::SOUTH_EAST>(ray);
@@ -158,7 +158,7 @@ namespace engine::board::magics_generator
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
             ray = Board::shiftDir<Directions::SOUTH_WEST>(ray);
@@ -169,12 +169,12 @@ namespace engine::board::magics_generator
 
     uint8_t findShiftRook(int squareIndex) noexcept
     {
-        return static_cast<uint8_t>(64 - getRookMaskAt(squareIndex).popCount());
+        return 64 - getRookMaskAt(squareIndex).popCount();
     }
 
     uint8_t findShiftBishop(int squareIndex) noexcept
     {
-        return static_cast<uint8_t>(64 - getBishopMaskAt(squareIndex).popCount());
+        return 64 - getBishopMaskAt(squareIndex).popCount();
     }
 
     Bitboard findMagicRook(int squareIndex) noexcept
@@ -186,9 +186,9 @@ namespace engine::board::magics_generator
         const uint64_t subsetCount = 1ULL << bits;
 
         std::vector<uint64_t> used(subsetCount, 0ULL);
-        std::vector<uint64_t> occupancies(subsetCount);
+        std::vector<uint64_t> occupancyupancies(subsetCount);
 
-        // Precompute all occupancy subsets
+        // Precompute all occupancyupancy subsets
         std::vector<int> bitIndices;
         for (int i = 0; i < 64; i++)
         {
@@ -200,15 +200,15 @@ namespace engine::board::magics_generator
 
         for (uint64_t idx = 0; idx < subsetCount; idx++)
         {
-            uint64_t occ = 0ULL;
+            uint64_t occupancy = 0ULL;
             for (uint8_t j = 0; j < bits; j++)
             {
                 if (idx & (1ULL << j))
                 {
-                    occ |= (1ULL << bitIndices[j]);
+                    occupancy |= (1ULL << bitIndices[j]);
                 }
             }
-            occupancies[idx] = occ;
+            occupancyupancies[idx] = occupancy;
         }
 
         std::mt19937_64 rng(std::random_device{}());
@@ -220,9 +220,9 @@ namespace engine::board::magics_generator
 
             for (uint64_t idx = 0; idx < subsetCount; idx++)
             {
-                uint64_t occ = occupancies[idx];
-                uint64_t key = (occ * magic) >> shift;
-                uint64_t attack = slidingAttackRook(squareIndex, Bitboard(occ)).getData();
+                uint64_t occupancy = occupancyupancies[idx];
+                uint64_t key = (occupancy * magic) >> shift;
+                uint64_t attack = slidingAttackRook(squareIndex, Bitboard(occupancy)).getData();
 
                 if (used[key] == 0ULL)
                 {
@@ -251,7 +251,7 @@ namespace engine::board::magics_generator
         const uint64_t subsetCount = 1ULL << bits;
 
         std::vector<uint64_t> used(subsetCount, 0ULL);
-        std::vector<uint64_t> occupancies(subsetCount);
+        std::vector<uint64_t> occupancyupancies(subsetCount);
         std::vector<int> bitIndices;
 
         for (int i = 0; i < 64; i++)
@@ -264,16 +264,16 @@ namespace engine::board::magics_generator
 
         for (uint64_t idx = 0; idx < subsetCount; idx++)
         {
-            uint64_t occ = 0ULL;
+            uint64_t occupancy = 0ULL;
             for (uint8_t j = 0; j < bits; j++)
             {
                 if (idx & (1ULL << j))
                 {
-                    occ |= (1ULL << bitIndices[j]);
+                    occupancy |= (1ULL << bitIndices[j]);
                 }
             }
 
-            occupancies[idx] = occ;
+            occupancyupancies[idx] = occupancy;
         }
 
         std::mt19937_64 rng(std::random_device{}());
@@ -285,9 +285,9 @@ namespace engine::board::magics_generator
 
             for (uint64_t idx = 0; idx < subsetCount; idx++)
             {
-                uint64_t occ = occupancies[idx];
-                uint64_t key = (occ * magic) >> shift;
-                uint64_t attack = slidingAttackBishop(squareIndex, Bitboard(occ)).getData();
+                uint64_t occupancy = occupancyupancies[idx];
+                uint64_t key = (occupancy * magic) >> shift;
+                uint64_t attack = slidingAttackBishop(squareIndex, Bitboard(occupancy)).getData();
 
                 if (used[key] == 0ULL)
                 {
