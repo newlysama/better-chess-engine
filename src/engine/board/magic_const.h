@@ -13,6 +13,9 @@
 #include "conf/types.h"
 #include "engine/board/mask.h"
 
+/**
+ * @namespace engine::board::magic_const
+ */
 namespace engine::board::magic_const
 {
     inline constexpr conf::types::BitboardTable rookMagics = {

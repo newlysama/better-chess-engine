@@ -18,6 +18,9 @@
 #include "engine/board/board.h"
 #include "engine/board/mask.h"
 
+/**
+ * @namespace engine::board::magics_generator
+ */
 namespace engine::board::magics_generator
 {
     // Generation routines (for offline use)

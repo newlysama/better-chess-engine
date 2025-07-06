@@ -18,6 +18,9 @@
 
 #include "logging/logging.h"
 
+/**
+ * @namespace engine::board::magics_generator
+ */
 namespace engine::board::magics_generator
 {
     using namespace engine::board;
