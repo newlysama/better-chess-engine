@@ -13,6 +13,8 @@
 #include <bit>
 #include <cstdint>
 
+#include "conf/enums.h"
+
 /**
  * @namespace engine::board
  */
@@ -192,6 +194,9 @@ namespace engine::board
       private:
         uint64_t data; // Actual bitboard
     };
+
+    inline constexpr Bitboard zeroBB = Bitboard{0};
+    inline constexpr Bitboard oneBB = Bitboard{1};
 } // namespace engine::board
 
 #endif // BITBOARD_H_
