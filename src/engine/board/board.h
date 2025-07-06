@@ -49,9 +49,10 @@ namespace engine::board
          *
          * @param [in] rankInex  : rank's index
          * @param [in] fileIndex : file's index
-         * @return uint8_t : the square's index
+         * @return std::size_t : the square's index
          */
-        static inline constexpr uint8_t getSquareIndex(const uint8_t rankIndex, const uint8_t fileIndex) noexcept
+        static inline constexpr std::size_t getSquareIndex(const std::size_t rankIndex,
+                                                           const std::size_t fileIndex) noexcept
         {
             return (8 * rankIndex) + fileIndex;
         };
@@ -60,9 +61,9 @@ namespace engine::board
          * @brief Get a rank's index, bases on a square's index
          *
          * @param [in] squareIndex : square's index
-         * @return uint8_t : the rank's index
+         * @return std::size_t : the rank's index
          */
-        static inline constexpr uint8_t getRankIndex(const uint8_t squareIndex) noexcept
+        static inline constexpr std::size_t getRankIndex(const std::size_t squareIndex) noexcept
         {
             return squareIndex >> 3;
         };
@@ -71,27 +72,34 @@ namespace engine::board
          * @brief Get a files's index, bases on a square's index.
          *
          * @param [in] squareIndex : square's index
-         * @return uint8_t : the file's index
+         * @return std::size_t : the file's index
          */
-        static inline constexpr uint8_t getFileIndex(const uint8_t squareIndex) noexcept
+        static inline constexpr std::size_t getFileIndex(const std::size_t squareIndex) noexcept
         {
             return squareIndex & 7;
         };
 
-        /**
-         * @brief Computes rook's sliding table.
-         */
-        inline void updateRookSlidingTable() noexcept;
+        template <conf::enums::Directions Dir>
+        static inline constexpr Bitboard shiftDir(Bitboard bb) noexcept
+        {
+            using namespace conf::enums;
+            using namespace board::mask;
 
-        /**
-         * @brief Computes bishop's sliding table.
-         */
-        inline void updateBishopSlidingTable() noexcept;
+            return Dir == NORTH       ? Bitboard(bb << 8)
+                 : Dir == SOUTH       ? Bitboard(bb >> 8)
+                 : Dir == EAST        ? Bitboard((bb & ~FILE_H_MASK) << 1)
+                 : Dir == WEST        ? Bitboard((bb & ~FILE_A_MASK) >> 1)
+                 : Dir == NORTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) << 9)
+                 : Dir == NORTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) << 7)
+                 : Dir == SOUTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) >> 7)
+                 : Dir == SOUTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) >> 9)
+                 : Dir == NORTH_NORTH ? Bitboard(bb << 16)
+                 : Dir == SOUTH_SOUTH ? Bitboard(bb >> 16)
+                                      : Bitboard(0ULL);
+        }
 
-        /**
-         * @brief Computes queen's sliding table.
-         */
-        inline void updateQueenlidingTable() noexcept;
+        template <conf::enums::Pieces Piece>
+        inline void updateSlidingAttacksTable() noexcept;
 
         // Bitboards for each piece from each team
         conf::types::PiecesBitboards allPieces;
@@ -100,6 +108,11 @@ namespace engine::board
         board::Bitboard generalOccupancy;
         board::Bitboard whiteOccupancy;
         board::Bitboard blackOccupancy;
+
+        // Sliding attacks tables
+        conf::types::SlidingAttackTable rookAttacksTables;
+        conf::types::SlidingAttackTable bishopAttacksTables;
+        conf::types::SlidingAttackTable queenAttacksTables;
     };
 
 } // namespace engine::board
