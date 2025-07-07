@@ -308,7 +308,7 @@ namespace engine::board::magics_generator
         {
             std::cout << "Bitboard{0x" << std::hex << rMagicVals[i] << "ULL}"
                       << (i < 63       ? ", "
-                          : i % 4 == 0 ? "\n"
+                          : i % 3 == 0 ? "\n"
                                        : "");
         }
         std::cout << "};\n\n";
@@ -318,7 +318,7 @@ namespace engine::board::magics_generator
         {
             std::cout << "Bitboard{0x" << std::hex << bMagicVals[i] << "ULL}"
                       << (i < 63       ? ", "
-                          : i % 4 == 0 ? "\n"
+                          : i % 3 == 0 ? "\n"
                                        : "");
         }
         std::cout << "};\n\n";
@@ -326,16 +326,16 @@ namespace engine::board::magics_generator
         std::cout << "inline constexpr std::array<uint8_t,64> rookShifts = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << std::dec << static_cast<int>(rShiftVals[i]) << (i < 63 ? ", " : i % 4 == 0 ? "\n" : "");
+            std::cout << std::dec << static_cast<int>(rShiftVals[i]) << (i < 63 ? ", " : i % 3 == 0 ? "\n" : "");
         }
         std::cout << "};\n\n";
 
         std::cout << "inline constexpr std::array<uint8_t,64> bishopShifts = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << std::dec << static_cast<int>(bShiftVals[i]) << (i < 63 ? ", " : i % 4 == 0 ? "\n" : "");
+            std::cout << std::dec << static_cast<int>(bShiftVals[i]) << (i < 63 ? ", " : i % 3 == 0 ? "\n" : "");
         }
-        std::cout << "};\n";
+        std::cout << "};\n\n";
     }
 
 } // namespace engine::board::magics_generator
