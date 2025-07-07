@@ -12,6 +12,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <omp.h>
 #include <random>
 #include <unordered_map>
 #include <vector>
@@ -27,46 +28,10 @@ namespace engine::board::magics_generator
     using namespace engine::board::magics_generator;
     using namespace conf::enums;
 
-    Bitboard getRookMaskAt(int squareIndex) noexcept
-    {
-        // Get file / rank indexes
-        const int file = Board::getFileIndex(squareIndex);
-        const int rank = Board::getRankIndex(squareIndex);
-
-        // Exclude ranks 1 and 8
-        Bitboard byFile = mask::FILES_MASKS[file] & mask::NOT_RANK_EDGES_MASK;
-
-        // Exclude files A and H
-        Bitboard byRank = mask::RANKS_MASKS[rank] & mask::NOT_FILE_EDGES_MASK;
-
-        return (byFile | byRank) & ~Bitboard(1ULL << squareIndex);
-    }
-
-    Bitboard getBishopMaskAt(int squareIndex) noexcept
-    {
-        // Get file / rank indexes
-        const int file = Board::getFileIndex(squareIndex);
-        const int rank = Board::getRankIndex(squareIndex);
-
-        // diag = file - rank + 7  → index [0..14]
-        const int diag = file - rank + 7;
-
-        // antidiag = file + rank → index [0..14]
-        const int antiDiag = file + rank;
-
-        // Squares on the same diags, excluding edges
-        Bitboard byDiag = mask::DIAGONALS_MASKS[diag] & mask::NOT_FILE_EDGES_MASK & mask::NOT_RANK_EDGES_MASK;
-        Bitboard byAntiDiag =
-            mask::ANTI_DIAGONALS_MASKS[antiDiag] & mask::NOT_FILE_EDGES_MASK & mask::NOT_RANK_EDGES_MASK;
-
-        // remove squareIndex
-        return (byDiag | byAntiDiag) ^ Bitboard(1ULL << squareIndex);
-    }
-
     Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & getRookMaskAt(squareIndex);
+        Bitboard occupancyMasked = occupancy & mask::ROOK_RELEVANT_MASKS[squareIndex];
 
         // North
         Bitboard ray = Board::shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
@@ -118,7 +83,7 @@ namespace engine::board::magics_generator
     Bitboard slidingAttackBishop(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & getBishopMaskAt(squareIndex);
+        Bitboard occupancyMasked = occupancy & mask::BISHOP_RELEVANT_MASKS[squareIndex];
 
         // NE
         Bitboard ray = Board::shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
@@ -169,17 +134,17 @@ namespace engine::board::magics_generator
 
     uint8_t findShiftRook(int squareIndex) noexcept
     {
-        return 64 - getRookMaskAt(squareIndex).popCount();
+        return 64 - mask::ROOK_RELEVANT_MASKS[squareIndex].popCount();
     }
 
     uint8_t findShiftBishop(int squareIndex) noexcept
     {
-        return 64 - getBishopMaskAt(squareIndex).popCount();
+        return 64 - mask::BISHOP_RELEVANT_MASKS[squareIndex].popCount();
     }
 
     Bitboard findMagicRook(int squareIndex) noexcept
     {
-        const Bitboard mask = getRookMaskAt(squareIndex);
+        const Bitboard mask = mask::ROOK_RELEVANT_MASKS[squareIndex];
         const uint8_t shift = findShiftRook(squareIndex);
 
         const uint8_t bits = mask.popCount();
@@ -244,7 +209,7 @@ namespace engine::board::magics_generator
 
     Bitboard findMagicBishop(int squareIndex) noexcept
     {
-        const Bitboard mask = getBishopMaskAt(squareIndex);
+        const Bitboard mask = mask::BISHOP_RELEVANT_MASKS[squareIndex];
         const uint8_t shift = findShiftBishop(squareIndex);
 
         const uint8_t bits = mask.popCount();
@@ -312,6 +277,17 @@ namespace engine::board::magics_generator
         std::array<uint64_t, 64> bMagicVals;
         std::array<uint8_t, 64> bShiftVals;
 
+        // Get the number of threads on host machine
+        int nproc = omp_get_num_procs();
+
+        // Turn off automatic thread adjustment
+        // Optional in practive, but I mean we never know
+        omp_set_dynamic(0);
+
+        // Specify the exact number of thread we want to use
+        omp_set_num_threads(nproc);
+
+#pragma omp parallel for
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
             LOG_INFO("Computing magics for square {}", squareIndex);
@@ -330,28 +306,34 @@ namespace engine::board::magics_generator
         std::cout << "inline constexpr conf::types::BitboardTable rookMagics = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << "Bitboard{0x" << std::hex << rMagicVals[i] << "ULL}" << (i < 63 ? ", " : "");
+            std::cout << "Bitboard{0x" << std::hex << rMagicVals[i] << "ULL}"
+                      << (i < 63       ? ", "
+                          : i % 4 == 0 ? "\n"
+                                       : "");
         }
-        std::cout << "};\n";
+        std::cout << "};\n\n";
 
         std::cout << "inline constexpr conf::types::BitboardTable bishopMagics = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << "Bitboard{0x" << std::hex << bMagicVals[i] << "ULL}" << (i < 63 ? ", " : "");
+            std::cout << "Bitboard{0x" << std::hex << bMagicVals[i] << "ULL}"
+                      << (i < 63       ? ", "
+                          : i % 4 == 0 ? "\n"
+                                       : "");
         }
-        std::cout << "};\n";
+        std::cout << "};\n\n";
 
         std::cout << "inline constexpr std::array<uint8_t,64> rookShifts = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << std::dec << static_cast<int>(rShiftVals[i]) << (i < 63 ? ", " : "");
+            std::cout << std::dec << static_cast<int>(rShiftVals[i]) << (i < 63 ? ", " : i % 4 == 0 ? "\n" : "");
         }
-        std::cout << "};\n";
+        std::cout << "};\n\n";
 
         std::cout << "inline constexpr std::array<uint8_t,64> bishopShifts = {";
         for (int i = 0; i < 64; i++)
         {
-            std::cout << std::dec << static_cast<int>(bShiftVals[i]) << (i < 63 ? ", " : "");
+            std::cout << std::dec << static_cast<int>(bShiftVals[i]) << (i < 63 ? ", " : i % 4 == 0 ? "\n" : "");
         }
         std::cout << "};\n";
     }
