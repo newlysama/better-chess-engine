@@ -151,7 +151,7 @@ namespace engine::board::magics_generator
         const uint64_t subsetCount = 1ULL << bits;
 
         std::vector<uint64_t> used(subsetCount, 0ULL);
-        std::vector<uint64_t> occupancyupancies(subsetCount);
+        std::vector<uint64_t> occupancies(subsetCount);
 
         // Precompute all occupancyupancy subsets
         std::vector<int> bitIndices;
@@ -173,7 +173,7 @@ namespace engine::board::magics_generator
                     occupancy |= (1ULL << bitIndices[j]);
                 }
             }
-            occupancyupancies[idx] = occupancy;
+            occupancies[idx] = occupancy;
         }
 
         std::mt19937_64 rng(std::random_device{}());
@@ -185,7 +185,7 @@ namespace engine::board::magics_generator
 
             for (uint64_t idx = 0; idx < subsetCount; idx++)
             {
-                uint64_t occupancy = occupancyupancies[idx];
+                uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
                 uint64_t attack = slidingAttackRook(squareIndex, Bitboard(occupancy)).getData();
 
@@ -216,7 +216,7 @@ namespace engine::board::magics_generator
         const uint64_t subsetCount = 1ULL << bits;
 
         std::vector<uint64_t> used(subsetCount, 0ULL);
-        std::vector<uint64_t> occupancyupancies(subsetCount);
+        std::vector<uint64_t> occupancies(subsetCount);
         std::vector<int> bitIndices;
 
         for (int i = 0; i < 64; i++)
@@ -238,7 +238,7 @@ namespace engine::board::magics_generator
                 }
             }
 
-            occupancyupancies[idx] = occupancy;
+            occupancies[idx] = occupancy;
         }
 
         std::mt19937_64 rng(std::random_device{}());
@@ -250,7 +250,7 @@ namespace engine::board::magics_generator
 
             for (uint64_t idx = 0; idx < subsetCount; idx++)
             {
-                uint64_t occupancy = occupancyupancies[idx];
+                uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
                 uint64_t attack = slidingAttackBishop(squareIndex, Bitboard(occupancy)).getData();
 
