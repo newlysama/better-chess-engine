@@ -78,6 +78,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds diagonals masks.
+     * @return x15 array of attacks masks
      */
     inline consteval conf::types::DiagonalMasks initDiagonalsMasks() noexcept
     {
@@ -100,6 +101,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds anti-diagonals masks.
+     * @return x15 array of attacks masks
      */
     inline consteval conf::types::DiagonalMasks initAntiDiagonalsMasks() noexcept
     {
@@ -122,6 +124,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds pawns attacks masks, depending on the color.
+     * @return x64 array of attacks masks
      */
     template <conf::enums::Colors Color>
     inline consteval conf::types::BitboardTable initPawnAttacksMasks() noexcept
@@ -153,6 +156,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds pawns pushes masks, depending on the color.
+     * @return x64 array of attacks masks
      */
     template <conf::enums::Colors Color>
     inline consteval conf::types::BitboardTable initPawnPushesMasks() noexcept
@@ -184,6 +188,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds knights attacks masks.
+     * @return x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initKnightAttacksMasks() noexcept
     {
@@ -209,6 +214,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds kings attacks masks.
+     * @return x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initKingAttacksMasks() noexcept
     {
@@ -234,6 +240,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds rooks attacks masks.
+     * @return x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initRookAttacksMasks() noexcept
     {
@@ -258,6 +265,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds bishop attacks masks.
+     * @return x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initBishopAttacksMasks() noexcept
     {
@@ -284,6 +292,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds queens attacks masks.
+     * @return x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initQueenAttacksMasks() noexcept
     {
@@ -299,7 +308,80 @@ namespace engine::board::mask
     inline constexpr conf::types::BitboardTable QUEENS_ATTACKS_MASKS = initQueenAttacksMasks();
 
     /**
+     * @brief Get the relevant occupancy masks for a rook.
+     * @details
+     * Excludes edges squares on ranks/files so that we only keep
+     * those who can block a ray from each squareIndex
+     *
+     * @return x64 array of relevant occupancy masks
+     */
+    inline consteval conf::types::BitboardTable initRookRelevantMasks() noexcept
+    {
+        conf::types::BitboardTable masks{};
+        int file;
+        int rank;
+
+        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
+        {
+            // Get file / rank indexes
+            file = squareIndex & 7;
+            rank = squareIndex >> 3;
+
+            // Exclude ranks 1 and 8
+            Bitboard byFile = FILES_MASKS[file] & NOT_RANK_EDGES_MASK;
+
+            // Exclude files A and H
+            Bitboard byRank = RANKS_MASKS[rank] & NOT_FILE_EDGES_MASK;
+
+            // remove squareIndex
+            masks[squareIndex] = (byFile | byRank) & ~Bitboard(1ULL << squareIndex);
+        }
+
+        return masks;
+    }
+    inline constexpr conf::types::BitboardTable ROOK_RELEVANT_MASKS = initRookRelevantMasks();
+
+    /**
+     * @brief Get the relevant occupancy masks for a bishop.
+     * @details Excludes edges squares on diags/anti-diags that goes through each sqaureIndex
+     *
+     * @return x64 array of relevant occupancy masks
+     */
+    inline consteval conf::types::BitboardTable initBishopRelevantMasks() noexcept
+    {
+        conf::types::BitboardTable masks{};
+        int file;
+        int rank;
+        int diag;
+        int antiDiag;
+
+        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
+        {
+            // Get file / rank indexes
+            file = squareIndex & 7;
+            rank = squareIndex >> 3;
+
+            // diag = file - rank + 7  → index [0..14]
+            diag = file - rank + 7;
+
+            // antidiag = file + rank → index [0..14]
+            antiDiag = file + rank;
+
+            // Squares on the same diags, excluding edges
+            Bitboard byDiag = DIAGONALS_MASKS[diag] & NOT_FILE_EDGES_MASK & NOT_RANK_EDGES_MASK;
+            Bitboard byAntiDiag = ANTI_DIAGONALS_MASKS[antiDiag] & NOT_FILE_EDGES_MASK & NOT_RANK_EDGES_MASK;
+
+            // remove squareIndex
+            masks[squareIndex] = (byDiag | byAntiDiag) ^ Bitboard(1ULL << squareIndex);
+        }
+
+        return masks;
+    }
+    inline constexpr conf::types::BitboardTable BISHOP_RELEVANT_MASKS = initBishopRelevantMasks();
+
+    /**
      * @brief Builds 'between 2 squares' masks.
+     * @return 2x64 array of attacks masks
      */
     inline consteval conf::types::BetweenMasks initBetweenMasks() noexcept
     {
