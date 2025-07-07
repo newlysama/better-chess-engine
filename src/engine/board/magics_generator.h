@@ -24,26 +24,6 @@
 namespace engine::board::magics_generator
 {
     /**
-     * @brief Get the relevant occupancy mask for a rook.
-     * @details
-     * Excludes edges squares on ranks/files so that we only keep
-     * those who can block a ray from squareIndex
-     *
-     * @param [in] squareIndex : the square to look at
-     * @return Bitboard : the required mask
-     */
-    inline Bitboard getRookMaskAt(int squareIndex) noexcept;
-
-    /**
-     * @brief Get the relevant occupancy mask for a bishop.
-     * @details Excludes edges squares on diags/anti-diags that goes through sqaureIndex
-     *
-     * @param [in] squareIndex : the square to look at
-     * @return Bitboard : the required mask
-     */
-    inline Bitboard getBishopMaskAt(int squareIndex) noexcept;
-
-    /**
      * @brief Computes bitboards of attackable squares by a
      *        rook from squareIndex, based on a given occupancy.
      *
