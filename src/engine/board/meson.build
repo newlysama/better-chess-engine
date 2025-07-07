@@ -21,12 +21,12 @@ board_lib = library(
   'board',
   board_src,
   include_directories: incs,
-  dependencies: [ logging_dep ]
+  dependencies: [ logging_dep, openmp_dep ]
 )
 
 #- Exportable Module -#
 board_dep = declare_dependency(
   link_with: board_lib,
   include_directories: incs,
-  dependencies: [ logging_dep ]
+  dependencies: [ logging_dep, openmp_dep ]
 )
