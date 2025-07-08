@@ -35,7 +35,7 @@ namespace engine::board
                          Bitboard{0x0800'0000'0000'0000ULL}, // queen
                          Bitboard{0x1000'0000'0000'0000ULL}  // king
                      }}},
-          generalOccupancy{}, whiteOccupancy{}, blackOccupancy{}, rookAttacksTables{}, bishopAttacksTables{}, queenAttacksTables{}
+          generalOccupancy{}, whiteOccupancy{}, blackOccupancy{}
     {
         // Builds occupancy bitboards
         for (std::size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
@@ -45,19 +45,6 @@ namespace engine::board
         }
 
         generalOccupancy = whiteOccupancy | blackOccupancy;
-
-        // Reserve memory for sliding attacks tables
-        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
-        {
-            std::size_t rooksBits = mask::ROOK_ATTACKS_MASKS[squareIndex].popCount();
-            rookAttacksTables[squareIndex].reserve(1ULL << rooksBits);
-
-            std::size_t bishopsBits = mask::BISHOP_ATTACKS_MASKS[squareIndex].popCount();
-            bishopAttacksTables[squareIndex].reserve(1ULL << bishopsBits);
-
-            std::size_t queensBits = mask::QUEENS_ATTACKS_MASKS[squareIndex].popCount();
-            queenAttacksTables[squareIndex].reserve(1ULL << queensBits);
-        }
     }
 
 } // namespace engine::board
