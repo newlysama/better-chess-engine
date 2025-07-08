@@ -98,9 +98,6 @@ namespace engine::board
                                       : Bitboard(0ULL);
         }
 
-        template <conf::enums::Pieces Piece>
-        inline void updateSlidingAttacksTable() noexcept;
-
         // Bitboards for each piece from each team
         conf::types::PiecesBitboards allPieces;
 
@@ -108,11 +105,6 @@ namespace engine::board
         board::Bitboard generalOccupancy;
         board::Bitboard whiteOccupancy;
         board::Bitboard blackOccupancy;
-
-        // Sliding attacks tables
-        conf::types::SlidingAttackTable rookAttacksTables;
-        conf::types::SlidingAttackTable bishopAttacksTables;
-        conf::types::SlidingAttackTable queenAttacksTables;
     };
 
 } // namespace engine::board
