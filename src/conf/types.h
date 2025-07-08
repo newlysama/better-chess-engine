@@ -95,10 +95,16 @@ namespace conf::types
     typedef std::array<std::array<engine::board::Bitboard, 64>, 64> BetweenMasks;
 
     /**
-     * @typedef SlidingAttackTable
-     * @brief   Attack Tables for sliding pieces.
+     * @typedef rookAttackTable
+     * @brief   Attack Tables for sliding rook.
      */
-    typedef std::array<std::vector<engine::board::Bitboard>, 64> SlidingAttackTable;
+    typedef std::array<std::array<engine::board::Bitboard, 4096>, 64> rookAttacksTable;
+
+    /**
+     * @typedef bishopAttackTable
+     * @brief   Attack Tables for sliding bishop.
+     */
+    typedef std::array<std::array<engine::board::Bitboard, 512>, 64> bishopAttacksTable;
 
 } // namespace conf::types
 
