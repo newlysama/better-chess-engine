@@ -178,6 +178,7 @@ namespace engine::board
          */
         inline constexpr uint8_t lsbIndex() const noexcept
         {
+            if (this->data == 0) return 64; // Guard against undefined behavior with countr_zero(0)
             return std::countr_zero(this->data);
         };
 

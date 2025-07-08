@@ -380,7 +380,7 @@ namespace engine::board::mask
      *
      * @return 64x4096 array of rook attacks
      */
-    inline consteval conf::types::rookAttacksTable initRookAttacksTable() noexcept
+    inline constexpr conf::types::rookAttacksTable initRookAttacksTable() noexcept
     {
         conf::types::rookAttacksTable table{};
 
@@ -416,7 +416,7 @@ namespace engine::board::mask
 
                 // North
                 board::Bitboard ray = board::Bitboard(1ULL << squareIndex) << 8;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -426,7 +426,7 @@ namespace engine::board::mask
 
                 // South
                 ray = board::Bitboard(1ULL << squareIndex) >> 8;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -436,7 +436,7 @@ namespace engine::board::mask
 
                 // East
                 ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 1;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -446,7 +446,7 @@ namespace engine::board::mask
 
                 // West
                 ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 1;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -463,7 +463,7 @@ namespace engine::board::mask
 
         return table;
     }
-    inline constexpr conf::types::rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
+    inline const conf::types::rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
 
     /**
      * @brief Builds the bishop's attacks table.
@@ -472,7 +472,7 @@ namespace engine::board::mask
      *
      * @return 64x512 array of bishop attacks
      */
-    inline consteval conf::types::bishopAttacksTable initBishopAttacksTable() noexcept
+    inline constexpr conf::types::bishopAttacksTable initBishopAttacksTable() noexcept
     {
         conf::types::bishopAttacksTable table{};
 
@@ -508,7 +508,7 @@ namespace engine::board::mask
 
                 // North-East
                 board::Bitboard ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 9;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -518,7 +518,7 @@ namespace engine::board::mask
 
                 // North-West
                 ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) << 7;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -528,7 +528,7 @@ namespace engine::board::mask
 
                 // South-East
                 ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) >> 7;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -538,7 +538,7 @@ namespace engine::board::mask
 
                 // South-West
                 ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 9;
-                while (!ray.isEmpty())
+                for (int step = 0; step < 8 && !ray.isEmpty(); step++)
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked) != board::Bitboard(0ULL))
@@ -556,7 +556,7 @@ namespace engine::board::mask
 
         return table;
     }
-    inline constexpr conf::types::bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
+    inline const conf::types::bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
     /**
      * @brief Builds 'between 2 squares' masks.
