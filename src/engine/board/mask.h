@@ -11,9 +11,11 @@
 #define MASKS_H_
 
 #include <cstdint>
+#include <cstdlib>
 
 #include "conf/enums.h"
 #include "conf/types.h"
+#include "engine/board/magic_const.h"
 
 /**
  * @namespace engine::board::mask
@@ -78,7 +80,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds diagonals masks.
-     * @return x15 array of attacks masks
+     * @return 1x15 array of attacks masks
      */
     inline consteval conf::types::DiagonalMasks initDiagonalsMasks() noexcept
     {
@@ -101,7 +103,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds anti-diagonals masks.
-     * @return x15 array of attacks masks
+     * @return 1x15 array of attacks masks
      */
     inline consteval conf::types::DiagonalMasks initAntiDiagonalsMasks() noexcept
     {
@@ -124,7 +126,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds pawns attacks masks, depending on the color.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     template <conf::enums::Colors Color>
     inline consteval conf::types::BitboardTable initPawnAttacksMasks() noexcept
@@ -156,7 +158,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds pawns pushes masks, depending on the color.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     template <conf::enums::Colors Color>
     inline consteval conf::types::BitboardTable initPawnPushesMasks() noexcept
@@ -188,7 +190,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds knights attacks masks.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initKnightAttacksMasks() noexcept
     {
@@ -214,7 +216,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds kings attacks masks.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initKingAttacksMasks() noexcept
     {
@@ -240,7 +242,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds rooks attacks masks.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initRookAttacksMasks() noexcept
     {
@@ -265,7 +267,7 @@ namespace engine::board::mask
 
     /**
      * @brief Builds bishop attacks masks.
-     * @return x64 array of attacks masks
+     * @return 1x64 array of attacks masks
      */
     inline consteval conf::types::BitboardTable initBishopAttacksMasks() noexcept
     {
@@ -291,29 +293,12 @@ namespace engine::board::mask
     inline constexpr conf::types::BitboardTable BISHOP_ATTACKS_MASKS = initBishopAttacksMasks();
 
     /**
-     * @brief Builds queens attacks masks.
-     * @return x64 array of attacks masks
-     */
-    inline consteval conf::types::BitboardTable initQueenAttacksMasks() noexcept
-    {
-        conf::types::BitboardTable masks{};
-
-        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
-        {
-            masks[squareIndex] = ROOK_ATTACKS_MASKS[squareIndex] | BISHOP_ATTACKS_MASKS[squareIndex];
-        }
-
-        return masks;
-    }
-    inline constexpr conf::types::BitboardTable QUEENS_ATTACKS_MASKS = initQueenAttacksMasks();
-
-    /**
      * @brief Get the relevant occupancy masks for a rook.
      * @details
      * Excludes edges squares on ranks/files so that we only keep
      * those who can block a ray from each squareIndex
      *
-     * @return x64 array of relevant occupancy masks
+     * @return 1x64 array of relevant occupancy masks
      */
     inline consteval conf::types::BitboardTable initRookRelevantMasks() noexcept
     {
@@ -345,7 +330,7 @@ namespace engine::board::mask
      * @brief Get the relevant occupancy masks for a bishop.
      * @details Excludes edges squares on diags/anti-diags that goes through each sqaureIndex
      *
-     * @return x64 array of relevant occupancy masks
+     * @return 1x64 array of relevant occupancy masks
      */
     inline consteval conf::types::BitboardTable initBishopRelevantMasks() noexcept
     {
@@ -378,6 +363,200 @@ namespace engine::board::mask
         return masks;
     }
     inline constexpr conf::types::BitboardTable BISHOP_RELEVANT_MASKS = initBishopRelevantMasks();
+
+    // Direction arrays for sliding pieces
+    inline constexpr std::array<conf::enums::Directions, 4> ROOK_DIRECTIONS = {
+        conf::enums::Directions::NORTH, conf::enums::Directions::SOUTH, conf::enums::Directions::EAST,
+        conf::enums::Directions::WEST};
+
+    inline constexpr std::array<conf::enums::Directions, 4> BISHOP_DIRECTIONS = {
+        conf::enums::Directions::NORTH_EAST, conf::enums::Directions::NORTH_WEST, conf::enums::Directions::SOUTH_EAST,
+        conf::enums::Directions::SOUTH_WEST};
+
+    /**
+     * @brief Builds the rook's attacks table.
+     * @details
+     * Computes all relevant attacks for all squares and all possible occupancies.
+     *
+     * @return 64x4096 array of rook attacks
+     */
+    inline consteval conf::types::rookAttacksTable initRookAttacksTable() noexcept
+    {
+        conf::types::rookAttacksTable table{};
+
+        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
+        {
+            uint8_t bits = 64 - board::magic_const::rookShifts[squareIndex];
+            uint64_t nEntries = 1ULL << bits;
+
+            // Get relevant occupancy mask for this square
+            board::Bitboard relevantMask = ROOK_RELEVANT_MASKS[squareIndex];
+            uint8_t relevantBits = relevantMask.popCount();
+
+            // Generate all possible occupancies
+            for (uint64_t occupancy = 0; occupancy < nEntries; occupancy++)
+            {
+                // Convert occupancy pattern to actual bitboard
+                board::Bitboard occupancyBB = 0;
+                board::Bitboard tempMask = relevantMask;
+
+                for (uint8_t i = 0; i < relevantBits; i++)
+                {
+                    uint8_t square = tempMask.lsbIndex();
+                    if (occupancy & (1ULL << i))
+                    {
+                        occupancyBB |= board::Bitboard(1ULL << square);
+                    }
+                    tempMask = board::Bitboard(tempMask.getData() & (tempMask.getData() - 1)); // Clear LSB
+                }
+
+                // Calculate attack pattern using direct bitwise operations
+                board::Bitboard attacks = 0;
+                board::Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[squareIndex];
+
+                // North
+                board::Bitboard ray = board::Bitboard(1ULL << squareIndex) << 8;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = ray << 8;
+                }
+
+                // South
+                ray = board::Bitboard(1ULL << squareIndex) >> 8;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = ray >> 8;
+                }
+
+                // East
+                ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 1;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_H_MASK) << 1;
+                }
+
+                // West
+                ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 1;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_A_MASK) >> 1;
+                }
+
+                // Store in table using magic index
+                uint64_t magicIndex = (occupancyBB.getData() * board::magic_const::rookMagics[squareIndex].getData()) >>
+                                      board::magic_const::rookShifts[squareIndex];
+                table[squareIndex][magicIndex] = attacks;
+            }
+        }
+
+        return table;
+    }
+    inline constexpr conf::types::rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
+
+    /**
+     * @brief Builds the bishop's attacks table.
+     * @details
+     * Computes all relevant attacks for all squares and all possible occupancies.
+     *
+     * @return 64x512 array of bishop attacks
+     */
+    inline consteval conf::types::bishopAttacksTable initBishopAttacksTable() noexcept
+    {
+        conf::types::bishopAttacksTable table{};
+
+        for (std::size_t squareIndex = 0; squareIndex < 64; squareIndex++)
+        {
+            uint8_t bits = 64 - board::magic_const::bishopShifts[squareIndex];
+            uint64_t nEntries = 1ULL << bits;
+
+            // Get relevant occupancy mask for this square
+            board::Bitboard relevantMask = BISHOP_RELEVANT_MASKS[squareIndex];
+            uint8_t relevantBits = relevantMask.popCount();
+
+            // Generate all possible occupancies
+            for (uint64_t occupancy = 0; occupancy < nEntries; occupancy++)
+            {
+                // Convert occupancy pattern to actual bitboard
+                board::Bitboard occupancyBB = 0;
+                board::Bitboard tempMask = relevantMask;
+
+                for (uint8_t i = 0; i < relevantBits; i++)
+                {
+                    uint8_t square = tempMask.lsbIndex();
+                    if (occupancy & (1ULL << i))
+                    {
+                        occupancyBB |= board::Bitboard(1ULL << square);
+                    }
+                    tempMask = board::Bitboard(tempMask.getData() & (tempMask.getData() - 1)); // Clear LSB
+                }
+
+                // Calculate attack pattern using direct bitwise operations (like in magics_generator.cpp)
+                board::Bitboard attacks = 0;
+                board::Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[squareIndex];
+
+                // North-East
+                board::Bitboard ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 9;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_H_MASK) << 9;
+                }
+
+                // North-West
+                ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) << 7;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_A_MASK) << 7;
+                }
+
+                // South-East
+                ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) >> 7;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_H_MASK) >> 7;
+                }
+
+                // South-West
+                ray = (board::Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 9;
+                while (!ray.isEmpty())
+                {
+                    attacks |= ray;
+                    if ((ray & occupancyMasked) != board::Bitboard(0ULL))
+                        break;
+                    ray = (ray & ~FILE_A_MASK) >> 9;
+                }
+
+                // Store in table using magic index
+                uint64_t magicIndex =
+                    (occupancyBB.getData() * board::magic_const::bishopMagics[squareIndex].getData()) >>
+                    board::magic_const::bishopShifts[squareIndex];
+                table[squareIndex][magicIndex] = attacks;
+            }
+        }
+
+        return table;
+    }
+    inline constexpr conf::types::bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
     /**
      * @brief Builds 'between 2 squares' masks.
