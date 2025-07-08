@@ -364,15 +364,6 @@ namespace engine::board::mask
     }
     inline constexpr conf::types::BitboardTable BISHOP_RELEVANT_MASKS = initBishopRelevantMasks();
 
-    // Direction arrays for sliding pieces
-    inline constexpr std::array<conf::enums::Directions, 4> ROOK_DIRECTIONS = {
-        conf::enums::Directions::NORTH, conf::enums::Directions::SOUTH, conf::enums::Directions::EAST,
-        conf::enums::Directions::WEST};
-
-    inline constexpr std::array<conf::enums::Directions, 4> BISHOP_DIRECTIONS = {
-        conf::enums::Directions::NORTH_EAST, conf::enums::Directions::NORTH_WEST, conf::enums::Directions::SOUTH_EAST,
-        conf::enums::Directions::SOUTH_WEST};
-
     /**
      * @brief Builds the rook's attacks table.
      * @details
@@ -380,7 +371,7 @@ namespace engine::board::mask
      *
      * @return 64x4096 array of rook attacks
      */
-    inline consteval conf::types::rookAttacksTable initRookAttacksTable() noexcept
+    inline constexpr conf::types::rookAttacksTable initRookAttacksTable() noexcept
     {
         conf::types::rookAttacksTable table{};
 
@@ -463,7 +454,7 @@ namespace engine::board::mask
 
         return table;
     }
-    inline constexpr conf::types::rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
+    inline const conf::types::rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
 
     /**
      * @brief Builds the bishop's attacks table.
@@ -472,7 +463,7 @@ namespace engine::board::mask
      *
      * @return 64x512 array of bishop attacks
      */
-    inline consteval conf::types::bishopAttacksTable initBishopAttacksTable() noexcept
+    inline constexpr conf::types::bishopAttacksTable initBishopAttacksTable() noexcept
     {
         conf::types::bishopAttacksTable table{};
 
@@ -556,7 +547,7 @@ namespace engine::board::mask
 
         return table;
     }
-    inline constexpr conf::types::bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
+    inline const conf::types::bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
     /**
      * @brief Builds 'between 2 squares' masks.
