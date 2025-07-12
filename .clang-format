@@ -4,7 +4,6 @@ Language:      Cpp
 # Indentation
 IndentWidth:           4
 NamespaceIndentation:  All
-IndentPPDirectives:    AfterHash
 
 # Alignment
 AlignArrayOfStructures: Left
