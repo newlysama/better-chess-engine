@@ -10,20 +10,25 @@
 #include "move.h"
 
 /**
- * @namespace engine::move
+ * @namespace engine::game::move
  */
-namespace engine::move
+namespace engine::game::move
 {
-    Move::Move(const std::size_t from, const std::size_t to, const conf::enums::MoveTypes type) noexcept
-        : _squareFrom(from), _squareTo(to), _moveType(type)
+    using namespace conf::enums;
+    using namespace board;
+
+    Move::Move(const int from, const int to, const MoveTypes type) noexcept
+        : _squareFrom(from)
+        , _squareTo(to)
+        , _moveType(type)
     {
     }
 
-    inline void Move::make(board::Board& board) noexcept
+    inline void Move::make(Board& board) noexcept
     {
     }
 
-    inline void Move::unmake(board::Board& board) noexcept
+    inline void Move::unmake(Board& board) noexcept
     {
     }
-} // namespace engine::move
+} // namespace engine::game::move

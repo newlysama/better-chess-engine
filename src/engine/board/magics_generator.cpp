@@ -14,7 +14,6 @@
 #include <iostream>
 #include <omp.h>
 #include <random>
-#include <unordered_map>
 #include <vector>
 
 #include "logging/logging.h"
@@ -24,14 +23,13 @@
  */
 namespace engine::board::magics_generator
 {
-    using namespace engine::board;
-    using namespace engine::board::magics_generator;
     using namespace conf::enums;
+    using namespace engine::board::mask;
 
     Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & mask::ROOK_RELEVANT_MASKS[squareIndex];
+        Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[squareIndex];
 
         // North
         Bitboard ray = Board::shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
@@ -83,7 +81,7 @@ namespace engine::board::magics_generator
     Bitboard slidingAttackBishop(int squareIndex, Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & mask::BISHOP_RELEVANT_MASKS[squareIndex];
+        Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[squareIndex];
 
         // NE
         Bitboard ray = Board::shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
@@ -134,17 +132,17 @@ namespace engine::board::magics_generator
 
     uint8_t findShiftRook(int squareIndex) noexcept
     {
-        return 64 - mask::ROOK_RELEVANT_MASKS[squareIndex].popCount();
+        return 64 - ROOK_RELEVANT_MASKS[squareIndex].popCount();
     }
 
     uint8_t findShiftBishop(int squareIndex) noexcept
     {
-        return 64 - mask::BISHOP_RELEVANT_MASKS[squareIndex].popCount();
+        return 64 - BISHOP_RELEVANT_MASKS[squareIndex].popCount();
     }
 
     Bitboard findMagicRook(int squareIndex) noexcept
     {
-        const Bitboard mask = mask::ROOK_RELEVANT_MASKS[squareIndex];
+        const Bitboard mask = ROOK_RELEVANT_MASKS[squareIndex];
         const uint8_t shift = findShiftRook(squareIndex);
 
         const uint8_t bits = mask.popCount();
@@ -209,7 +207,7 @@ namespace engine::board::magics_generator
 
     Bitboard findMagicBishop(int squareIndex) noexcept
     {
-        const Bitboard mask = mask::BISHOP_RELEVANT_MASKS[squareIndex];
+        const Bitboard mask = BISHOP_RELEVANT_MASKS[squareIndex];
         const uint8_t shift = findShiftBishop(squareIndex);
 
         const uint8_t bits = mask.popCount();

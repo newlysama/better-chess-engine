@@ -22,6 +22,10 @@
  */
 namespace engine::game
 {
+    using namespace conf::enums;
+    using namespace engine::board;
+    using namespace engine::game::move;
+
     /**
      * @class Game
      * @brief Holds the game state
@@ -45,11 +49,11 @@ namespace engine::game
         ~Game() noexcept = default;
 
       private:
-        uint16_t turnCount;              // Number of played tunred
-        conf::enums::Colors colorToPlay; // Whose turn is it ? :)
+        uint16_t turnCount; // Number of played tunred
+        Colors colorToPlay; // Whose turn is it ? :)
 
-        engine::board::Board board;      // Game's board
-        engine::move::MoveList moveList; // List of moves
+        Board board;       // Game's board
+        MoveList moveList; // List of moves
     };
 
 } // namespace engine::game

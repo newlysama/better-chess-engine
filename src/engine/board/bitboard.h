@@ -40,7 +40,8 @@ namespace engine::board
          *
          * @param [in] data_ : Value to initialize data member
          */
-        constexpr Bitboard(const uint64_t& data_ = 0ULL) noexcept : data(data_)
+        constexpr Bitboard(const uint64_t& data_ = 0ULL) noexcept
+            : data(data_)
         {
         }
 
@@ -154,9 +155,9 @@ namespace engine::board
         /**
          * @brief  Get the number of bits set to 1.
          *
-         * @return uint8_t : the number of bits set to 1
+         * @return int : the number of bits set to 1
          */
-        inline constexpr uint8_t popCount() const noexcept
+        inline constexpr int popCount() const noexcept
         {
             return std::popcount(this->data);
         };
@@ -174,9 +175,9 @@ namespace engine::board
         /**
          * @brief  Get LSB's index.
          *
-         * @return uint8_t : LSB's index
+         * @return int : LSB's index
          */
-        inline constexpr uint8_t lsbIndex() const noexcept
+        inline constexpr int lsbIndex() const noexcept
         {
             return std::countr_zero(this->data);
         };
@@ -184,9 +185,9 @@ namespace engine::board
         /**
          * @brief  Get MSB's index.
          *
-         * @return uint8_t : MSB's index
+         * @return int : MSB's index
          */
-        inline constexpr uint8_t msbIndex() const noexcept
+        inline constexpr int msbIndex() const noexcept
         {
             return 63 - std::countl_zero(this->data);
         };
@@ -194,9 +195,6 @@ namespace engine::board
       private:
         uint64_t data; // Actual bitboard
     };
-
-    inline constexpr Bitboard zeroBB = Bitboard{0};
-    inline constexpr Bitboard oneBB = Bitboard{1};
 } // namespace engine::board
 
 #endif // BITBOARD_H_

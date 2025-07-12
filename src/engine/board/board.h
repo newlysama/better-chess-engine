@@ -22,6 +22,10 @@
  */
 namespace engine::board
 {
+    using namespace conf::enums;
+    using namespace conf::types;
+    using namespace engine::board::mask;
+
     /**
      * @class Board
      * @brief Board represented by multiple Bitboards.
@@ -49,10 +53,9 @@ namespace engine::board
          *
          * @param [in] rankInex  : rank's index
          * @param [in] fileIndex : file's index
-         * @return std::size_t : the square's index
+         * @return int : the square's index
          */
-        static inline constexpr std::size_t getSquareIndex(const std::size_t rankIndex,
-                                                           const std::size_t fileIndex) noexcept
+        static inline constexpr int getSquareIndex(const int rankIndex, const int fileIndex) noexcept
         {
             return (8 * rankIndex) + fileIndex;
         };
@@ -61,9 +64,9 @@ namespace engine::board
          * @brief Get a rank's index, bases on a square's index
          *
          * @param [in] squareIndex : square's index
-         * @return std::size_t : the rank's index
+         * @return int : the rank's index
          */
-        static inline constexpr std::size_t getRankIndex(const std::size_t squareIndex) noexcept
+        static inline constexpr int getRankIndex(const int squareIndex) noexcept
         {
             return squareIndex >> 3;
         };
@@ -72,19 +75,16 @@ namespace engine::board
          * @brief Get a files's index, bases on a square's index.
          *
          * @param [in] squareIndex : square's index
-         * @return std::size_t : the file's index
+         * @return int : the file's index
          */
-        static inline constexpr std::size_t getFileIndex(const std::size_t squareIndex) noexcept
+        static inline constexpr int getFileIndex(const int squareIndex) noexcept
         {
             return squareIndex & 7;
         };
 
-        template <conf::enums::Directions Dir>
+        template <Directions Dir>
         static inline constexpr Bitboard shiftDir(Bitboard bb) noexcept
         {
-            using namespace conf::enums;
-            using namespace board::mask;
-
             return Dir == NORTH       ? Bitboard(bb << 8)
                  : Dir == SOUTH       ? Bitboard(bb >> 8)
                  : Dir == EAST        ? Bitboard((bb & ~FILE_H_MASK) << 1)
@@ -99,12 +99,11 @@ namespace engine::board
         }
 
         // Bitboards for each piece from each team
-        conf::types::PiecesBitboards allPieces;
+        PiecesBitboards allPieces;
 
         // Occupancy of the board (1 general + 1 for each team)
-        board::Bitboard generalOccupancy;
-        board::Bitboard whiteOccupancy;
-        board::Bitboard blackOccupancy;
+        Bitboard generalOccupancy;
+        std::array<Bitboard, Colors::COLORS> coloredOccupancies;
     };
 
 } // namespace engine::board

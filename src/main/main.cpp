@@ -12,7 +12,7 @@
 #include "logging/logging.h"
 
 #if defined(BUILD_GENERATE_MAGICS)
-#    include "engine/board/magics_generator.h"
+#include "engine/board/magics_generator.h"
 #endif
 
 int main(int argc, char* argv[])

@@ -4,7 +4,13 @@ Language:      Cpp
 # Indentation
 IndentWidth:           4
 NamespaceIndentation:  All
-InitializerList::Pack: Never
+
+# Always add space after comma
+SpacesInContainerLiterals: true
+
+# Braces initializers
+BreakConstructorInitializers: BeforeComma
+BreakFunctionDefinitionParameters: false
 
 # Alignment
 AlignArrayOfStructures: Left

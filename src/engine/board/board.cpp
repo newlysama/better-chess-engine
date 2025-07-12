@@ -35,16 +35,16 @@ namespace engine::board
                          Bitboard{0x0800'0000'0000'0000ULL}, // queen
                          Bitboard{0x1000'0000'0000'0000ULL}  // king
                      }}},
-          generalOccupancy{}, whiteOccupancy{}, blackOccupancy{}
+          generalOccupancy{}, coloredOccupancies{}
     {
         // Builds occupancy bitboards
-        for (std::size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
+        for (std::size_t piece = 0; piece < Pieces::PIECES; piece++)
         {
-            whiteOccupancy |= allPieces[conf::enums::Colors::WHITE][piece];
-            blackOccupancy |= allPieces[conf::enums::Colors::BLACK][piece];
+            this->coloredOccupancies[Colors::WHITE] |= this->allPieces[Colors::WHITE][piece];
+            this->coloredOccupancies[Colors::BLACK] |= this->allPieces[Colors::BLACK][piece];
         }
 
-        generalOccupancy = whiteOccupancy | blackOccupancy;
+        this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
     }
 
 } // namespace engine::board

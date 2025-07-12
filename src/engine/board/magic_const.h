@@ -18,7 +18,9 @@
  */
 namespace engine::board::magic_const
 {
-    inline constexpr conf::types::BitboardTable rookMagics = {
+    using namespace conf::types;
+
+    inline constexpr BitboardTable rookMagics = {
         Bitboard{0x80084002801020ULL},   Bitboard{0xc040100040002000ULL}, Bitboard{0x50010200041002bULL},
         Bitboard{0x9000850010004a0ULL},  Bitboard{0x200102508200200ULL},  Bitboard{0x1200081114308200ULL},
         Bitboard{0x200220004008108ULL},  Bitboard{0x2100010000208546ULL}, Bitboard{0x108000814000e1ULL},
@@ -42,7 +44,7 @@ namespace engine::board::magic_const
         Bitboard{0x4100100c080007ULL},   Bitboard{0x802008310280402ULL},  Bitboard{0x4201020810008304ULL},
         Bitboard{0x124460840028c102ULL}};
 
-    inline constexpr conf::types::BitboardTable bishopMagics = {
+    inline constexpr BitboardTable bishopMagics = {
         Bitboard{0x1010010b002209ULL},   Bitboard{0x1100202034810ULL},    Bitboard{0x6040400820000ULL},
         Bitboard{0xa0020a0240802000ULL}, Bitboard{0x2123000021022ULL},    Bitboard{0x1001209040010010ULL},
         Bitboard{0x4088210100402c1ULL},  Bitboard{0x4001149044044200ULL}, Bitboard{0x8800822088018448ULL},

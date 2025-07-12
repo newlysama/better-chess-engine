@@ -12,14 +12,22 @@
 
 #include <cstdint>
 
+#if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+#include <iostream>
+#include <string_view>
+#endif
+
 #include "conf/enums.h"
 #include "engine/board/board.h"
 
 /**
- * @namespace engine::move
+ * @namespace engine::game::move
  */
-namespace engine::move
+namespace engine::game::move
 {
+    using namespace conf::enums;
+    using namespace board;
+
     /**
      * @class Move
      */
@@ -34,27 +42,48 @@ namespace engine::move
         /**
          * @brief Constructor.
          */
-        Move(const std::size_t from, const std::size_t to, const conf::enums::MoveTypes type) noexcept;
+        Move(const int from, const int to, const MoveTypes type) noexcept;
 
         /**
          * @brief Make a move.
          *
          * @param [in] board : The board to make the move on
          */
-        inline void make(board::Board& board) noexcept;
+        void make(Board& board) noexcept;
 
         /**
          * @brief Unmake a move.
          *
          * @param [in] board : The board to unmake the move on
          */
-        inline void unmake(board::Board& board) noexcept;
+        void unmake(Board& board) noexcept;
+
+        // clang-format off
+        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+            inline void print() const noexcept
+            {
+                using namespace conf::enums;
+
+                std::string_view typeStr =
+                      _moveType == CAPTURE    ? "Capture"
+                    : _moveType == QUIET      ? "Quiet"
+                    : _moveType == PROMOTION  ? "Promotion"
+                    : _moveType == CASTLE     ? "Castle"
+                    : _moveType == ENPASSANT ? "En Passant"
+                    : "";
+
+                std::cout << "Square from: " << _squareFrom << "\n"
+                          << "Square to:   " << _squareTo   << "\n"
+                          << "Move type:   " << typeStr      << "\n";
+            }
+        #endif
+        // clang-format on
 
       private:
-        std::size_t _squareFrom;          // Start square
-        std::size_t _squareTo;            // Target square
-        conf::enums::MoveTypes _moveType; // Move type (Capture, EnPassant, etc...)
+        int _squareFrom;     // Start square
+        int _squareTo;       // Target square
+        MoveTypes _moveType; // Move type (Capture, EnPassant, etc...)
     };
-} // namespace engine::move
+} // namespace engine::game::move
 
 #endif // MOVE_H

@@ -17,10 +17,13 @@
 #include "engine/game/move.h"
 
 /**
- * @namespace engine::move
+ * @namespace engine::game::move
  */
-namespace engine::move
+namespace engine::game::move
 {
+    using namespace conf::enums;
+    using namespace board;
+
     /**
      * @class MoveList
      */
@@ -37,7 +40,7 @@ namespace engine::move
          *
          * @param [in] move : move to add
          */
-        void add(move::Move& move) noexcept;
+        void add(Move& move) noexcept;
 
         /**
          * @brief Set write index back to 0.
@@ -54,61 +57,77 @@ namespace engine::move
          *
          * @param [in] index : index to access
          */
-        move::Move& operator[](std::size_t index) noexcept;
+        Move& operator[](std::size_t index) noexcept;
 
         /**
          * @brief Call each generation method to generate all legal moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        void generateAllMoves(const board::Board& board) noexcept;
+        void generateAllMoves(const Board& board, Colors color) noexcept;
 
       private:
+        /**
+         * @brief Generates moves from a given square with a specific moveType and targets bitboard.
+         *
+         * @param [in] targets    : Bitboard of possible destination
+         * @param [in] squareFrom : Starting square index
+         * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
+         */
+        inline void processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType) noexcept;
+
         /**
          * @brief Generates pseudo-legal Pawns moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generatePawnsMoves(const board::Board& board) noexcept;
+        void generatePawnsMoves(const Board& board, Colors color) noexcept;
 
         /**
          * @brief Generates pseudo-legal Knights moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generateKnightsMoves(const board::Board& board) noexcept;
+        void generateKnightsMoves(const Board& board, Colors color) noexcept;
 
         /**
          * @brief Generates pseudo-legal Bishops moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generateBishopsMoves(const board::Board& board) noexcept;
+        void generateBishopsMoves(const Board& board, Colors color) noexcept;
 
         /**
          * @brief Generates pseudo-legal Rooks moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generateRooksMoves(const board::Board& board) noexcept;
+        void generateRooksMoves(const Board& board, Colors color) noexcept;
 
         /**
          * @brief Generates pseudo-legal Queen moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generateQueenMoves(const board::Board& board) noexcept;
+        void generateQueenMoves(const Board& board, Colors color) noexcept;
 
         /**
          * @brief Generates pseudo-legal King moves.
          *
          * @param [in] board : The board to work with
+         * @param [in] color : Color to play
          */
-        inline void generateKingMoves(const board::Board& board) noexcept;
+        void generateKingMoves(const Board& board, Colors color) noexcept;
 
-        move::Move _moves[256]; // Actual list of moves
-        int _size;              // Current size of the list
+        Move _moves[256]; // Actual list of moves
+        int _size;        // Current size of the list
     };
-} // namespace engine::move
+} // namespace engine::game::move
 
 #endif // MOVE_GENERATOR_H_

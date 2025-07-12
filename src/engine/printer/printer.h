@@ -19,6 +19,8 @@
  */
 namespace engine::printer
 {
+    using namespace conf::enums;
+    using namespace engine::board;
 
     // Print colors
     inline constexpr std::string_view RESET = "\033[0m";
@@ -78,11 +80,11 @@ namespace engine::printer
     /**
      * @brief Get a colored string representing a piece on a specific square.
      */
-    inline constexpr std::string_view getPiece(const board::Board& board, int squareIndex)
+    inline constexpr std::string_view getPiece(const Board& board, int squareIndex)
     {
-        for (std::size_t color = 0; color < conf::enums::Colors::COLORS; color++)
+        for (std::size_t color = 0; color < Colors::COLORS; color++)
         {
-            for (std::size_t piece = 0; piece < conf::enums::Pieces::PIECES; piece++)
+            for (std::size_t piece = 0; piece < Pieces::PIECES; piece++)
             {
                 // If allPieces[color][piece] is set to 1 (piece is present)
                 if ((board.allPieces[color][piece].getData() >> squareIndex) & 1ULL)
@@ -99,7 +101,7 @@ namespace engine::printer
     /**
      * @brief Prints the board.
      */
-    inline void printBoard(const board::Board& board) noexcept
+    inline void printBoard(const Board& board) noexcept
     {
         printHeader();
 
@@ -113,7 +115,7 @@ namespace engine::printer
             for (int fileIndex = 0; fileIndex < 8; fileIndex++)
             {
                 // Get the piece to print
-                int squareIndex = board::Board::getSquareIndex(rankIndex, fileIndex);
+                int squareIndex = Board::getSquareIndex(rankIndex, fileIndex);
                 std::string_view piece = getPiece(board, squareIndex);
 
                 std::cout << "  " << piece << "  |";

@@ -16,8 +16,12 @@ namespace engine::game
 {
 
     using namespace conf::enums;
+    using namespace board;
 
-    Game::Game() noexcept : turnCount(0), colorToPlay(conf::enums::Colors::WHITE), board(board::Board())
+    Game::Game() noexcept
+        : turnCount(0)
+        , colorToPlay(Colors::WHITE)
+        , board(Board{})
     {
     }
 } // namespace engine::game
