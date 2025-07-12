@@ -25,34 +25,7 @@ namespace conf::types
      * @typedef PieceBoards
      * @brief   2x6 array holding each piece's bitboards from each team.
      */
-    typedef std::array<std::array<engine::board::Bitboard, conf::enums::Pieces::PIECES>, conf::enums::Colors::COLORS>
-        PiecesBitboards;
-
-    /**
-     * @typedef Move
-     * @brief   Structure representing a move.
-     */
-    typedef struct Move
-    {
-        uint8_t squareFrom; // Start square
-        uint8_t squareTo;   // End square
-
-        conf::enums::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
-
-        /**
-         * @brief Constructor.
-         */
-        Move(const uint8_t from, const uint8_t to, const conf::enums::MoveTypes type) noexcept
-            : squareFrom(from), squareTo(to), moveType(type)
-        {
-        }
-    } Move;
-
-    /**
-     * @typedef LegalMoves
-     * @brief   1x5 array storing vectors of legal moves for each move type.
-     */
-    typedef std::array<std::vector<Move>, conf::enums::MoveTypes::MOVE_TYPES> LegalMoves;
+    typedef std::array<std::array<engine::board::Bitboard, conf::enums::PIECES>, conf::enums::COLORS> PiecesBitboards;
 
     /*----------------------------------*
      *              MASKS               *
@@ -62,13 +35,13 @@ namespace conf::types
      * @typedef BorderFilesMasks
      * @brief   1x8 array holding each file's mask.
      */
-    typedef std::array<engine::board::Bitboard, conf::enums::Files::FILES> FilesMasks;
+    typedef std::array<engine::board::Bitboard, conf::enums::FILES> FilesMasks;
 
     /**
      * @typedef RanksMasks
      * @brief   1x8 array holding each rank's mask.
      */
-    typedef std::array<engine::board::Bitboard, conf::enums::Ranks::RANKS> RanksMasks;
+    typedef std::array<engine::board::Bitboard, conf::enums::RANKS> RanksMasks;
 
     /**
      * @typedef DiagonalMasks
@@ -86,7 +59,7 @@ namespace conf::types
      * @typedef CastlingMasks
      * @brief   Castling masks: one mask per castling right (e.g., White King-side, White Queen-side, ...).
      */
-    typedef std::array<engine::board::Bitboard, conf::enums::Castlings::CASTLINGS> CastlingMasks;
+    typedef std::array<engine::board::Bitboard, conf::enums::CASTLINGS> CastlingMasks;
 
     /**
      * @typedef BetweenMasks
