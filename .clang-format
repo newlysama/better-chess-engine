@@ -4,6 +4,7 @@ Language:      Cpp
 # Indentation
 IndentWidth:           4
 NamespaceIndentation:  All
+InitializerList::Pack: Never
 
 # Alignment
 AlignArrayOfStructures: Left
