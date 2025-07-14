@@ -14,7 +14,7 @@
  */
 namespace engine::game
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
 
     Move::Move(const int from, const int to, const MoveTypes type) noexcept

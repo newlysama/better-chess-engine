@@ -19,7 +19,7 @@
  */
 namespace engine::printer
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
 
     // Print colors

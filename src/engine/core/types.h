@@ -13,22 +13,38 @@
 #include <array>
 #include <vector>
 
-#include "conf/enums.h"
 #include "engine/board/bitboard.h"
+#include "engine/core/enums.h"
 
 /**
- * @namespace conf::types
+ * @namespace engine::core
  */
-namespace conf::types
+namespace engine::core
 {
     using namespace engine::board;
-    using namespace conf::enums;
 
     /**
      * @typedef PieceBoards
      * @brief   2x6 array holding each piece's bitboards from each team.
      */
     typedef std::array<std::array<Bitboard, Pieces::PIECES>, Colors::COLORS> PiecesBitboards;
+
+    /**
+     * @typedef ColoredOccupancies
+     * @brief   1x2 array holding each team's occupancy.
+     */
+    typedef std::array<Bitboard, Colors::COLORS> ColoredOccupancies;
+
+    /**
+     * @typedef CastlingRights
+     * @brief   8 bits unsigned int where bits represent a type of castling right.
+     * @details
+     * Bit 0 : White King Side Castling |
+     * Bit 1 : White Queen Side Castling |
+     * Bit 2 : Black King Side Castling |
+     * Bit 3 : Black Queen Side Castling
+     */
+    typedef uint8_t CastlingRights;
 
     /*----------------------------------*
      *              MASKS               *
@@ -70,18 +86,22 @@ namespace conf::types
      */
     typedef std::array<std::array<Bitboard, 64>, 64> BetweenMasks;
 
+    /*----------------------------------*
+     *      SLIDING ATTACK TABLES       *
+     *----------------------------------*/
+
     /**
-     * @typedef rookAttackTable
+     * @typedef RookAttackTable
      * @brief   Attack Tables for sliding rook.
      */
-    typedef std::array<std::array<Bitboard, 4096>, 64> rookAttacksTable;
+    typedef std::array<std::array<Bitboard, 4096>, 64> RookAttacksTable;
 
     /**
-     * @typedef bishopAttackTable
+     * @typedef BishopAttackTable
      * @brief   Attack Tables for sliding bishop.
      */
-    typedef std::array<std::array<Bitboard, 512>, 64> bishopAttacksTable;
+    typedef std::array<std::array<Bitboard, 512>, 64> BishopAttacksTable;
 
-} // namespace conf::types
+} // namespace engine::core
 
 #endif // TYPES_H_

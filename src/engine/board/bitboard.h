@@ -13,14 +13,14 @@
 #include <bit>
 #include <cstdint>
 
-#include "conf/enums.h"
+#include "engine/core/enums.h"
 
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace conf::enums;
+    using namespace engine::core;
 
     /**
      * @class Bitboard

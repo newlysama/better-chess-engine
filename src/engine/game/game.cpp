@@ -15,9 +15,8 @@
 namespace engine::game
 {
 
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
-    using namespace engine::game;
 
     Game::Game() noexcept
         : state(State{})

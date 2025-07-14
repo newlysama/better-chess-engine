@@ -13,17 +13,16 @@
 #include <cstdint>
 #include <memory>
 
-#include "conf/types.h"
 #include "engine/board/bitboard.h"
 #include "engine/board/mask.h"
+#include "engine/core/types.h"
 
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace conf::enums;
-    using namespace conf::types;
+    using namespace engine::core;
     using namespace engine::board;
 
     /**
@@ -81,15 +80,44 @@ namespace engine::board
             return squareIndex & 7;
         };
 
-        uint16_t turnCount; // Number of played tunred
-        Colors colorToPlay; // Whose turn is it ? :)
+        /**
+         * @brief Check if a type of castling is enabled by checking its corresponding bit.
+         *
+         * @return bool : Wether this type of castling is enabled.
+         */
+        template <Castlings Type>
+        inline constexpr bool hasCastlingRight() const noexcept
+        {
+            return ((this->castlingRights >> static_cast<unsigned>(Type)) & 1U) != 0;
+        }
 
-        // Bitboards for each piece from each team
-        PiecesBitboards allPieces;
+        /**
+         * @brief Enable a type of castling.
+         */
+        template <Castlings Type>
+        inline constexpr void setCastlingRight() noexcept
+        {
+            this->castlingRights |= (uint8_t{1} << static_cast<unsigned>(Type));
+        }
 
-        // Occupancy of the board (1 general + 1 for each team)
-        Bitboard generalOccupancy;
-        std::array<Bitboard, Colors::COLORS> coloredOccupancies;
+        /**
+         * @brief Disable a type of castling.
+         */
+        template <Castlings Type>
+        inline constexpr void clearCastlingRight() noexcept
+        {
+            this->castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
+        }
+
+        uint16_t halfMoveClock; // Half move counter
+        uint16_t fullMoveClock; // Full move counter
+        Colors colorToPlay;     // Whose turn is it ? :)
+
+        CastlingRights castlingRights; // Informations about enabled castlings.
+
+        PiecesBitboards allPieces;             // Occupancy for each team and each piece
+        Bitboard generalOccupancy;             // Occupancy for all pieces
+        ColoredOccupancies coloredOccupancies; // Team specific occupancies
     };
 
 } // namespace engine::board

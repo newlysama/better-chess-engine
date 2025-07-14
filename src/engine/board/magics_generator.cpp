@@ -23,7 +23,7 @@
  */
 namespace engine::board
 {
-    using namespace conf::enums;
+    using namespace engine::core;
 
     Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
     {

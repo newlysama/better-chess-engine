@@ -13,17 +13,16 @@
 #include <cstdint>
 #include <cstdlib>
 
-#include "conf/enums.h"
-#include "conf/types.h"
 #include "engine/board/magic_const.h"
+#include "engine/core/enums.h"
+#include "engine/core/types.h"
 
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace conf::enums;
-    using namespace conf::types;
+    using namespace engine::core;
 
     inline constexpr FilesMasks FILES_MASKS = {
         Bitboard{0x0101'0101'0101'0101ULL}, // file A
@@ -384,9 +383,9 @@ namespace engine::board
      *
      * @return 64x4096 array of rook attacks
      */
-    inline constexpr rookAttacksTable initRookAttacksTable() noexcept
+    inline constexpr RookAttacksTable initRookAttacksTable() noexcept
     {
-        rookAttacksTable table{};
+        RookAttacksTable table{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -467,7 +466,7 @@ namespace engine::board
 
         return table;
     }
-    inline const rookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
+    inline const RookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
 
     /**
      * @brief Builds the bishop's attacks table.
@@ -476,9 +475,9 @@ namespace engine::board
      *
      * @return 64x512 array of bishop attacks
      */
-    inline constexpr bishopAttacksTable initBishopAttacksTable() noexcept
+    inline constexpr BishopAttacksTable initBishopAttacksTable() noexcept
     {
-        bishopAttacksTable table{};
+        BishopAttacksTable table{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -559,7 +558,7 @@ namespace engine::board
 
         return table;
     }
-    inline const bishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
+    inline const BishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
     /**
      * @brief Builds 'between 2 squares' masks.

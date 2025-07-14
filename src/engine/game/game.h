@@ -12,9 +12,9 @@
 
 #include <cstdint>
 
-#include "conf/enums.h"
-#include "conf/types.h"
 #include "engine/board/state.h"
+#include "engine/core/enums.h"
+#include "engine/core/types.h"
 #include "engine/game/move_list.h"
 
 /**
@@ -22,9 +22,8 @@
  */
 namespace engine::game
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
-    using namespace engine::game;
 
     /**
      * @class Game

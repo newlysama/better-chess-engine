@@ -10,15 +10,15 @@
 #ifndef MAGIC_CONST_H_
 #define MAGIC_CONST_H_
 
-#include "conf/types.h"
 #include "engine/board/mask.h"
+#include "engine/core/types.h"
 
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace conf::types;
+    using namespace engine::core;
 
     inline constexpr BitboardTable rookMagics = {
         Bitboard{0x80084002801020ULL},   Bitboard{0xc040100040002000ULL}, Bitboard{0x50010200041002bULL},

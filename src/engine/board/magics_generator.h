@@ -13,10 +13,10 @@
 #include <array>
 #include <cstdint>
 
-#include "conf/enums.h"
-#include "conf/types.h"
 #include "engine/board/mask.h"
 #include "engine/board/state.h"
+#include "engine/core/enums.h"
+#include "engine/core/types.h"
 
 /**
  * @namespace engine::board

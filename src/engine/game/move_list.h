@@ -13,8 +13,8 @@
 #include <cstdint>
 #include <stack>
 
-#include "conf/types.h"
 #include "engine/board/state.h"
+#include "engine/core/types.h"
 #include "engine/game/move.h"
 
 /**
@@ -22,7 +22,7 @@
  */
 namespace engine::game
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
 
     /**

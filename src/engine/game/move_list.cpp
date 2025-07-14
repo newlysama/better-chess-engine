@@ -18,7 +18,7 @@
  */
 namespace engine::game
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
 
     void MoveList::add(Move& move) noexcept

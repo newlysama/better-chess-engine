@@ -11,9 +11,9 @@
 #define ENUMS_H_
 
 /**
- * @namespace conf::enums
+ * @namespace engine::core
  */
-namespace conf::enums
+namespace engine::core
 {
     /**
      * @enum  Piece
@@ -132,6 +132,6 @@ namespace conf::enums
         BLACK_QUEEN_SIDE = 3,
         CASTLINGS = 4
     };
-} // namespace conf::enums
+} // namespace engine::core
 
 #endif // ENUMS_H_

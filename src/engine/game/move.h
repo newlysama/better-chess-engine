@@ -17,15 +17,15 @@
 #include <string_view>
 #endif
 
-#include "conf/enums.h"
 #include "engine/board/state.h"
+#include "engine/core/enums.h"
 
 /**
  * @namespace engine::game
  */
 namespace engine::game
 {
-    using namespace conf::enums;
+    using namespace engine::core;
     using namespace engine::board;
 
     /**
@@ -51,8 +51,6 @@ namespace engine::game
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
             inline void print() const noexcept
             {
-                using namespace conf::enums;
-
                 std::string_view typeStr =
                       _moveType == CAPTURE    ? "Capture"
                     : _moveType == QUIET      ? "Quiet"
