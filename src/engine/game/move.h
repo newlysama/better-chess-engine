@@ -18,15 +18,15 @@
 #endif
 
 #include "conf/enums.h"
-#include "engine/board/board.h"
+#include "engine/board/state.h"
 
 /**
- * @namespace engine::game::move
+ * @namespace engine::game
  */
-namespace engine::game::move
+namespace engine::game
 {
     using namespace conf::enums;
-    using namespace board;
+    using namespace engine::board;
 
     /**
      * @class Move
@@ -44,19 +44,8 @@ namespace engine::game::move
          */
         Move(const int from, const int to, const MoveTypes type) noexcept;
 
-        /**
-         * @brief Make a move.
-         *
-         * @param [in] board : The board to make the move on
-         */
-        void make(Board& board) noexcept;
-
-        /**
-         * @brief Unmake a move.
-         *
-         * @param [in] board : The board to unmake the move on
-         */
-        void unmake(Board& board) noexcept;
+        inline constexpr bool operator==(Move& move) noexcept;
+        inline constexpr bool operator!=(Move& move) noexcept;
 
         // clang-format off
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
@@ -69,7 +58,7 @@ namespace engine::game::move
                     : _moveType == QUIET      ? "Quiet"
                     : _moveType == PROMOTION  ? "Promotion"
                     : _moveType == CASTLE     ? "Castle"
-                    : _moveType == ENPASSANT ? "En Passant"
+                    : _moveType == ENPASSANT  ? "En Passant"
                     : "";
 
                 std::cout << "Square from: " << _squareFrom << "\n"
@@ -84,6 +73,6 @@ namespace engine::game::move
         int _squareTo;       // Target square
         MoveTypes _moveType; // Move type (Capture, EnPassant, etc...)
     };
-} // namespace engine::game::move
+} // namespace engine::game
 
 #endif // MOVE_H

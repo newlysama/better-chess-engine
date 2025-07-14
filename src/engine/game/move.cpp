@@ -10,12 +10,12 @@
 #include "move.h"
 
 /**
- * @namespace engine::game::move
+ * @namespace engine::game
  */
-namespace engine::game::move
+namespace engine::game
 {
     using namespace conf::enums;
-    using namespace board;
+    using namespace engine::board;
 
     Move::Move(const int from, const int to, const MoveTypes type) noexcept
         : _squareFrom(from)
@@ -24,11 +24,15 @@ namespace engine::game::move
     {
     }
 
-    inline void Move::make(Board& board) noexcept
+    inline constexpr bool Move::operator==(Move& move) noexcept
     {
+        return this->_squareFrom == move._squareFrom && this->_squareTo == move._squareTo &&
+               this->_moveType == move._moveType;
     }
 
-    inline void Move::unmake(Board& board) noexcept
+    inline constexpr bool Move::operator!=(Move& move) noexcept
     {
+        return this->_squareFrom != move._squareFrom && this->_squareTo != move._squareTo &&
+               this->_moveType != move._moveType;
     }
-} // namespace engine::game::move
+} // namespace engine::game

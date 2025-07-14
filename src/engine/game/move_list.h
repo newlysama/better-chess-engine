@@ -11,18 +11,30 @@
 #define MOVE_GENERATOR_H_
 
 #include <cstdint>
+#include <stack>
 
 #include "conf/types.h"
-#include "engine/board/board.h"
+#include "engine/board/state.h"
 #include "engine/game/move.h"
 
 /**
- * @namespace engine::game::move
+ * @namespace engine::game
  */
-namespace engine::game::move
+namespace engine::game
 {
     using namespace conf::enums;
-    using namespace board;
+    using namespace engine::board;
+
+    /**
+     * @typedef UnmakeInfo
+     * @brief Contains all the necessary info to unmake a move.
+     */
+    typedef struct UnmakeInfo
+    {
+        Move move;
+        Pieces captured;
+        State* previous;
+    } UnmakeInfo;
 
     /**
      * @class MoveList
@@ -60,74 +72,91 @@ namespace engine::game::move
         Move& operator[](std::size_t index) noexcept;
 
         /**
+         * @brief Make a move.
+         *
+         * @param [in] state : The state to make the move on
+         * @param [in] move  : The move to make
+         */
+        void makeMove(State& state, const Move& move) noexcept;
+
+        /**
+         * @brief Unmake a move.
+         *
+         * @param [in] state : The state to unmake the move on
+         * @param [in] move  : The move to unmake
+         */
+        void unmakeMove(State& state, const Move& move) noexcept;
+
+        /**
          * @brief Call each generation method to generate all legal moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateAllMoves(const Board& board, Colors color) noexcept;
+        void generateAllMoves(const State& state, Colors color) noexcept;
 
       private:
         /**
-         * @brief Generates moves from a given square with a specific moveType and targets bitboard.
+         * @brief Generates legal moves from a given square with a specific moveType and targets bitstate.
          *
-         * @param [in] targets    : Bitboard of possible destination
+         * @param [in] targets    : Bitboard of possible destinations
          * @param [in] squareFrom : Starting square index
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
          */
         inline void processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType) noexcept;
 
         /**
-         * @brief Generates pseudo-legal Pawns moves.
+         * @brief Generates legal Pawns moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generatePawnsMoves(const Board& board, Colors color) noexcept;
+        void generatePawnsMoves(const State& state, Colors color) noexcept;
 
         /**
-         * @brief Generates pseudo-legal Knights moves.
+         * @brief Generates legal Knights moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateKnightsMoves(const Board& board, Colors color) noexcept;
+        void generateKnightsMoves(const State& state, Colors color) noexcept;
 
         /**
-         * @brief Generates pseudo-legal Bishops moves.
+         * @brief Generates legal Bishops moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateBishopsMoves(const Board& board, Colors color) noexcept;
+        void generateBishopsMoves(const State& state, Colors color) noexcept;
 
         /**
-         * @brief Generates pseudo-legal Rooks moves.
+         * @brief Generates legal Rooks moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateRooksMoves(const Board& board, Colors color) noexcept;
+        void generateRooksMoves(const State& state, Colors color) noexcept;
 
         /**
-         * @brief Generates pseudo-legal Queen moves.
+         * @brief Generates legal Queen moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateQueenMoves(const Board& board, Colors color) noexcept;
+        void generateQueenMoves(const State& state, Colors color) noexcept;
 
         /**
-         * @brief Generates pseudo-legal King moves.
+         * @brief Generates legal King moves.
          *
-         * @param [in] board : The board to work with
+         * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateKingMoves(const Board& board, Colors color) noexcept;
+        void generateKingMoves(const State& state, Colors color) noexcept;
 
-        Move _moves[256]; // Actual list of moves
-        int _size;        // Current size of the list
+        Move _moves[256];                // Actual list of moves
+        int _size;                       // Current size of the list
+        std::stack<UnmakeInfo> _history; // History of made moves
     };
-} // namespace engine::game::move
+} // namespace engine::game
 
 #endif // MOVE_GENERATOR_H_
