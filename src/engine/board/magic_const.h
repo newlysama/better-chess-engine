@@ -14,9 +14,9 @@
 #include "engine/board/mask.h"
 
 /**
- * @namespace engine::board::magic_const
+ * @namespace engine::board
  */
-namespace engine::board::magic_const
+namespace engine::board
 {
     using namespace conf::types;
 
@@ -78,6 +78,6 @@ namespace engine::board::magic_const
         59, 58, 58, 59, 57, 55, 55, 57, 59, 58, 58, 59, 57, 55, 55, 57, 59, 58, 58, 59, 57, 57,
         57, 57, 59, 58, 58, 59, 59, 59, 59, 59, 59, 58, 57, 58, 58, 58, 58, 58, 58, 57};
 
-} // namespace engine::board::magic_const
+} // namespace engine::board
 
 #endif // MAGIC_CONST_H_

@@ -7,7 +7,7 @@
  * @brief Entry point of the program
  */
 
-#include "engine/board/board.h"
+#include "engine/game/game.h"
 #include "engine/printer/printer.h"
 #include "logging/logging.h"
 
@@ -21,12 +21,12 @@ int main(int argc, char* argv[])
     logging::init_logger();
 
 #if defined(BUILD_GENERATE_MAGICS)
-    engine::board::magics_generator::initMagics();
+    engine::board::initMagics();
 #else
 
-    engine::board::Board board;
+    engine::game::Game game;
 
-    engine::printer::printBoard(board);
+    engine::printer::printBoard(game.state);
 
 #endif // BUILD_GENERATE_MAGICS
 

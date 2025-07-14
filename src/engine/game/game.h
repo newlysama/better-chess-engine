@@ -14,7 +14,7 @@
 
 #include "conf/enums.h"
 #include "conf/types.h"
-#include "engine/board/board.h"
+#include "engine/board/state.h"
 #include "engine/game/move_list.h"
 
 /**
@@ -24,7 +24,7 @@ namespace engine::game
 {
     using namespace conf::enums;
     using namespace engine::board;
-    using namespace engine::game::move;
+    using namespace engine::game;
 
     /**
      * @class Game
@@ -48,12 +48,21 @@ namespace engine::game
          */
         ~Game() noexcept = default;
 
-      private:
-        uint16_t turnCount; // Number of played tunred
-        Colors colorToPlay; // Whose turn is it ? :)
+        // /**
+        //  * @brief Make a move.
+        //  *
+        //  * @param [in] move  : The move to make
+        //  */
+        // void makeMove(const Move move) noexcept;
 
-        Board board;       // Game's board
-        MoveList moveList; // List of moves
+        // /**
+        //  * @brief Unmake a move.
+        //  *
+        //  * @param [in] move  : The move to unmake
+        //  */
+        // void unmakeMove(const Move move) noexcept;
+
+        State state; // Game's board
     };
 
 } // namespace engine::game

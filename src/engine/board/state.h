@@ -1,10 +1,10 @@
 /**
- * @file      board.h
+ * @file      state.h
  * @author    Thibault THOMAS
  * @copyright Copyright 2025 Better Chess Engine
  * @par       This project is released under the MIT License
  *
- * @brief Board representation.
+ * @brief State representation.
  */
 
 #ifndef BOARD_H_
@@ -24,29 +24,28 @@ namespace engine::board
 {
     using namespace conf::enums;
     using namespace conf::types;
-    using namespace engine::board::mask;
+    using namespace engine::board;
 
     /**
-     * @class Board
-     * @brief Board represented by multiple Bitboards.
+     * @class State
      */
-    class Board
+    class State
     {
       public:
         /**
          * @brief Constructor.
          */
-        Board() noexcept;
+        State() noexcept;
 
         /**
          * @brief Constructor from FEN notation.
          */
-        Board(const std::string_view fenNotation) noexcept;
+        State(const std::string_view fenNotation) noexcept;
 
         /**
          * @brief Destructor.
          */
-        ~Board() = default;
+        ~State() = default;
 
         /**
          * @brief Get a square's index, based on the rank's and file's indexes.
@@ -82,21 +81,8 @@ namespace engine::board
             return squareIndex & 7;
         };
 
-        template <Directions Dir>
-        static inline constexpr Bitboard shiftDir(Bitboard bb) noexcept
-        {
-            return Dir == NORTH       ? Bitboard(bb << 8)
-                 : Dir == SOUTH       ? Bitboard(bb >> 8)
-                 : Dir == EAST        ? Bitboard((bb & ~FILE_H_MASK) << 1)
-                 : Dir == WEST        ? Bitboard((bb & ~FILE_A_MASK) >> 1)
-                 : Dir == NORTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) << 9)
-                 : Dir == NORTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) << 7)
-                 : Dir == SOUTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) >> 7)
-                 : Dir == SOUTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) >> 9)
-                 : Dir == NORTH_NORTH ? Bitboard(bb << 16)
-                 : Dir == SOUTH_SOUTH ? Bitboard(bb >> 16)
-                                      : Bitboard(0ULL);
-        }
+        uint16_t turnCount; // Number of played tunred
+        Colors colorToPlay; // Whose turn is it ? :)
 
         // Bitboards for each piece from each team
         PiecesBitboards allPieces;

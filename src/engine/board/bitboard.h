@@ -20,6 +20,8 @@
  */
 namespace engine::board
 {
+    using namespace conf::enums;
+
     /**
      * @class Bitboard
      * @brief Wrapper around an actual bitboard (64 bits unsigned int).
@@ -38,10 +40,10 @@ namespace engine::board
         /**
          * @brief Constructor.
          *
-         * @param [in] data_ : Value to initialize data member
+         * @param [in] _data_ : Value to initialize _data member
          */
-        constexpr Bitboard(const uint64_t& data_ = 0ULL) noexcept
-            : data(data_)
+        constexpr Bitboard(const uint64_t& _data_ = 0ULL) noexcept
+            : _data(_data_)
         {
         }
 
@@ -62,46 +64,46 @@ namespace engine::board
          *----------------------------------------*/
         inline constexpr bool operator==(const Bitboard& bitboard_) const noexcept
         {
-            return this->data == bitboard_.data;
-        };
+            return this->_data == bitboard_._data;
+        }
 
         inline constexpr bool operator!=(const Bitboard& bitboard_) const noexcept
         {
-            return this->data != bitboard_.data;
-        };
+            return this->_data != bitboard_._data;
+        }
 
         /*----------------------------------------*
          *           BITWISE OPERATORS            *
          *----------------------------------------*/
         inline constexpr Bitboard operator&(const Bitboard& bitboard_) const noexcept
         {
-            return Bitboard(this->data & bitboard_.data);
-        };
+            return Bitboard{this->_data & bitboard_._data};
+        }
 
         inline constexpr Bitboard operator|(const Bitboard& bitboard_) const noexcept
         {
-            return Bitboard(this->data | bitboard_.data);
-        };
+            return Bitboard{this->_data | bitboard_._data};
+        }
 
         inline constexpr Bitboard operator~() const noexcept
         {
-            return Bitboard(~this->data);
-        };
+            return Bitboard{~this->_data};
+        }
 
         inline constexpr Bitboard operator^(const Bitboard& bitboard_) const noexcept
         {
-            return Bitboard(this->data ^ bitboard_.data);
-        };
+            return Bitboard{this->_data ^ bitboard_._data};
+        }
 
         inline constexpr Bitboard operator<<(const int shift) const noexcept
         {
-            return Bitboard(this->data << shift);
-        };
+            return Bitboard{this->_data << shift};
+        }
 
         inline constexpr Bitboard operator>>(const int shift) const noexcept
         {
-            return Bitboard(this->data >> shift);
-        };
+            return Bitboard{this->_data >> shift};
+        }
 
         /*----------------------------------------*
          *         ASSIGNMENT OPERATORS           *
@@ -110,47 +112,47 @@ namespace engine::board
 
         inline constexpr Bitboard& operator&=(const Bitboard& bitboard_) noexcept
         {
-            this->data &= bitboard_.data;
+            this->_data &= bitboard_._data;
             return *this;
-        };
+        }
 
         inline constexpr Bitboard& operator|=(const Bitboard& bitboard_) noexcept
         {
-            this->data |= bitboard_.data;
+            this->_data |= bitboard_._data;
             return *this;
-        };
+        }
 
         inline constexpr Bitboard& operator^=(const Bitboard& bitboard_) noexcept
         {
-            this->data ^= bitboard_.data;
+            this->_data ^= bitboard_._data;
             return *this;
-        };
+        }
 
         inline constexpr Bitboard& operator<<=(const int shift) noexcept
         {
-            this->data <<= shift;
+            this->_data <<= shift;
             return *this;
-        };
+        }
 
         inline constexpr Bitboard& operator>>=(const int shift) noexcept
         {
-            this->data >>= shift;
+            this->_data >>= shift;
             return *this;
-        };
+        }
 
         /*----------------------------------------*
          *           UTILITY FUNCTIONS            *
          *----------------------------------------*/
 
         /**
-         * @brief  Getter for data member.
+         * @brief  Getter for _data member.
          *
          * @return uint64_t : the actual bitboard
          */
         inline constexpr uint64_t getData() const noexcept
         {
-            return this->data;
-        };
+            return this->_data;
+        }
 
         /**
          * @brief  Get the number of bits set to 1.
@@ -159,8 +161,8 @@ namespace engine::board
          */
         inline constexpr int popCount() const noexcept
         {
-            return std::popcount(this->data);
-        };
+            return std::popcount(this->_data);
+        }
 
         /**
          * @brief  Check if the bitboard is empty.
@@ -169,8 +171,8 @@ namespace engine::board
          */
         inline constexpr bool isEmpty() const noexcept
         {
-            return this->data == 0;
-        };
+            return this->_data == 0;
+        }
 
         /**
          * @brief  Get LSB's index.
@@ -179,8 +181,8 @@ namespace engine::board
          */
         inline constexpr int lsbIndex() const noexcept
         {
-            return std::countr_zero(this->data);
-        };
+            return std::countr_zero(this->_data);
+        }
 
         /**
          * @brief  Get MSB's index.
@@ -189,11 +191,11 @@ namespace engine::board
          */
         inline constexpr int msbIndex() const noexcept
         {
-            return 63 - std::countl_zero(this->data);
-        };
+            return 63 - std::countl_zero(this->_data);
+        }
 
       private:
-        uint64_t data; // Actual bitboard
+        uint64_t _data; // Actual bitboard
     };
 } // namespace engine::board
 

@@ -15,13 +15,13 @@
 
 #include "conf/enums.h"
 #include "conf/types.h"
-#include "engine/board/board.h"
 #include "engine/board/mask.h"
+#include "engine/board/state.h"
 
 /**
- * @namespace engine::board::magics_generator
+ * @namespace engine::board
  */
-namespace engine::board::magics_generator
+namespace engine::board
 {
     /**
      * @brief Computes bitboards of attackable squares by a
@@ -97,6 +97,6 @@ namespace engine::board::magics_generator
      */
     void initMagics() noexcept;
 
-} // namespace engine::board::magics_generator
+} // namespace engine::board
 
 #endif // MAGICS_GENERATOR_H_

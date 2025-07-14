@@ -16,12 +16,11 @@ namespace engine::game
 {
 
     using namespace conf::enums;
-    using namespace board;
+    using namespace engine::board;
+    using namespace engine::game;
 
     Game::Game() noexcept
-        : turnCount(0)
-        , colorToPlay(Colors::WHITE)
-        , board(Board{})
+        : state(State{})
     {
     }
 } // namespace engine::game

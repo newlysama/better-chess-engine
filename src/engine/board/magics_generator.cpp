@@ -19,12 +19,11 @@
 #include "logging/logging.h"
 
 /**
- * @namespace engine::board::magics_generator
+ * @namespace engine::board
  */
-namespace engine::board::magics_generator
+namespace engine::board
 {
     using namespace conf::enums;
-    using namespace engine::board::mask;
 
     Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
     {
@@ -32,47 +31,47 @@ namespace engine::board::magics_generator
         Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[squareIndex];
 
         // North
-        Bitboard ray = Board::shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
+        Bitboard ray = shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::NORTH>(ray);
+            ray = shiftDir<Directions::NORTH>(ray);
         }
 
         // South
-        ray = Board::shiftDir<Directions::SOUTH>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::SOUTH>(ray);
+            ray = shiftDir<Directions::SOUTH>(ray);
         }
 
         // East
-        ray = Board::shiftDir<Directions::EAST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::EAST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::EAST>(ray);
+            ray = shiftDir<Directions::EAST>(ray);
         }
 
         // West
-        ray = Board::shiftDir<Directions::WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::WEST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::WEST>(ray);
+            ray = shiftDir<Directions::WEST>(ray);
         }
 
         return attacks;
@@ -84,47 +83,47 @@ namespace engine::board::magics_generator
         Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[squareIndex];
 
         // NE
-        Bitboard ray = Board::shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
+        Bitboard ray = shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::NORTH_EAST>(ray);
+            ray = shiftDir<Directions::NORTH_EAST>(ray);
         }
 
         // NW
-        ray = Board::shiftDir<Directions::NORTH_WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::NORTH_WEST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::NORTH_WEST>(ray);
+            ray = shiftDir<Directions::NORTH_WEST>(ray);
         }
 
         // SE
-        ray = Board::shiftDir<Directions::SOUTH_EAST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH_EAST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::SOUTH_EAST>(ray);
+            ray = shiftDir<Directions::SOUTH_EAST>(ray);
         }
 
         // SW
-        ray = Board::shiftDir<Directions::SOUTH_WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH_WEST>(Bitboard(1ULL << squareIndex));
         while (!ray.isEmpty())
         {
             attacks |= ray;
             if ((ray & occupancyMasked) != Bitboard(0ULL))
                 break;
 
-            ray = Board::shiftDir<Directions::SOUTH_WEST>(ray);
+            ray = shiftDir<Directions::SOUTH_WEST>(ray);
         }
 
         return attacks;
@@ -343,4 +342,4 @@ namespace engine::board::magics_generator
         std::cout << "};\n\n";
     }
 
-} // namespace engine::board::magics_generator
+} // namespace engine::board

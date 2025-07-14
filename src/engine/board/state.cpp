@@ -1,13 +1,13 @@
 /**
- * @file      board.cpp
+ * @file      state.cpp
  * @author    Thibault THOMAS
  * @copyright Copyright 2025 Better Chess Engine
  * @par       This project is released under the MIT License
  *
- * @brief Board class implementation.
+ * @brief State class implementation.
  */
 
-#include "engine/board/board.h"
+#include "engine/board/state.h"
 
 /**
  * @namespace engine::board
@@ -16,7 +16,7 @@ namespace engine::board
 {
     using namespace conf::enums;
 
-    Board::Board() noexcept
+    State::State() noexcept
         : allPieces{{// -- White pieces (index 0) --
                      {
                          Bitboard{0x0000'0000'0000'FF00ULL}, // pawns

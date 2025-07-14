@@ -3,7 +3,7 @@ openmp_dep = dependency('openmp', required: false)
 
 #- Source Files -#
 board_src = files(
-  'board.cpp'
+  'state.cpp'
 )
 
 # If we want to generate magics, need openmp

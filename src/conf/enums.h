@@ -89,9 +89,21 @@ namespace conf::enums
         NORTH_WEST = 5,
         SOUTH_EAST = 6,
         SOUTH_WEST = 7,
+
+        // Pawn specific dirs
         NORTH_NORTH = 8,
         SOUTH_SOUTH = 9,
-        DIRECTIONS = 10
+
+        // Knight specific dirs
+        NNE = 10,
+        ENE = 11,
+        ESE = 12,
+        SSE = 13,
+        SSW = 14,
+        WSW = 15,
+        WNW = 16,
+        NNW = 17,
+        DIRECTIONS = 18
     };
 
     /**

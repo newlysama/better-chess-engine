@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#include "engine/board/board.h"
+#include "engine/board/state.h"
 
 /**
  * @namespace engine::printer
@@ -38,12 +38,12 @@ namespace engine::printer
           "\033[32m󰡚\033[0m", "\033[32m󰡗\033[0m"}}
     };
 
-    // Tabs to center a bit the board and the header on the terminal
+    // Tabs to center a bit the state and the header on the terminal
     const std::string HEADER_TAB = "                        ";
     const std::string BOARD_TAB = "              ";
 
     /**
-     * @brief Prints the board's print function header.
+     * @brief Prints the state's print function header.
      */
     inline void printHeader() noexcept
     {
@@ -57,7 +57,7 @@ namespace engine::printer
     }
 
     /**
-     * @brief Prints the tab before the board, the rank's number and the opening border.
+     * @brief Prints the tab before the state, the rank's number and the opening border.
      */
     inline void printRankStart(const int rankIndex) noexcept
     {
@@ -80,14 +80,14 @@ namespace engine::printer
     /**
      * @brief Get a colored string representing a piece on a specific square.
      */
-    inline constexpr std::string_view getPiece(const Board& board, int squareIndex)
+    inline constexpr std::string_view getPiece(const State& state, int squareIndex)
     {
         for (std::size_t color = 0; color < Colors::COLORS; color++)
         {
             for (std::size_t piece = 0; piece < Pieces::PIECES; piece++)
             {
                 // If allPieces[color][piece] is set to 1 (piece is present)
-                if ((board.allPieces[color][piece].getData() >> squareIndex) & 1ULL)
+                if ((state.allPieces[color][piece].getData() >> squareIndex) & 1ULL)
                 {
                     return PIECE_STR[color][piece];
                 }
@@ -99,13 +99,13 @@ namespace engine::printer
     }
 
     /**
-     * @brief Prints the board.
+     * @brief Prints the state.
      */
-    inline void printBoard(const Board& board) noexcept
+    inline void printBoard(const State& state) noexcept
     {
         printHeader();
 
-        for (int rankIndex = 0; rankIndex < 8; rankIndex++)
+        for (int rankIndex = 7; rankIndex >= 0; rankIndex--)
         {
             std::cout << BOARD_TAB << "  -------------------------------------------------\n";
             std::cout << BOARD_TAB << "  |     |     |     |     |     |     |     |     |\n";
@@ -115,8 +115,8 @@ namespace engine::printer
             for (int fileIndex = 0; fileIndex < 8; fileIndex++)
             {
                 // Get the piece to print
-                int squareIndex = Board::getSquareIndex(rankIndex, fileIndex);
-                std::string_view piece = getPiece(board, squareIndex);
+                int squareIndex = State::getSquareIndex(rankIndex, fileIndex);
+                std::string_view piece = getPiece(state, squareIndex);
 
                 std::cout << "  " << piece << "  |";
             }

@@ -18,9 +18,9 @@
 #include "engine/board/magic_const.h"
 
 /**
- * @namespace engine::board::mask
+ * @namespace engine::board
  */
-namespace engine::board::mask
+namespace engine::board
 {
     using namespace conf::enums;
     using namespace conf::types;
@@ -82,6 +82,36 @@ namespace engine::board::mask
     inline constexpr Bitboard NOT_FILE_EDGES_MASK = ~(FILE_A_MASK | FILE_H_MASK);
 
     /**
+     * @brief Shifts a given Bitboard in a given direction.
+     *
+     * @param [in] bb : Bitboard to shift
+     * @return Bitboard : the shifted bitboard
+     */
+    template <Directions Dir>
+    inline consteval Bitboard shiftDir(Bitboard bb) noexcept
+    {
+        return Dir == Directions::NORTH       ? Bitboard(bb << 8)
+             : Dir == Directions::SOUTH       ? Bitboard(bb >> 8)
+             : Dir == Directions::EAST        ? Bitboard((bb & ~FILE_H_MASK) << 1)
+             : Dir == Directions::WEST        ? Bitboard((bb & ~FILE_A_MASK) >> 1)
+             : Dir == Directions::NORTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) << 9)
+             : Dir == Directions::NORTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) << 7)
+             : Dir == Directions::SOUTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) >> 7)
+             : Dir == Directions::SOUTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) >> 9)
+             : Dir == Directions::NORTH_NORTH ? Bitboard(bb << 16)
+             : Dir == Directions::SOUTH_SOUTH ? Bitboard(bb >> 16)
+             : Dir == Directions::NNE         ? Bitboard((bb & ~FILE_H_MASK) << 17)
+             : Dir == Directions::ENE         ? Bitboard((bb & ~(FILE_H_MASK | FILE_G_MASK)) << 10)
+             : Dir == Directions::ESE         ? Bitboard((bb & ~(FILE_H_MASK | FILE_G_MASK)) >> 6)
+             : Dir == Directions::SSE         ? Bitboard((bb & ~FILE_H_MASK) >> 15)
+             : Dir == Directions::SSW         ? Bitboard((bb & ~FILE_A_MASK) >> 17)
+             : Dir == Directions::WSW         ? Bitboard((bb & ~(FILE_A_MASK | FILE_B_MASK)) >> 10)
+             : Dir == Directions::WNW         ? Bitboard((bb & ~(FILE_A_MASK | FILE_B_MASK)) << 6)
+             : Dir == Directions::NNW         ? Bitboard((bb & ~FILE_A_MASK) << 15)
+                                              : Bitboard(0ULL);
+    }
+
+    /**
      * @brief Builds diagonals masks.
      * @return 1x15 array of attacks masks
      */
@@ -135,23 +165,20 @@ namespace engine::board::mask
     inline consteval BitboardTable initPawnAttacksMasks() noexcept
     {
         BitboardTable masks{};
-
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard mask = Bitboard(1ULL << squareIndex);
-
+            Bitboard squareBB = Bitboard(1ULL << squareIndex);
             if constexpr (Color == Colors::WHITE)
             {
-                // North-West (<<7) excludes file A, North-East (<<9) excludes file H
-                masks[squareIndex] = ((mask << 7) & ~FILE_A_MASK) | ((mask << 9) & ~FILE_H_MASK);
+                masks[squareIndex] =
+                    shiftDir<Directions::NORTH_WEST>(squareBB) | shiftDir<Directions::NORTH_EAST>(squareBB);
             }
             else
             {
-                // South-East (>>7) excludes file H, South-West (>>9) excludes file A
-                masks[squareIndex] = ((mask >> 7) & ~FILE_H_MASK) | ((mask >> 9) & ~FILE_A_MASK);
+                masks[squareIndex] =
+                    shiftDir<Directions::SOUTH_EAST>(squareBB) | shiftDir<Directions::SOUTH_WEST>(squareBB);
             }
         }
-
         return masks;
     }
 
@@ -163,23 +190,20 @@ namespace engine::board::mask
     inline consteval BitboardTable initPawnPushesMasks() noexcept
     {
         BitboardTable masks{};
-
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard mask = Bitboard(1ULL << squareIndex);
-
+            Bitboard squareBB = Bitboard(1ULL << squareIndex);
             if constexpr (Color == Colors::WHITE)
             {
-                // One step north or two steps from rank 2
-                masks[squareIndex] = (mask << 8) | ((mask & RANKS_MASKS[1]) << 16);
+                masks[squareIndex] =
+                    shiftDir<Directions::NORTH>(squareBB) | shiftDir<Directions::NORTH_NORTH>(squareBB);
             }
             else
             {
-                // One step south or two steps from rank 7
-                masks[squareIndex] = (mask >> 8) | ((mask & RANKS_MASKS[6]) >> 16);
+                masks[squareIndex] =
+                    shiftDir<Directions::SOUTH>(squareBB) | shiftDir<Directions::SOUTH_SOUTH>(squareBB);
             }
         }
-
         return masks;
     }
     // clang-format off
@@ -201,21 +225,14 @@ namespace engine::board::mask
     inline consteval BitboardTable initKnightAttacksMasks() noexcept
     {
         BitboardTable masks{};
-
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard mask = Bitboard(1ULL << squareIndex);
-
-            masks[squareIndex] = ((mask << 17) & ~FILE_A_MASK)  // +2 North / +1 West
-                               | ((mask << 15) & ~FILE_H_MASK)  // +2 North / +1 East
-                               | ((mask << 10) & NOT_GH_MASK)   // +1 North / +2 West
-                               | ((mask >> 6) & NOT_GH_MASK)    // +1 South / +2 West
-                               | ((mask << 6) & NOT_AB_MASK)    // +1 North / +2 East
-                               | ((mask >> 10) & NOT_AB_MASK)   // +1 South / +2 East
-                               | ((mask >> 15) & ~FILE_A_MASK)  // +2 South / +1 West
-                               | ((mask >> 17) & ~FILE_H_MASK); // +2 South / +1 East
+            Bitboard squareBB = Bitboard(1ULL << squareIndex);
+            masks[squareIndex] = shiftDir<Directions::NNE>(squareBB) | shiftDir<Directions::ENE>(squareBB) |
+                                 shiftDir<Directions::ESE>(squareBB) | shiftDir<Directions::SSE>(squareBB) |
+                                 shiftDir<Directions::SSW>(squareBB) | shiftDir<Directions::WSW>(squareBB) |
+                                 shiftDir<Directions::WNW>(squareBB) | shiftDir<Directions::NNW>(squareBB);
         }
-
         return masks;
     }
     inline constexpr BitboardTable KNIGHT_ATTACKS_MASKS = initKnightAttacksMasks();
@@ -232,14 +249,10 @@ namespace engine::board::mask
         {
             Bitboard mask = Bitboard(1ULL << squareIndex);
 
-            masks[squareIndex] = (mask << 8)                   // North
-                               | (mask >> 8)                   // South
-                               | ((mask << 1) & ~FILE_A_MASK)  // East
-                               | ((mask >> 1) & ~FILE_H_MASK)  // West
-                               | ((mask << 9) & ~FILE_A_MASK)  // North-East
-                               | ((mask << 7) & ~FILE_H_MASK)  // North-West
-                               | ((mask >> 7) & ~FILE_A_MASK)  // South-East
-                               | ((mask >> 9) & ~FILE_H_MASK); // South-West
+            masks[squareIndex] = shiftDir<Directions::NORTH>(mask) | shiftDir<Directions::SOUTH>(mask) |
+                                 shiftDir<Directions::EAST>(mask) | shiftDir<Directions::WEST>(mask) |
+                                 shiftDir<Directions::NORTH_EAST>(mask) | shiftDir<Directions::NORTH_WEST>(mask) |
+                                 shiftDir<Directions::SOUTH_EAST>(mask) | shiftDir<Directions::SOUTH_WEST>(mask);
         }
 
         return masks;
@@ -377,7 +390,7 @@ namespace engine::board::mask
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            int bits = 64 - magic_const::rookShifts[squareIndex];
+            int bits = 64 - rookShifts[squareIndex];
             uint64_t nEntries = 1ULL << bits;
 
             // Get relevant occupancy mask for this square
@@ -446,8 +459,8 @@ namespace engine::board::mask
                 }
 
                 // Store in table using magic index
-                uint64_t magicIndex = (occupancyBB.getData() * magic_const::rookMagics[squareIndex].getData()) >>
-                                      magic_const::rookShifts[squareIndex];
+                uint64_t magicIndex =
+                    (occupancyBB.getData() * rookMagics[squareIndex].getData()) >> rookShifts[squareIndex];
                 table[squareIndex][magicIndex] = attacks;
             }
         }
@@ -469,7 +482,7 @@ namespace engine::board::mask
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            int bits = 64 - magic_const::bishopShifts[squareIndex];
+            int bits = 64 - bishopShifts[squareIndex];
             uint64_t nEntries = 1ULL << bits;
 
             // Get relevant occupancy mask for this square
@@ -538,8 +551,8 @@ namespace engine::board::mask
                 }
 
                 // Store in table using magic index
-                uint64_t magicIndex = (occupancyBB.getData() * magic_const::bishopMagics[squareIndex].getData()) >>
-                                      magic_const::bishopShifts[squareIndex];
+                uint64_t magicIndex =
+                    (occupancyBB.getData() * bishopMagics[squareIndex].getData()) >> bishopShifts[squareIndex];
                 table[squareIndex][magicIndex] = attacks;
             }
         }
@@ -583,6 +596,6 @@ namespace engine::board::mask
         Bitboard((1ULL << 5) | (1ULL << 6)), Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
         Bitboard((1ULL << 61) | (1ULL << 62)), Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
 
-} // namespace engine::board::mask
+} // namespace engine::board
 
 #endif // MASKS_H_
