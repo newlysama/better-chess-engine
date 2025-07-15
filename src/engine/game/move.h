@@ -17,7 +17,6 @@
 #include <string_view>
 #endif
 
-#include "engine/board/state.h"
 #include "engine/core/enums.h"
 
 /**
@@ -26,7 +25,6 @@
 namespace engine::game
 {
     using namespace engine::core;
-    using namespace engine::board;
 
     /**
      * @class Move

@@ -19,7 +19,7 @@ namespace engine::board
     State::State() noexcept
         : halfMoveClock(0)
         , fullMoveClock(0)
-        , colorToPlay(Colors::WHITE)
+        , sideToMove(Colors::WHITE)
         , castlingRights(uint8_t(0))
         ,allPieces{
                     {

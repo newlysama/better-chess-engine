@@ -26,26 +26,15 @@ namespace engine::game
     using namespace engine::board;
 
     /**
-     * @typedef UnmakeInfo
-     * @brief Contains all the necessary info to unmake a move.
-     */
-    typedef struct UnmakeInfo
-    {
-        Move move;
-        Pieces captured;
-        State* previous;
-    } UnmakeInfo;
-
-    /**
      * @class MoveList
      */
     class MoveList
     {
       public:
         /**
-         * @brief Default constructor.
+         * @brief Constructor.
          */
-        MoveList() noexcept = default;
+        MoveList(State& state) noexcept;
 
         /**
          * @brief Add a new move to the moves list, throw exception if it is full.
@@ -153,9 +142,8 @@ namespace engine::game
          */
         void generateKingMoves(const State& state, Colors color) noexcept;
 
-        Move _moves[256];                // Actual list of moves
-        int _size;                       // Current size of the list
-        std::stack<UnmakeInfo> _history; // History of made moves
+        Move _moves[256]; // Actual list of moves
+        int _size;        // Current size of the list
     };
 } // namespace engine::game
 

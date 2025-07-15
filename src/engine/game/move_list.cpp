@@ -21,6 +21,12 @@ namespace engine::game
     using namespace engine::core;
     using namespace engine::board;
 
+    MoveList::MoveList(State& state) noexcept
+        : _moves{}
+        , _size(0)
+    {
+    }
+
     void MoveList::add(Move& move) noexcept
     {
         // clang-format off
@@ -56,7 +62,7 @@ namespace engine::game
             this->add(move);
 
             // Move to the next target
-            targets &= ~(1ULL << squareTo);
+            targets.unset(squareTo);
         }
     }
 
@@ -75,7 +81,7 @@ namespace engine::game
             int squareFrom = pawns.lsbIndex();
 
             // Move to the next pawn
-            pawns &= ~(1ULL << squareFrom);
+            pawns.unset(squareFrom);
 
             // Rechable empty squares
             Bitboard pushTargets = PAWN_PUSHES_MASKS[color][squareFrom] & ~state.generalOccupancy;
@@ -100,7 +106,7 @@ namespace engine::game
             int squareFrom = knights.lsbIndex();
 
             // Move to the next knight
-            knights &= ~(1ULL << squareFrom);
+            knights.unset(squareFrom);
 
             // Get the targets
             Bitboard targets = KNIGHT_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[color];
@@ -128,7 +134,7 @@ namespace engine::game
             int squareFrom = rooks.lsbIndex();
 
             // Move to the next rook
-            rooks &= ~(1ULL << squareFrom);
+            rooks.unset(squareFrom);
 
             Bitboard relevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
 
@@ -162,7 +168,7 @@ namespace engine::game
             int squareFrom = bishops.lsbIndex();
 
             // Move to the next bishop
-            bishops &= ~(1ULL << squareFrom);
+            bishops.unset(squareFrom);
 
             Bitboard relevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[squareFrom];
 
@@ -197,7 +203,7 @@ namespace engine::game
             int squareFrom = queen.lsbIndex();
 
             // Remove queen's bit
-            queen &= ~(1ULL << squareFrom);
+            queen.unset(squareFrom);
 
             // Magic rook
             Bitboard rookRelevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
@@ -236,5 +242,15 @@ namespace engine::game
 
         this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
         this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+    }
+
+    void MoveList::generateAllMoves(const State& state, Colors color) noexcept
+    {
+        this->generatePawnsMoves(state, color);
+        this->generateKnightsMoves(state, color);
+        this->generateRooksMoves(state, color);
+        this->generateBishopsMoves(state, color);
+        this->generateQueenMoves(state, color);
+        this->generateKingMoves(state, color);
     }
 } // namespace engine::game

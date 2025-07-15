@@ -35,7 +35,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::NORTH>(ray);
@@ -46,7 +46,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::SOUTH>(ray);
@@ -57,7 +57,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::EAST>(ray);
@@ -68,7 +68,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::WEST>(ray);
@@ -87,7 +87,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::NORTH_EAST>(ray);
@@ -98,7 +98,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::NORTH_WEST>(ray);
@@ -109,7 +109,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::SOUTH_EAST>(ray);
@@ -120,7 +120,7 @@ namespace engine::board
         while (!ray.isEmpty())
         {
             attacks |= ray;
-            if ((ray & occupancyMasked) != Bitboard(0ULL))
+            if ((ray & occupancyMasked).isEmpty() == false)
                 break;
 
             ray = shiftDir<Directions::SOUTH_WEST>(ray);
@@ -154,7 +154,7 @@ namespace engine::board
         std::vector<int> bitIndices;
         for (int i = 0; i < 64; i++)
         {
-            if ((mask.getData() >> i) & 1ULL)
+            if (mask.isSet(i))
             {
                 bitIndices.push_back(i);
             }
@@ -218,7 +218,7 @@ namespace engine::board
 
         for (int i = 0; i < 64; i++)
         {
-            if ((mask.getData() >> i) & 1ULL)
+            if (mask.isSet(i))
             {
                 bitIndices.push_back(i);
             }

@@ -87,7 +87,7 @@ namespace engine::board
      * @return Bitboard : the shifted bitboard
      */
     template <Directions Dir>
-    inline consteval Bitboard shiftDir(Bitboard bb) noexcept
+    inline constexpr Bitboard shiftDir(Bitboard bb) noexcept
     {
         return Dir == Directions::NORTH       ? Bitboard(bb << 8)
              : Dir == Directions::SOUTH       ? Bitboard(bb >> 8)
@@ -126,7 +126,7 @@ namespace engine::board
 
             std::size_t maskIndex = file - rank + 7;
 
-            masks[maskIndex] |= Bitboard(1ULL << squareIndex);
+            masks[maskIndex] |= Bitboard{1ULL << squareIndex};
         }
 
         return masks;
@@ -149,7 +149,7 @@ namespace engine::board
             // file's index + rank's index -> range [0,14]
             std::size_t maskIndex = file + rank;
 
-            masks[maskIndex] |= Bitboard(1ULL << squareIndex);
+            masks[maskIndex] |= Bitboard{1ULL << squareIndex};
         }
 
         return masks;
@@ -166,7 +166,7 @@ namespace engine::board
         BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard squareBB = Bitboard(1ULL << squareIndex);
+            Bitboard squareBB = Bitboard{1ULL << squareIndex};
             if constexpr (Color == Colors::WHITE)
             {
                 masks[squareIndex] =
@@ -191,7 +191,7 @@ namespace engine::board
         BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard squareBB = Bitboard(1ULL << squareIndex);
+            Bitboard squareBB = Bitboard{1ULL << squareIndex};
             if constexpr (Color == Colors::WHITE)
             {
                 masks[squareIndex] =
@@ -226,7 +226,7 @@ namespace engine::board
         BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
-            Bitboard squareBB = Bitboard(1ULL << squareIndex);
+            Bitboard squareBB = Bitboard{1ULL << squareIndex};
             masks[squareIndex] = shiftDir<Directions::NNE>(squareBB) | shiftDir<Directions::ENE>(squareBB) |
                                  shiftDir<Directions::ESE>(squareBB) | shiftDir<Directions::SSE>(squareBB) |
                                  shiftDir<Directions::SSW>(squareBB) | shiftDir<Directions::WSW>(squareBB) |
@@ -246,7 +246,7 @@ namespace engine::board
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            Bitboard mask = Bitboard(1ULL << squareIndex);
+            Bitboard mask = Bitboard{1ULL << squareIndex};
 
             masks[squareIndex] = shiftDir<Directions::NORTH>(mask) | shiftDir<Directions::SOUTH>(mask) |
                                  shiftDir<Directions::EAST>(mask) | shiftDir<Directions::WEST>(mask) |
@@ -270,7 +270,7 @@ namespace engine::board
         {
             std::size_t file = squareIndex & 7;
             std::size_t rank = squareIndex >> 3;
-            Bitboard mask = Bitboard(1ULL << squareIndex);
+            Bitboard mask = Bitboard{1ULL << squareIndex};
 
             // Same file and same rank without the square itself
             Bitboard byFile = FILES_MASKS[file] ^ mask;
@@ -299,7 +299,7 @@ namespace engine::board
             std::size_t diag = file - rank + 7;
             std::size_t antiDiag = file + rank;
 
-            Bitboard mask = Bitboard(1ULL << squareIndex);
+            Bitboard mask = Bitboard{1ULL << squareIndex};
             Bitboard diag1 = DIAGONALS_MASKS[diag] ^ mask;
             Bitboard diag2 = ANTI_DIAGONALS_MASKS[antiDiag] ^ mask;
 
@@ -334,8 +334,8 @@ namespace engine::board
             // Exclude files A and H
             Bitboard byRank = RANKS_MASKS[rank] & NOT_FILE_EDGES_MASK;
 
-            // remove squareIndex
-            masks[squareIndex] = (byFile | byRank) & ~Bitboard(1ULL << squareIndex);
+            masks[squareIndex] = (byFile | byRank);
+            masks[squareIndex].unset(squareIndex);
         }
 
         return masks;
@@ -369,7 +369,8 @@ namespace engine::board
             Bitboard byAntiDiag = ANTI_DIAGONALS_MASKS[antiDiag] & NOT_FILE_EDGES_MASK & NOT_RANK_EDGES_MASK;
 
             // remove squareIndex
-            masks[squareIndex] = (byDiag | byAntiDiag) ^ Bitboard(1ULL << squareIndex);
+            masks[squareIndex] = (byDiag | byAntiDiag);
+            masks[squareIndex].unset(squareIndex);
         }
 
         return masks;
@@ -408,53 +409,52 @@ namespace engine::board
                     int square = tempMask.lsbIndex();
                     if (occupancy & (1ULL << i))
                     {
-                        occupancyBB |= Bitboard(1ULL << square);
+                        occupancyBB.set(square);
                     }
-                    tempMask = Bitboard(tempMask.getData() & (tempMask.getData() - 1)); // Clear LSB
+                    tempMask.unset(square); // Clear LSB
                 }
 
-                // Calculate attack pattern using direct bitwise operations
                 Bitboard attacks = 0;
                 Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[squareIndex];
 
                 // North
-                Bitboard ray = Bitboard(1ULL << squareIndex) << 8;
+                Bitboard ray = shiftDir<Directions::NORTH>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = ray << 8;
+                    ray = shiftDir<Directions::NORTH>(ray);
                 }
 
                 // South
-                ray = Bitboard(1ULL << squareIndex) >> 8;
+                ray = shiftDir<Directions::SOUTH>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = ray >> 8;
+                    ray = shiftDir<Directions::SOUTH>(ray);
                 }
 
                 // East
-                ray = (Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 1;
+                ray = shiftDir<Directions::EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_H_MASK) << 1;
+                    ray = shiftDir<Directions::EAST>(ray);
                 }
 
                 // West
-                ray = (Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 1;
+                ray = shiftDir<Directions::WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_A_MASK) >> 1;
+                    ray = shiftDir<Directions::WEST>(ray);
                 }
 
                 // Store in table using magic index
@@ -500,53 +500,51 @@ namespace engine::board
                     int square = tempMask.lsbIndex();
                     if (occupancy & (1ULL << i))
                     {
-                        occupancyBB |= Bitboard(1ULL << square);
+                        occupancyBB.set(square);
                     }
-                    tempMask = Bitboard(tempMask.getData() & (tempMask.getData() - 1)); // Clear LSB
+                    tempMask.unset(square); // Clear LSB
                 }
-
-                // Calculate attack pattern using direct bitwise operations (like in magics_generator.cpp)
                 Bitboard attacks = 0;
                 Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[squareIndex];
 
                 // North-East
-                Bitboard ray = (Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) << 9;
+                Bitboard ray = shiftDir<Directions::NORTH_EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_H_MASK) << 9;
+                    ray = shiftDir<Directions::NORTH_EAST>(ray);
                 }
 
                 // North-West
-                ray = (Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) << 7;
+                ray = shiftDir<Directions::NORTH_WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_A_MASK) << 7;
+                    ray = shiftDir<Directions::NORTH_WEST>(ray);
                 }
 
                 // South-East
-                ray = (Bitboard(1ULL << squareIndex) & ~FILE_H_MASK) >> 7;
+                ray = shiftDir<Directions::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_H_MASK) >> 7;
+                    ray = shiftDir<Directions::SOUTH_EAST>(ray);
                 }
 
                 // South-West
-                ray = (Bitboard(1ULL << squareIndex) & ~FILE_A_MASK) >> 9;
+                ray = shiftDir<Directions::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
-                    if ((ray & occupancyMasked) != Bitboard(0ULL))
+                    if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = (ray & ~FILE_A_MASK) >> 9;
+                    ray = shiftDir<Directions::SOUTH_WEST>(ray);
                 }
 
                 // Store in table using magic index

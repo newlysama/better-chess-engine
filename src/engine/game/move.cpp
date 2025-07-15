@@ -15,7 +15,6 @@
 namespace engine::game
 {
     using namespace engine::core;
-    using namespace engine::board;
 
     Move::Move(const int from, const int to, const MoveTypes type) noexcept
         : _squareFrom(from)

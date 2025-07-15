@@ -16,6 +16,7 @@
 #include "engine/board/bitboard.h"
 #include "engine/board/mask.h"
 #include "engine/core/types.h"
+#include "engine/game/move.h"
 
 /**
  * @namespace engine::board
@@ -23,7 +24,20 @@
 namespace engine::board
 {
     using namespace engine::core;
-    using namespace engine::board;
+    using namespace engine::game;
+
+    /**
+     * @typedef UnmakeInfo
+     * @brief Contains all the necessary infos to unmake a move.
+     */
+    typedef struct StateInfo
+    {
+        Move move;
+        Pieces captured;
+        StateInfo* previous;
+
+        StateInfo() = default;
+    } StateInfo;
 
     /**
      * @class State
@@ -111,13 +125,15 @@ namespace engine::board
 
         uint16_t halfMoveClock; // Half move counter
         uint16_t fullMoveClock; // Full move counter
-        Colors colorToPlay;     // Whose turn is it ? :)
+        Colors sideToMove;      // Whose turn is it ? :)
 
         CastlingRights castlingRights; // Informations about enabled castlings.
 
         PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;             // Occupancy for all pieces
         ColoredOccupancies coloredOccupancies; // Team specific occupancies
+
+        StateInfo stateInfo; // Structure holding relevant infos to unmake a move
     };
 
 } // namespace engine::board
