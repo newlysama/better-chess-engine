@@ -165,6 +165,32 @@ namespace engine::board
         }
 
         /**
+         * @brief Checker wether a bit is set to 1 at a specific index.
+         *
+         * @return bool : Wether the bit is set or not
+         */
+        inline constexpr bool isSet(int index) const noexcept
+        {
+            return (((this->_data >> index) & 1ULL) == 1ULL);
+        }
+
+        /**
+         * @brief Set a bit to to 1.
+         */
+        inline constexpr void set(int index) noexcept
+        {
+            this->_data |= (1ULL << index);
+        }
+
+        /**
+         * @brief Set a bit to to 0.
+         */
+        inline constexpr void unset(int index) noexcept
+        {
+            this->_data &= ~(1ULL << index);
+        }
+
+        /**
          * @brief  Check if the bitboard is empty.
          *
          * @return bool : wether the bitboard is empty or not
@@ -182,6 +208,14 @@ namespace engine::board
         inline constexpr int lsbIndex() const noexcept
         {
             return std::countr_zero(this->_data);
+        }
+
+        /**
+         * @brief Pops the LSB.
+         */
+        inline constexpr void popLsb() noexcept
+        {
+            this->_data &= ~(1ULL << this->lsbIndex());
         }
 
         /**
