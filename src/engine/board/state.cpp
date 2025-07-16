@@ -9,6 +9,14 @@
 
 #include "engine/board/state.h"
 
+#include "engine/core/const.h"
+#include "logging/logging.h"
+#include "utils/enums_to_string.h"
+
+#if !defined(BUILD_RELEASE)
+#include "utils/utils.h"
+#endif
+
 /**
  * @namespace engine::board
  */
@@ -54,6 +62,68 @@ namespace engine::board
         }
 
         this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
+    }
+
+    Pieces State::getPiece(int squareIndex) const noexcept
+    {
+        for (Colors color : {Colors::WHITE, Colors::BLACK})
+        {
+            for (Pieces piece = Pieces::PAWN; piece < Pieces::PIECES; piece = static_cast<Pieces>(piece + 1))
+            {
+                if (this->allPieces[color][piece].isSet(squareIndex))
+                {
+                    return piece;
+                }
+            }
+        }
+
+        LOG_ERROR("[State::getPiece()] Trying to access piece at square {}, but no piece was found.", squareIndex);
+        return Pieces::UNKNOWN_PIECE;
+    }
+
+    Pieces State::getPiece(const Colors color, const int squareIndex) const noexcept
+    {
+        for (Pieces piece = Pieces::PAWN; piece < Pieces::PIECES; piece = static_cast<Pieces>(piece + 1))
+        {
+            if (this->allPieces[color][piece].isSet(squareIndex))
+            {
+                return piece;
+            }
+        }
+
+        LOG_ERROR("[State::getPiece(Color)] Trying to access piece of team {} at square {}, but no piece was found.",
+                  utils::toString(color), squareIndex);
+
+        return Pieces::UNKNOWN_PIECE;
+    }
+
+    void State::setPiece(const Colors color, const Pieces piece, const int squareIndex) noexcept
+    {
+        this->allPieces[color][piece].set(squareIndex);
+        this->generalOccupancy.set(squareIndex);
+        this->coloredOccupancies[color].set(squareIndex);
+
+        LOG_DEBUG("[State::setPiece()] Added {} {} to {}", utils::toString(color), utils::toString(piece),
+                  utils::squareIndexToString(squareIndex));
+    }
+
+    void State::unsetPiece(const Colors color, const Pieces piece, const int squareIndex) noexcept
+    {
+        this->allPieces[color][piece].unset(squareIndex);
+        this->generalOccupancy.unset(squareIndex);
+        this->coloredOccupancies[color].unset(squareIndex);
+
+        LOG_DEBUG("[State::unsetPiece()] Removed {} {} from {}", utils::toString(color), utils::toString(piece),
+                  utils::squareIndexToString(squareIndex));
+    }
+
+    void State::movePiece(const Colors color, const Pieces piece, const int fromSquare, const int toSquare) noexcept
+    {
+        this->unsetPiece(color, piece, fromSquare);
+        this->setPiece(color, piece, toSquare);
+
+        LOG_INFO("[State::movePiece()] Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
+                 utils::squareIndexToString(fromSquare), utils::squareIndexToString(toSquare));
     }
 
 } // namespace engine::board
