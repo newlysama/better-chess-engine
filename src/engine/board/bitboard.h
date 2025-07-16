@@ -13,15 +13,11 @@
 #include <bit>
 #include <cstdint>
 
-#include "engine/core/enums.h"
-
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace engine::core;
-
     /**
      * @class Bitboard
      * @brief Wrapper around an actual bitboard (64 bits unsigned int).
