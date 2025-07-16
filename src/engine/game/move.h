@@ -24,8 +24,6 @@
  */
 namespace engine::game
 {
-    using namespace engine::core;
-
     /**
      * @class Move
      */
@@ -40,34 +38,41 @@ namespace engine::game
         /**
          * @brief Constructor.
          */
-        Move(const int from, const int to, const MoveTypes type) noexcept;
+        Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece) noexcept;
 
-        inline constexpr bool operator==(Move& move) noexcept;
-        inline constexpr bool operator!=(Move& move) noexcept;
+        bool operator==(Move& move) const noexcept;
+        bool operator!=(Move& move) const noexcept;
+
+        /**
+         * @brief Check if a move is set (not set when default constructed).
+         *
+         * @return bool : weather the move is set or not
+         */
+        bool isSet() const noexcept;
 
         // clang-format off
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
             inline void print() const noexcept
             {
                 std::string_view typeStr =
-                      _moveType == CAPTURE    ? "Capture"
-                    : _moveType == QUIET      ? "Quiet"
-                    : _moveType == PROMOTION  ? "Promotion"
-                    : _moveType == CASTLE     ? "Castle"
-                    : _moveType == ENPASSANT  ? "En Passant"
+                      moveType == core::MoveTypes::CAPTURE    ? "Capture"
+                    : moveType == core::MoveTypes::QUIET      ? "Quiet"
+                    : moveType == core::MoveTypes::PROMOTION  ? "Promotion"
+                    : moveType == core::MoveTypes::CASTLE     ? "Castle"
+                    : moveType == core::MoveTypes::ENPASSANT  ? "En Passant"
                     : "";
 
-                std::cout << "Square from: " << _squareFrom << "\n"
-                          << "Square to:   " << _squareTo   << "\n"
+                std::cout << "Square from: " << squareFrom << "\n"
+                          << "Square to:   " << squareTo   << "\n"
                           << "Move type:   " << typeStr      << "\n";
             }
         #endif
         // clang-format on
 
-      private:
-        int _squareFrom;     // Start square
-        int _squareTo;       // Target square
-        MoveTypes _moveType; // Move type (Capture, EnPassant, etc...)
+        int squareFrom;           // Start square
+        int squareTo;             // Target square
+        core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
+        core::Pieces fromPiece;   // Piece type on squareFrom
     };
 } // namespace engine::game
 
