@@ -147,8 +147,12 @@ namespace engine::game
 
         this->state.sideToMove = enemyColor;
 
-        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}]",
-                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove));
+        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}] - [White "
+                  "king side castling right: {}] - [White queen side castling right: {}] - [Black king side castling "
+                  "right: {}] - [Black queen side castling right: {}]",
+                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove),
+                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>(),
+                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>());
 
         this->moveList.generateAllMoves(this->state, enemyColor);
     }
