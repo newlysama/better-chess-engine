@@ -51,6 +51,7 @@ namespace logging
         // Create and configure logger
         logger = std::make_shared<spdlog::logger>("engine", std::initializer_list<spdlog::sink_ptr>{sink});
         logger->set_level(isRelease ? spdlog::level::info : spdlog::level::trace);
+        logger->flush_on(spdlog::level::info);
         spdlog::register_logger(logger);
     }
 
