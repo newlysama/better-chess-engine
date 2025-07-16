@@ -16,6 +16,7 @@
 #include <random>
 #include <vector>
 
+#include "engine/board/mask.h"
 #include "logging/logging.h"
 
 /**
@@ -31,7 +32,7 @@ namespace engine::board
         Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[squareIndex];
 
         // North
-        Bitboard ray = shiftDir<Directions::NORTH>(Bitboard(1ULL << squareIndex));
+        Bitboard ray = shiftDir<Directions::NORTH>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -42,7 +43,7 @@ namespace engine::board
         }
 
         // South
-        ray = shiftDir<Directions::SOUTH>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -53,7 +54,7 @@ namespace engine::board
         }
 
         // East
-        ray = shiftDir<Directions::EAST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::EAST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -64,7 +65,7 @@ namespace engine::board
         }
 
         // West
-        ray = shiftDir<Directions::WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::WEST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -83,7 +84,7 @@ namespace engine::board
         Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[squareIndex];
 
         // NE
-        Bitboard ray = shiftDir<Directions::NORTH_EAST>(Bitboard(1ULL << squareIndex));
+        Bitboard ray = shiftDir<Directions::NORTH_EAST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -94,7 +95,7 @@ namespace engine::board
         }
 
         // NW
-        ray = shiftDir<Directions::NORTH_WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::NORTH_WEST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -105,7 +106,7 @@ namespace engine::board
         }
 
         // SE
-        ray = shiftDir<Directions::SOUTH_EAST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -116,7 +117,7 @@ namespace engine::board
         }
 
         // SW
-        ray = shiftDir<Directions::SOUTH_WEST>(Bitboard(1ULL << squareIndex));
+        ray = shiftDir<Directions::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -184,7 +185,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackRook(squareIndex, Bitboard(occupancy)).getData();
+                uint64_t attack = slidingAttackRook(squareIndex, Bitboard{occupancy}).getData();
 
                 if (used[key] == 0ULL)
                 {
@@ -199,7 +200,7 @@ namespace engine::board
 
             if (!fail)
             {
-                return Bitboard(magic);
+                return Bitboard{magic};
             }
         }
     }
@@ -249,7 +250,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackBishop(squareIndex, Bitboard(occupancy)).getData();
+                uint64_t attack = slidingAttackBishop(squareIndex, Bitboard{occupancy}).getData();
 
                 if (used[key] == 0ULL)
                 {
@@ -263,7 +264,7 @@ namespace engine::board
             }
 
             if (!fail)
-                return Bitboard(magic);
+                return Bitboard{magic};
         }
     }
 
@@ -278,7 +279,7 @@ namespace engine::board
         int nproc = omp_get_num_procs();
 
         // Turn off automatic thread adjustment
-        // Optional in practive, but I mean we never know
+        // Optional in practice, but I mean we never know
         omp_set_dynamic(0);
 
         // Specify the exact number of thread we want to use
@@ -301,7 +302,7 @@ namespace engine::board
 
         // Print C++ constexpr initializers
         // clang-format off
-        std::cout << "inline constexpr conf::types::BitboardTable rookMagics = {";
+        std::cout << "inline constexpr core::BitboardTable rookMagics = {";
         for (int i = 0; i < 64; i++)
         {
             std::cout << "Bitboard{0x"
@@ -312,7 +313,7 @@ namespace engine::board
         }
         std::cout << "};\n\n";
 
-        std::cout << "inline constexpr conf::types::BitboardTable bishopMagics = {";
+        std::cout << "inline constexpr core::BitboardTable bishopMagics = {";
         for (int i = 0; i < 64; i++)
         {
             std::cout << "Bitboard{0x"
