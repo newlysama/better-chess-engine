@@ -19,9 +19,6 @@
  */
 namespace engine::printer
 {
-    using namespace engine::core;
-    using namespace engine::board;
-
     // Print colors
     inline constexpr std::string_view RESET = "\033[0m";
     inline constexpr std::string_view RED = "\033[31m";
@@ -80,11 +77,11 @@ namespace engine::printer
     /**
      * @brief Get a colored string representing a piece on a specific square.
      */
-    inline constexpr std::string_view getPiece(const State& state, int squareIndex)
+    inline constexpr std::string_view getPiece(const board::State& state, int squareIndex)
     {
-        for (std::size_t color = 0; color < Colors::COLORS; color++)
+        for (std::size_t color = 0; color < core::Colors::COLORS; color++)
         {
-            for (std::size_t piece = 0; piece < Pieces::PIECES; piece++)
+            for (std::size_t piece = 0; piece < core::Pieces::PIECES; piece++)
             {
                 // If allPieces[color][piece] is set to 1 (piece is present)
                 if ((state.allPieces[color][piece].getData() >> squareIndex) & 1ULL)
@@ -101,10 +98,8 @@ namespace engine::printer
     /**
      * @brief Prints the state.
      */
-    inline void printBoard(const State& state) noexcept
+    inline void printBoard(const board::State& state) noexcept
     {
-        printHeader();
-
         for (int rankIndex = 7; rankIndex >= 0; rankIndex--)
         {
             std::cout << BOARD_TAB << "  -------------------------------------------------\n";
@@ -115,7 +110,7 @@ namespace engine::printer
             for (int fileIndex = 0; fileIndex < 8; fileIndex++)
             {
                 // Get the piece to print
-                int squareIndex = State::getSquareIndex(rankIndex, fileIndex);
+                int squareIndex = board::State::getSquareIndex(rankIndex, fileIndex);
                 std::string_view piece = getPiece(state, squareIndex);
 
                 std::cout << "  " << piece << "  |";
@@ -129,6 +124,16 @@ namespace engine::printer
 
         printFiles();
         std::cout << "\n\n\n";
+    }
+
+    inline void printState(const board::State& state) noexcept
+    {
+        printHeader();
+        printBoard(state);
+
+        std::cout << "Side to move:    " << state.sideToMove << "\n"
+                  << "Half Move Clock: " << state.halfMoveClock << "\n"
+                  << "Full Move Clock: " << state.fullMoveClock << "\n";
     }
 } // namespace engine::printer
 
