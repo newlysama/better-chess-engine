@@ -7,14 +7,10 @@
  * @brief Holds the move list and handles the move generation.
  */
 
-#ifndef MOVE_GENERATOR_H_
-#define MOVE_GENERATOR_H_
-
-#include <cstdint>
-#include <stack>
+#ifndef MOVE_LIST_H_
+#define MOVE_LIST_H_
 
 #include "engine/board/state.h"
-#include "engine/core/types.h"
 #include "engine/game/move.h"
 
 /**
@@ -22,9 +18,6 @@
  */
 namespace engine::game
 {
-    using namespace engine::core;
-    using namespace engine::board;
-
     /**
      * @class MoveList
      */
@@ -34,7 +27,7 @@ namespace engine::game
         /**
          * @brief Constructor.
          */
-        MoveList(State& state) noexcept;
+        MoveList() noexcept;
 
         /**
          * @brief Add a new move to the moves list, throw exception if it is full.
@@ -51,7 +44,7 @@ namespace engine::game
         /**
          * @brief Get the size of the list
          */
-        std::size_t size() noexcept;
+        std::size_t size() const noexcept;
 
         /**
          * @brief Allow [index] access though the class
@@ -61,12 +54,20 @@ namespace engine::game
         Move& operator[](std::size_t index) noexcept;
 
         /**
+         * @brief Check if a given move is present in the list.
+         *
+         * @param [in] move : the move to look for
+         * @return bool : weather the move is present or not
+         */
+        bool contains(Move move) noexcept;
+
+        /**
          * @brief Make a move.
          *
          * @param [in] state : The state to make the move on
          * @param [in] move  : The move to make
          */
-        void makeMove(State& state, const Move& move) noexcept;
+        void makeMove(board::State& state, const Move& move) noexcept;
 
         /**
          * @brief Unmake a move.
@@ -74,7 +75,7 @@ namespace engine::game
          * @param [in] state : The state to unmake the move on
          * @param [in] move  : The move to unmake
          */
-        void unmakeMove(State& state, const Move& move) noexcept;
+        void unmakeMove(board::State& state, const Move& move) noexcept;
 
         /**
          * @brief Call each generation method to generate all legal moves.
@@ -82,7 +83,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateAllMoves(const State& state, Colors color) noexcept;
+        void generateAllMoves(const board::State& state, core::Colors color) noexcept;
 
       private:
         /**
@@ -92,7 +93,8 @@ namespace engine::game
          * @param [in] squareFrom : Starting square index
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
          */
-        inline void processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType) noexcept;
+        void processTargets(board::Bitboard& targets, int squareFrom, core::MoveTypes moveType,
+                            core::Pieces fromPiece) noexcept;
 
         /**
          * @brief Generates legal Pawns moves.
@@ -100,7 +102,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generatePawnsMoves(const State& state, Colors color) noexcept;
+        void generatePawnsMoves(const board::State& state, core::Colors color) noexcept;
 
         /**
          * @brief Generates legal Knights moves.
@@ -108,7 +110,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateKnightsMoves(const State& state, Colors color) noexcept;
+        void generateKnightsMoves(const board::State& state, core::Colors color) noexcept;
 
         /**
          * @brief Generates legal Bishops moves.
@@ -116,7 +118,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateBishopsMoves(const State& state, Colors color) noexcept;
+        void generateBishopsMoves(const board::State& state, core::Colors color) noexcept;
 
         /**
          * @brief Generates legal Rooks moves.
@@ -124,7 +126,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateRooksMoves(const State& state, Colors color) noexcept;
+        void generateRooksMoves(const board::State& state, core::Colors color) noexcept;
 
         /**
          * @brief Generates legal Queen moves.
@@ -132,7 +134,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateQueenMoves(const State& state, Colors color) noexcept;
+        void generateQueenMoves(const board::State& state, core::Colors color) noexcept;
 
         /**
          * @brief Generates legal King moves.
@@ -140,11 +142,11 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateKingMoves(const State& state, Colors color) noexcept;
+        void generateKingMoves(const board::State& state, core::Colors color) noexcept;
 
         Move _moves[256]; // Actual list of moves
         int _size;        // Current size of the list
     };
 } // namespace engine::game
 
-#endif // MOVE_GENERATOR_H_
+#endif // MOVE_LIST_H_
