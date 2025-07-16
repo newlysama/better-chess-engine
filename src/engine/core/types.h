@@ -21,19 +21,17 @@
  */
 namespace engine::core
 {
-    using namespace engine::board;
-
     /**
      * @typedef PieceBoards
      * @brief   2x6 array holding each piece's bitboards from each team.
      */
-    typedef std::array<std::array<Bitboard, Pieces::PIECES>, Colors::COLORS> PiecesBitboards;
+    typedef std::array<std::array<board::Bitboard, Pieces::PIECES>, Colors::COLORS> PiecesBitboards;
 
     /**
      * @typedef ColoredOccupancies
      * @brief   1x2 array holding each team's occupancy.
      */
-    typedef std::array<Bitboard, Colors::COLORS> ColoredOccupancies;
+    typedef std::array<board::Bitboard, Colors::COLORS> ColoredOccupancies;
 
     /**
      * @typedef CastlingRights
@@ -54,37 +52,37 @@ namespace engine::core
      * @typedef BorderFilesMasks
      * @brief   1x8 array holding each file's mask.
      */
-    typedef std::array<Bitboard, Files::FILES> FilesMasks;
+    typedef std::array<board::Bitboard, Files::FILES> FilesMasks;
 
     /**
      * @typedef RanksMasks
      * @brief   1x8 array holding each rank's mask.
      */
-    typedef std::array<Bitboard, Ranks::RANKS> RanksMasks;
+    typedef std::array<board::Bitboard, Ranks::RANKS> RanksMasks;
 
     /**
      * @typedef DiagonalMasks
      * @brief   1x15 array holing each diagonal's mask.
      */
-    typedef std::array<Bitboard, 15> DiagonalMasks;
+    typedef std::array<board::Bitboard, 15> DiagonalMasks;
 
     /**
      * @typedef BitboardTable
      * @brief   x64 array holding masks for each square.
      */
-    typedef std::array<Bitboard, 64> BitboardTable;
+    typedef std::array<board::Bitboard, 64> BitboardTable;
 
     /**
      * @typedef CastlingMasks
      * @brief   Castling masks: one mask per castling right (e.g., White King-side, White Queen-side, ...).
      */
-    typedef std::array<Bitboard, Castlings::CASTLINGS> CastlingMasks;
+    typedef std::array<board::Bitboard, Castlings::CASTLINGS> CastlingMasks;
 
     /**
      * @typedef BetweenMasks
      * @brief   Masks of squares strictly between any two squares (for line checks, pinned pieces, ...).
      */
-    typedef std::array<std::array<Bitboard, 64>, 64> BetweenMasks;
+    typedef std::array<std::array<board::Bitboard, 64>, 64> BetweenMasks;
 
     /*----------------------------------*
      *      SLIDING ATTACK TABLES       *
@@ -94,13 +92,13 @@ namespace engine::core
      * @typedef RookAttackTable
      * @brief   Attack Tables for sliding rook.
      */
-    typedef std::array<std::array<Bitboard, 4096>, 64> RookAttacksTable;
+    typedef std::array<std::array<board::Bitboard, 4096>, 64> RookAttacksTable;
 
     /**
      * @typedef BishopAttackTable
      * @brief   Attack Tables for sliding bishop.
      */
-    typedef std::array<std::array<Bitboard, 512>, 64> BishopAttacksTable;
+    typedef std::array<std::array<board::Bitboard, 512>, 64> BishopAttacksTable;
 
 } // namespace engine::core
 
