@@ -12,6 +12,12 @@
 #include <assert.h>
 
 #include "engine/board/magic_const.h"
+#include "engine/board/mask.h"
+#include "logging/logging.h"
+
+#if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+#include "utils/enums_to_string.h"
+#endif
 
 /**
  * @namespace engine::game
@@ -21,7 +27,7 @@ namespace engine::game
     using namespace engine::core;
     using namespace engine::board;
 
-    MoveList::MoveList(State& state) noexcept
+    MoveList::MoveList() noexcept
         : _moves{}
         , _size(0)
     {
@@ -43,7 +49,7 @@ namespace engine::game
         this->_size = 0;
     }
 
-    std::size_t MoveList::size() noexcept
+    std::size_t MoveList::size() const noexcept
     {
         return this->_size;
     }
@@ -53,17 +59,36 @@ namespace engine::game
         return this->_moves[index];
     }
 
-    inline void MoveList::processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType) noexcept
+    bool MoveList::contains(Move move) noexcept
     {
+        for (int i = 0; i < this->_size; i++)
+        {
+            if (move == this->_moves[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void MoveList::processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType, Pieces fromPiece) noexcept
+    {
+        int count = 0;
         while (targets.getData())
         {
             int squareTo = targets.lsbIndex();
-            Move move{squareFrom, squareTo, moveType};
+
+            Move move{squareFrom, squareTo, moveType, fromPiece};
             this->add(move);
 
             // Move to the next target
             targets.unset(squareTo);
+
+            count++;
         }
+
+        LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
     }
 
     /**
@@ -72,7 +97,7 @@ namespace engine::game
     void MoveList::generatePawnsMoves(const State& state, Colors color) noexcept
     {
         Bitboard pawns = state.allPieces[color][Pieces::PAWN];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // While there is bits set to 1
         while (pawns.getData())
@@ -87,17 +112,17 @@ namespace engine::game
             Bitboard pushTargets = PAWN_PUSHES_MASKS[color][squareFrom] & ~state.generalOccupancy;
 
             // Rechable capture square
-            Bitboard captureTargets = PAWN_CAPTURES_MASKS[color][squareFrom] & ~state.coloredOccupancies[ennemyColor];
+            Bitboard captureTargets = PAWN_CAPTURES_MASKS[color][squareFrom] & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
-            this->processTargets(pushTargets, squareFrom, MoveTypes::QUIET);
+            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::PAWN);
+            this->processTargets(pushTargets, squareFrom, MoveTypes::QUIET, Pieces::PAWN);
         }
     }
 
     void MoveList::generateKnightsMoves(const State& state, Colors color) noexcept
     {
         Bitboard knights = state.allPieces[color][Pieces::KNIGHT];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // While there is bits set to 1
         while (knights.getData())
@@ -112,20 +137,20 @@ namespace engine::game
             Bitboard targets = KNIGHT_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[color];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[ennemyColor];
+            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
 
-            // Rechable squares occupied by an ennemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[ennemyColor];
+            // Rechable squares occupied by an enemy piece
+            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::KNIGHT);
+            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::KNIGHT);
         }
     }
 
     void MoveList::generateRooksMoves(const State& state, Colors color) noexcept
     {
         Bitboard rooks = state.allPieces[color][Pieces::ROOK];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // While there is bits set to 1
         while (rooks.getData())
@@ -139,27 +164,26 @@ namespace engine::game
             Bitboard relevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex =
-                (relevantOcc.getData() * rookMagics[squareFrom].getData()) >> (64 - rookShifts[squareFrom]);
+            size_t magicIndex = (relevantOcc.getData() * rookMagics[squareFrom].getData()) >> rookShifts[squareFrom];
 
             // Get the targets
             Bitboard targets = ROOK_ATTACKS_TABLE[squareFrom][magicIndex] & ~state.coloredOccupancies[color];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[ennemyColor];
+            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
 
-            // Rechable squares occupied by an ennemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[ennemyColor];
+            // Rechable squares occupied by an enemy piece
+            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::ROOK);
+            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::ROOK);
         }
     }
 
     void MoveList::generateBishopsMoves(const State& state, Colors color) noexcept
     {
         Bitboard bishops = state.allPieces[color][Pieces::BISHOP];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // While there is bits set to 1
         while (bishops.getData())
@@ -174,26 +198,26 @@ namespace engine::game
 
             // Index the attack table using magic bitboards
             size_t magicIndex =
-                (relevantOcc.getData() * bishopMagics[squareFrom].getData()) >> (64 - bishopShifts[squareFrom]);
+                (relevantOcc.getData() * bishopMagics[squareFrom].getData()) >> bishopShifts[squareFrom];
 
             // Get the targets
             Bitboard targets = BISHOP_ATTACKS_TABLE[squareFrom][magicIndex] & ~state.coloredOccupancies[color];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[ennemyColor];
+            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
 
-            // Rechable squares occupied by an ennemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[ennemyColor];
+            // Rechable squares occupied by an enemy piece
+            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::BISHOP);
+            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::BISHOP);
         }
     }
 
     void MoveList::generateQueenMoves(const State& state, Colors color) noexcept
     {
         Bitboard queen = state.allPieces[color][Pieces::QUEEN];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // While there is bits set to 1
         // Remember that thank's to promotions, we can have several queens alive
@@ -208,49 +232,55 @@ namespace engine::game
             // Magic rook
             Bitboard rookRelevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
             size_t rookMagicIndex =
-                (rookRelevantOcc.getData() * rookMagics[squareFrom].getData()) >> (64 - rookShifts[squareFrom]);
+                (rookRelevantOcc.getData() * rookMagics[squareFrom].getData()) >> rookShifts[squareFrom];
 
             // Magic bishop
             Bitboard bishopRelevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[squareFrom];
             size_t bishopMagicIndex =
-                (bishopRelevantOcc.getData() * bishopMagics[squareFrom].getData()) >> (64 - bishopShifts[squareFrom]);
+                (bishopRelevantOcc.getData() * bishopMagics[squareFrom].getData()) >> bishopShifts[squareFrom];
 
             // Combine rooks and bishops attack tables
             Bitboard attacks =
                 ROOK_ATTACKS_TABLE[squareFrom][rookMagicIndex] | BISHOP_ATTACKS_TABLE[squareFrom][bishopMagicIndex];
 
             Bitboard targets = attacks & ~state.coloredOccupancies[color];
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[ennemyColor];
-            Bitboard catpureTargets = targets & state.coloredOccupancies[ennemyColor];
+            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
+            Bitboard catpureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(catpureTargets, squareFrom, MoveTypes::CAPTURE);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+            this->processTargets(catpureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::QUEEN);
+            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::QUEEN);
         }
     }
 
     void MoveList::generateKingMoves(const State& state, Colors color) noexcept
     {
         Bitboard king = state.allPieces[color][Pieces::KING];
-        Colors ennemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = color == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // Extract king's index
         int squareFrom = king.lsbIndex();
 
         Bitboard targets = KING_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[color];
-        Bitboard quietTargets = targets & ~state.coloredOccupancies[ennemyColor];
-        Bitboard captureTargets = targets & state.coloredOccupancies[ennemyColor];
+        Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
+        Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-        this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE);
-        this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET);
+        this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::KING);
+        this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::KING);
     }
 
     void MoveList::generateAllMoves(const State& state, Colors color) noexcept
     {
+        this->clear();
+
+        LOG_DEBUG("Generating {} legal moves...", utils::toString(color));
+
         this->generatePawnsMoves(state, color);
         this->generateKnightsMoves(state, color);
         this->generateRooksMoves(state, color);
         this->generateBishopsMoves(state, color);
         this->generateQueenMoves(state, color);
         this->generateKingMoves(state, color);
+
+        LOG_DEBUG("{} {} legal moves generated", this->_size, utils::toString(color));
     }
 } // namespace engine::game
