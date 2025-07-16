@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "engine/board/state.h"
+#include "utils/enums_to_string.h"
 
 /**
  * @namespace engine::printer
@@ -131,7 +132,7 @@ namespace engine::printer
         printHeader();
         printBoard(state);
 
-        std::cout << "Side to move:    " << state.sideToMove << "\n"
+        std::cout << "Side to move:    " << utils::toString(state.sideToMove) << "\n"
                   << "Half Move Clock: " << state.halfMoveClock << "\n"
                   << "Full Move Clock: " << state.fullMoveClock << "\n";
     }
