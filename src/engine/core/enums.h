@@ -27,7 +27,8 @@ namespace engine::core
         ROOK = 3,
         QUEEN = 4,
         KING = 5,
-        PIECES = 6
+        PIECES = 6,
+        UNKNOWN_PIECE = 255
     };
 
     /**
