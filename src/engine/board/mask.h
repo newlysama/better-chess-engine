@@ -603,28 +603,52 @@ namespace engine::board
 
     /**
      * @brief Builds 'between 2 squares' masks.
-     * @return 2x64 array of attacks masks
+     * @return 2x64 array of between masks
      */
     inline consteval core::BetweenMasks initBetweenMasks() noexcept
     {
         core::BetweenMasks masks{};
 
-        for (std::size_t fromSquare = 0; fromSquare < 64; fromSquare++)
+        for (int fromSquare = 0; fromSquare < 64; fromSquare++)
         {
-            for (std::size_t toSquare = 0; toSquare < 64; toSquare++)
+            int fromRank = fromSquare / 8;
+            int fromFile = fromSquare % 8;
+
+            for (int toSquare = 0; toSquare < 64; toSquare++)
             {
                 if (fromSquare == toSquare)
                     continue;
 
-                // If there is any, extract common line / diag
-                Bitboard line = ROOK_ATTACKS_MASKS[fromSquare] & ROOK_ATTACKS_MASKS[toSquare];
-                Bitboard diag = BISHOP_ATTACKS_MASKS[fromSquare] & BISHOP_ATTACKS_MASKS[toSquare];
-                Bitboard mask = line | diag;
+                int toRank = toSquare / 8;
+                int toFile = toSquare % 8;
 
-                // Keeps only squares strictly between 'fromSquare' and 'toSquare'
-                Bitboard both = (Bitboard{1ULL << fromSquare} | Bitboard{1ULL << toSquare});
+                int deltaRank = toRank - fromRank;
+                int deltaFile = toFile - fromFile;
 
-                masks[fromSquare][toSquare] = mask & ~both;
+                int delta = 0;
+
+                // horizontal
+                if (deltaRank == 0 && deltaFile != 0)
+                    delta = (deltaFile > 0 ? 1 : -1);
+                // vertical
+                else if (deltaFile == 0 && deltaRank != 0)
+                    delta = (deltaRank > 0 ? 8 : -8);
+                // diagonal '\'
+                else if (deltaRank == deltaFile)
+                    delta = (deltaRank > 0 ? 9 : -9);
+                // anti-diagonal '/'
+                else if (deltaRank == -deltaFile)
+                    delta = (deltaRank > 0 ? 7 : -7);
+                else
+                    continue; // not aligned
+
+                Bitboard betweenMask = 0;
+                for (int square = fromSquare + delta; square != toSquare; square += delta)
+                {
+                    betweenMask.set(square);
+                }
+
+                masks[fromSquare][toSquare] = betweenMask;
             }
         }
 
@@ -633,8 +657,8 @@ namespace engine::board
     inline constexpr core::BetweenMasks BETWEEN_MASKS = initBetweenMasks();
 
     inline constexpr core::CastlingMasks CASTLING_MASKS = {
-        Bitboard((1ULL << 5) | (1ULL << 6)), Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
-        Bitboard((1ULL << 61) | (1ULL << 62)), Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
+        Bitboard{(1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 1) | (1ULL << 2) | (1ULL << 3)},
+        Bitboard{(1ULL << 61) | (1ULL << 62)}, Bitboard{(1ULL << 57) | (1ULL << 58) | (1ULL << 59)}};
 
 } // namespace engine::board
 
