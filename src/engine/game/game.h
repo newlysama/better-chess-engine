@@ -13,8 +13,6 @@
 #include <cstdint>
 
 #include "engine/board/state.h"
-#include "engine/core/enums.h"
-#include "engine/core/types.h"
 #include "engine/game/move_list.h"
 
 /**
@@ -22,9 +20,6 @@
  */
 namespace engine::game
 {
-    using namespace engine::core;
-    using namespace engine::board;
-
     /**
      * @class Game
      * @brief Holds the game state
@@ -47,21 +42,30 @@ namespace engine::game
          */
         ~Game() noexcept = default;
 
-        // /**
-        //  * @brief Make a move.
-        //  *
-        //  * @param [in] move  : The move to make
-        //  */
-        // void makeMove(const Move move) noexcept;
+        /**
+         * @brief Ask the user the move he wants to play.
+         *
+         * @return std::string : the user's input
+         */
+        std::string askInput() const noexcept;
 
-        // /**
-        //  * @brief Unmake a move.
-        //  *
-        //  * @param [in] move  : The move to unmake
-        //  */
-        // void unmakeMove(const Move move) noexcept;
+        /**
+         * @brief Parses a user input and use it to build a move.
+         *
+         * @param [in] input : the user input
+         * @return Move : the builded move / Empty move if the input is not valid
+         */
+        game::Move inputToMove(std::string input) noexcept;
 
-        State state; // Game's board
+        /**
+         * @brief Play a move.
+         *
+         * @param [in] move  : The move to play
+         */
+        void playMove(const game::Move move) noexcept;
+
+        board::State state;      // Game's state
+        game::MoveList moveList; // Legal move lists of the current halfMoveClock
     };
 
 } // namespace engine::game
