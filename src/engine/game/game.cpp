@@ -9,6 +9,17 @@
 
 #include "engine/game/game.h"
 
+#include <iostream>
+#include <string>
+
+#include "engine/core/const.h"
+#include "logging/logging.h"
+
+#if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+#include "utils/enums_to_string.h"
+#include "utils/utils.h"
+#endif
+
 /**
  * @namespace engine::game
  */
@@ -20,6 +31,125 @@ namespace engine::game
 
     Game::Game() noexcept
         : state(State{})
+        , moveList(MoveList{})
     {
+    }
+
+    std::string Game::askInput() const noexcept
+    {
+        std::string input;
+
+        std::cout << "Select a move to play (format ex: a1a2): ";
+        std::cin >> input;
+
+        LOG_DEBUG("Got user console input: {}", input);
+
+        return input;
+    }
+
+    Move Game::inputToMove(std::string input) noexcept
+    {
+        if (input.size() != 4)
+        {
+            LOG_DEBUG("User's input had invalid size: {}", input.size());
+            return Move{};
+        }
+
+        std::string fromStr = input.substr(0, 2);
+        std::string toStr = input.substr(2, 2);
+
+        int fromSquare;
+        int toSquare;
+
+        // Check if from square input is valid
+        if (SQUARE_INDEX.find(fromStr) != SQUARE_INDEX.end())
+        {
+            fromSquare = SQUARE_INDEX.at(fromStr);
+
+            // Check if from square input contains a piece from sideToMove team
+            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(fromSquare) == false)
+            {
+                LOG_DEBUG("User entered a fromSquare that does not contains any ally piece");
+                return Move{};
+            }
+        }
+        else
+        {
+            LOG_DEBUG("User entered a fromSquare that does not exist");
+            return Move{};
+        }
+
+        // Check if to square input is valid
+        if (SQUARE_INDEX.find(toStr) != SQUARE_INDEX.end())
+        {
+            toSquare = SQUARE_INDEX.at(toStr);
+
+            // Check if to square input contains a piece from sideToMove team
+            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(toSquare))
+            {
+                LOG_DEBUG("User entered a toSquare that contains an ally piece");
+                return Move{};
+            }
+        }
+        else
+        {
+            LOG_DEBUG("User entered a toSquare that does not exist");
+            return Move{};
+        }
+
+        // If the requested move exists, assign it
+        Move move{};
+        for (std::size_t i = 0; i < this->moveList.size(); i++)
+        {
+            Move current = this->moveList[i];
+
+            // Check if the requested move is in the legal moves list
+            if (current.squareFrom == fromSquare && current.squareTo == toSquare)
+            {
+                move = current;
+                break;
+            }
+        }
+
+        // If the requested move doesn't exists, throw
+        if (!move.isSet())
+        {
+            LOG_DEBUG("User entered an move that is not legal");
+        }
+
+        return move;
+    }
+
+    void Game::playMove(const Move move) noexcept
+    {
+        LOG_DEBUG("Playing move: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
+                  utils::squareIndexToString(move.squareFrom), utils::squareIndexToString(move.squareTo),
+                  utils::toString(move.moveType), utils::toString(move.fromPiece));
+
+        Colors enemyColor = this->state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+
+        // If move is a capture, remove the target piece from occupancies
+        if (move.moveType == MoveTypes::CAPTURE)
+        {
+            Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
+            this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
+        }
+
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+
+        // Update game infos
+        this->state.halfMoveClock++;
+
+        if (this->state.sideToMove == Colors::WHITE)
+        {
+            this->state.fullMoveClock++;
+        }
+
+        this->state.sideToMove = enemyColor;
+
+        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}]",
+                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove));
+
+        this->moveList.generateAllMoves(this->state, enemyColor);
     }
 } // namespace engine::game
