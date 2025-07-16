@@ -7,38 +7,20 @@
  * @brief State representation.
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef STATE_H_
+#define STATE_H_
 
 #include <cstdint>
 #include <memory>
 
 #include "engine/board/bitboard.h"
-#include "engine/board/mask.h"
 #include "engine/core/types.h"
-#include "engine/game/move.h"
 
 /**
  * @namespace engine::board
  */
 namespace engine::board
 {
-    using namespace engine::core;
-    using namespace engine::game;
-
-    /**
-     * @typedef UnmakeInfo
-     * @brief Contains all the necessary infos to unmake a move.
-     */
-    typedef struct StateInfo
-    {
-        Move move;
-        Pieces captured;
-        StateInfo* previous;
-
-        StateInfo() = default;
-    } StateInfo;
-
     /**
      * @class State
      */
@@ -99,7 +81,7 @@ namespace engine::board
          *
          * @return bool : Wether this type of castling is enabled.
          */
-        template <Castlings Type>
+        template <core::Castlings Type>
         inline constexpr bool hasCastlingRight() const noexcept
         {
             return ((this->castlingRights >> static_cast<unsigned>(Type)) & 1U) != 0;
@@ -108,7 +90,7 @@ namespace engine::board
         /**
          * @brief Enable a type of castling.
          */
-        template <Castlings Type>
+        template <core::Castlings Type>
         inline constexpr void setCastlingRight() noexcept
         {
             this->castlingRights |= (uint8_t{1} << static_cast<unsigned>(Type));
@@ -117,25 +99,69 @@ namespace engine::board
         /**
          * @brief Disable a type of castling.
          */
-        template <Castlings Type>
+        template <core::Castlings Type>
         inline constexpr void clearCastlingRight() noexcept
         {
             this->castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
         }
 
-        uint16_t halfMoveClock; // Half move counter
-        uint16_t fullMoveClock; // Full move counter
-        Colors sideToMove;      // Whose turn is it ? :)
+        /**
+         * @brief Get a piece on a given square.
+         *
+         * @param [in] squareIndex : the square to check
+         * @return Pieces : the found Piece
+         */
+        core::Pieces getPiece(const int squareIndex) const noexcept;
 
-        CastlingRights castlingRights; // Informations about enabled castlings.
+        /**
+         * @brief Get a piece from a given team and square.
+         *
+         * @param [in] color       : the team to check
+         * @param [in] squareIndex : the square to check
+         * @return Pieces : the found Piece
+         */
+        core::Pieces getPiece(const core::Colors color, const int squareIndex) const noexcept;
 
-        PiecesBitboards allPieces;             // Occupancy for each team and each piece
-        Bitboard generalOccupancy;             // Occupancy for all pieces
-        ColoredOccupancies coloredOccupancies; // Team specific occupancies
+        /**
+         * @brief Add a piece to a given team on a given square.
+         *
+         * @param [in] color       : Team to add the piece to
+         * @param [in] piece       : Piece to add
+         * @param [in] squareIndex : Square to add the piece on
+         */
+        void setPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
 
-        StateInfo stateInfo; // Structure holding relevant infos to unmake a move
+        /**
+         * @brief Remove a piece from a given team and square.
+         *
+         * @param [in] color       : Team to remove the piece from
+         * @param [in] piece       : Piece to remove
+         * @param [in] squareIndex : Square to remove the piece from
+         */
+        void unsetPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
+
+        /**
+         * @brief Move a given piece.
+         *
+         * @param [in] color      : Team to move the piece from
+         * @param [in] piece      : Piece to move
+         * @param [in] fromSquare : Square to move the piece from
+         * @param [in] toSquare   : Square to move the piece to
+         */
+        void movePiece(const core::Colors color, const core::Pieces piece, const int fromSquare,
+                       const int toSquare) noexcept;
+
+        uint16_t halfMoveClock;  // Half move counter
+        uint16_t fullMoveClock;  // Full move counter
+        core::Colors sideToMove; // Whose turn is it ? :)
+
+        core::CastlingRights castlingRights; // Informations about enabled castlings.
+
+        core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
+        Bitboard generalOccupancy;                   // Occupancy for all pieces
+        core::ColoredOccupancies coloredOccupancies; // Team specific occupancies
     };
 
 } // namespace engine::board
 
-#endif // BOARD_H_
+#endif // STATE_H_
