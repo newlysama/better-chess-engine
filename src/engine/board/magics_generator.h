@@ -10,13 +10,9 @@
 #ifndef MAGICS_GENERATOR_H_
 #define MAGICS_GENERATOR_H_
 
-#include <array>
 #include <cstdint>
 
-#include "engine/board/mask.h"
-#include "engine/board/state.h"
-#include "engine/core/enums.h"
-#include "engine/core/types.h"
+#include "engine/board/bitboard.h"
 
 /**
  * @namespace engine::board
@@ -66,7 +62,7 @@ namespace engine::board
     inline Bitboard findMagicBishop(int squareIndex) noexcept;
 
     /**
-     * @brief Computed the necesarry shift for a rook on squareIndex.
+     * @brief Computed the necessary shift for a rook on squareIndex.
      * @details
      * It is the number of bits you need to shift after multiplying,
      * so that we get an index < popcount(getRookMaskAt(squareIndex))
@@ -77,7 +73,7 @@ namespace engine::board
     inline uint8_t findShiftRook(int squareIndex) noexcept;
 
     /**
-     * @brief Computed the necesarry shift for a bishop on squareIndex.
+     * @brief Computed the necessary shift for a bishop on squareIndex.
      * @details
      * It is the number of bits you need to shift after multiplying,
      * so that we get an index < popcount(getBishopMaskAt(squareIndex))
