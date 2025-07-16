@@ -22,9 +22,7 @@
  */
 namespace engine::board
 {
-    using namespace engine::core;
-
-    inline constexpr FilesMasks FILES_MASKS = {
+    inline constexpr core::FilesMasks FILES_MASKS = {
         Bitboard{0x0101'0101'0101'0101ULL}, // file A
         Bitboard{0x0202'0202'0202'0202ULL}, // file B
         Bitboard{0x0404'0404'0404'0404ULL}, // file C
@@ -35,7 +33,7 @@ namespace engine::board
         Bitboard{0x8080'8080'8080'8080ULL}  // file H
     };
 
-    inline constexpr RanksMasks RANKS_MASKS = {
+    inline constexpr core::RanksMasks RANKS_MASKS = {
         Bitboard{0x0000'0000'0000'00FFULL}, // rank 1
         Bitboard{0x0000'0000'0000'FF00ULL}, // rank 2
         Bitboard{0x0000'0000'00FF'0000ULL}, // rank 3
@@ -86,37 +84,70 @@ namespace engine::board
      * @param [in] bb : Bitboard to shift
      * @return Bitboard : the shifted bitboard
      */
-    template <Directions Dir>
-    inline constexpr Bitboard shiftDir(Bitboard bb) noexcept
+    template <core::Directions D>
+    constexpr Bitboard shiftDir(Bitboard b)
     {
-        return Dir == Directions::NORTH       ? Bitboard(bb << 8)
-             : Dir == Directions::SOUTH       ? Bitboard(bb >> 8)
-             : Dir == Directions::EAST        ? Bitboard((bb & ~FILE_H_MASK) << 1)
-             : Dir == Directions::WEST        ? Bitboard((bb & ~FILE_A_MASK) >> 1)
-             : Dir == Directions::NORTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) << 9)
-             : Dir == Directions::NORTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) << 7)
-             : Dir == Directions::SOUTH_EAST  ? Bitboard((bb & ~FILE_H_MASK) >> 7)
-             : Dir == Directions::SOUTH_WEST  ? Bitboard((bb & ~FILE_A_MASK) >> 9)
-             : Dir == Directions::NORTH_NORTH ? Bitboard(bb << 16)
-             : Dir == Directions::SOUTH_SOUTH ? Bitboard(bb >> 16)
-             : Dir == Directions::NNE         ? Bitboard((bb & ~FILE_H_MASK) << 17)
-             : Dir == Directions::ENE         ? Bitboard((bb & ~(FILE_H_MASK | FILE_G_MASK)) << 10)
-             : Dir == Directions::ESE         ? Bitboard((bb & ~(FILE_H_MASK | FILE_G_MASK)) >> 6)
-             : Dir == Directions::SSE         ? Bitboard((bb & ~FILE_H_MASK) >> 15)
-             : Dir == Directions::SSW         ? Bitboard((bb & ~FILE_A_MASK) >> 17)
-             : Dir == Directions::WSW         ? Bitboard((bb & ~(FILE_A_MASK | FILE_B_MASK)) >> 10)
-             : Dir == Directions::WNW         ? Bitboard((bb & ~(FILE_A_MASK | FILE_B_MASK)) << 6)
-             : Dir == Directions::NNW         ? Bitboard((bb & ~FILE_A_MASK) << 15)
-                                              : Bitboard(0ULL);
+        switch (D)
+        {
+        // ——— Glissants & roi/pion ———
+        case core::Directions::NORTH:
+            return (b & ~RANK_8_MASK) << 8;
+        case core::Directions::NORTH_EAST:
+            return (b & ~RANK_8_MASK & ~FILE_H_MASK) << 9;
+        case core::Directions::EAST:
+            return (b & ~FILE_H_MASK) << 1;
+        case core::Directions::SOUTH_EAST:
+            return (b & ~RANK_1_MASK & ~FILE_H_MASK) >> 7;
+        case core::Directions::SOUTH:
+            return (b & ~RANK_1_MASK) >> 8;
+        case core::Directions::SOUTH_WEST:
+            return (b & ~RANK_1_MASK & ~FILE_A_MASK) >> 9;
+        case core::Directions::WEST:
+            return (b & ~FILE_A_MASK) >> 1;
+        case core::Directions::NORTH_WEST:
+            return (b & ~RANK_8_MASK & ~FILE_A_MASK) << 7;
+        case core::Directions::NORTH_NORTH:
+            return (b & ~RANK_8_MASK & ~RANK_7_MASK) << 16;
+        case core::Directions::SOUTH_SOUTH:
+            return (b & ~RANK_1_MASK & ~RANK_2_MASK) >> 16;
+
+        // ——— Cavaliers ———
+        // two North + one East
+        case core::Directions::NNE:
+            return (b & ~RANK_8_MASK & ~RANK_7_MASK & ~FILE_H_MASK) << 17;
+        // one North + two East
+        case core::Directions::ENE:
+            return (b & ~RANK_8_MASK & ~FILE_H_MASK & ~FILE_G_MASK) << 10;
+        // one South + two East
+        case core::Directions::ESE:
+            return (b & ~RANK_1_MASK & ~FILE_H_MASK & ~FILE_G_MASK) >> 6;
+        // two South + one East
+        case core::Directions::SSE:
+            return (b & ~RANK_1_MASK & ~RANK_2_MASK & ~FILE_H_MASK) >> 15;
+        // two South + one West
+        case core::Directions::SSW:
+            return (b & ~RANK_1_MASK & ~RANK_2_MASK & ~FILE_A_MASK) >> 17;
+        // one South + two West
+        case core::Directions::WSW:
+            return (b & ~RANK_1_MASK & ~FILE_A_MASK & ~FILE_B_MASK) >> 10;
+        // one North + two West
+        case core::Directions::WNW:
+            return (b & ~RANK_8_MASK & ~FILE_A_MASK & ~FILE_B_MASK) << 6;
+        // two North + one West
+        case core::Directions::NNW:
+            return (b & ~RANK_8_MASK & ~RANK_7_MASK & ~FILE_A_MASK) << 15;
+        }
+
+        return 0ULL; // (jamais atteint)
     }
 
     /**
      * @brief Builds diagonals masks.
      * @return 1x15 array of attacks masks
      */
-    inline consteval DiagonalMasks initDiagonalsMasks() noexcept
+    inline consteval core::DiagonalMasks initDiagonalsMasks() noexcept
     {
-        DiagonalMasks masks{};
+        core::DiagonalMasks masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -131,15 +162,15 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr DiagonalMasks DIAGONALS_MASKS = initDiagonalsMasks();
+    inline constexpr core::DiagonalMasks DIAGONALS_MASKS = initDiagonalsMasks();
 
     /**
      * @brief Builds anti-diagonals masks.
      * @return 1x15 array of attacks masks
      */
-    inline consteval DiagonalMasks initAntiDiagonalsMasks() noexcept
+    inline consteval core::DiagonalMasks initAntiDiagonalsMasks() noexcept
     {
-        DiagonalMasks masks{};
+        core::DiagonalMasks masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -154,28 +185,28 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr DiagonalMasks ANTI_DIAGONALS_MASKS = initAntiDiagonalsMasks();
+    inline constexpr core::DiagonalMasks ANTI_DIAGONALS_MASKS = initAntiDiagonalsMasks();
 
     /**
      * @brief Builds pawns attacks masks, depending on the color.
      * @return 1x64 array of attacks masks
      */
-    template <Colors Color>
-    inline consteval BitboardTable initPawnAttacksMasks() noexcept
+    template <core::Colors Color>
+    inline consteval core::BitboardTable initPawnAttacksMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
             Bitboard squareBB = Bitboard{1ULL << squareIndex};
-            if constexpr (Color == Colors::WHITE)
+            if constexpr (Color == core::Colors::WHITE)
             {
                 masks[squareIndex] =
-                    shiftDir<Directions::NORTH_WEST>(squareBB) | shiftDir<Directions::NORTH_EAST>(squareBB);
+                    shiftDir<core::Directions::NORTH_WEST>(squareBB) | shiftDir<core::Directions::NORTH_EAST>(squareBB);
             }
             else
             {
                 masks[squareIndex] =
-                    shiftDir<Directions::SOUTH_EAST>(squareBB) | shiftDir<Directions::SOUTH_WEST>(squareBB);
+                    shiftDir<core::Directions::SOUTH_EAST>(squareBB) | shiftDir<core::Directions::SOUTH_WEST>(squareBB);
             }
         }
         return masks;
@@ -185,35 +216,46 @@ namespace engine::board
      * @brief Builds pawns pushes masks, depending on the color.
      * @return 1x64 array of attacks masks
      */
-    template <Colors Color>
-    inline consteval BitboardTable initPawnPushesMasks() noexcept
+    template <core::Colors Color>
+    inline consteval core::BitboardTable initPawnPushesMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
             Bitboard squareBB = Bitboard{1ULL << squareIndex};
-            if constexpr (Color == Colors::WHITE)
+            if constexpr (Color == core::Colors::WHITE)
             {
-                masks[squareIndex] =
-                    shiftDir<Directions::NORTH>(squareBB) | shiftDir<Directions::NORTH_NORTH>(squareBB);
+                masks[squareIndex] = shiftDir<core::Directions::NORTH>(squareBB);
+
+                int rankIndex = squareIndex >> 3;
+
+                if (rankIndex == 1) // Second rank
+                {
+                    masks[squareIndex] |= shiftDir<core::Directions::NORTH_NORTH>(squareBB);
+                }
             }
             else
             {
-                masks[squareIndex] =
-                    shiftDir<Directions::SOUTH>(squareBB) | shiftDir<Directions::SOUTH_SOUTH>(squareBB);
+                masks[squareIndex] = shiftDir<core::Directions::SOUTH>(squareBB);
+
+                int rankIndex = squareIndex >> 3;
+                if (rankIndex == 6) // 7th rank
+                {
+                    masks[squareIndex] |= shiftDir<core::Directions::SOUTH_SOUTH>(squareBB);
+                }
             }
         }
         return masks;
     }
     // clang-format off
-    inline constexpr std::array<BitboardTable, Colors::COLORS> PAWN_PUSHES_MASKS{
-        initPawnPushesMasks<Colors::WHITE>(),
-        initPawnPushesMasks<Colors::BLACK>()
+    inline constexpr std::array<core::BitboardTable, core::Colors::COLORS> PAWN_PUSHES_MASKS{
+        initPawnPushesMasks<core::Colors::WHITE>(),
+        initPawnPushesMasks<core::Colors::BLACK>()
     };
 
-    inline constexpr std::array<BitboardTable, Colors::COLORS> PAWN_CAPTURES_MASKS{
-        initPawnAttacksMasks<Colors::WHITE>(),
-        initPawnAttacksMasks<Colors::BLACK>()
+    inline constexpr std::array<core::BitboardTable, core::Colors::COLORS> PAWN_CAPTURES_MASKS{
+        initPawnAttacksMasks<core::Colors::WHITE>(),
+        initPawnAttacksMasks<core::Colors::BLACK>()
     };
     // clang-format on
 
@@ -221,50 +263,51 @@ namespace engine::board
      * @brief Builds knights attacks masks.
      * @return 1x64 array of attacks masks
      */
-    inline consteval BitboardTable initKnightAttacksMasks() noexcept
+    inline consteval core::BitboardTable initKnightAttacksMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
             Bitboard squareBB = Bitboard{1ULL << squareIndex};
-            masks[squareIndex] = shiftDir<Directions::NNE>(squareBB) | shiftDir<Directions::ENE>(squareBB) |
-                                 shiftDir<Directions::ESE>(squareBB) | shiftDir<Directions::SSE>(squareBB) |
-                                 shiftDir<Directions::SSW>(squareBB) | shiftDir<Directions::WSW>(squareBB) |
-                                 shiftDir<Directions::WNW>(squareBB) | shiftDir<Directions::NNW>(squareBB);
+            masks[squareIndex] = shiftDir<core::Directions::NNE>(squareBB) | shiftDir<core::Directions::ENE>(squareBB) |
+                                 shiftDir<core::Directions::ESE>(squareBB) | shiftDir<core::Directions::SSE>(squareBB) |
+                                 shiftDir<core::Directions::SSW>(squareBB) | shiftDir<core::Directions::WSW>(squareBB) |
+                                 shiftDir<core::Directions::WNW>(squareBB) | shiftDir<core::Directions::NNW>(squareBB);
         }
         return masks;
     }
-    inline constexpr BitboardTable KNIGHT_ATTACKS_MASKS = initKnightAttacksMasks();
+    inline constexpr core::BitboardTable KNIGHT_ATTACKS_MASKS = initKnightAttacksMasks();
 
     /**
      * @brief Builds kings attacks masks.
      * @return 1x64 array of attacks masks
      */
-    inline consteval BitboardTable initKingAttacksMasks() noexcept
+    inline consteval core::BitboardTable initKingAttacksMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             Bitboard mask = Bitboard{1ULL << squareIndex};
 
-            masks[squareIndex] = shiftDir<Directions::NORTH>(mask) | shiftDir<Directions::SOUTH>(mask) |
-                                 shiftDir<Directions::EAST>(mask) | shiftDir<Directions::WEST>(mask) |
-                                 shiftDir<Directions::NORTH_EAST>(mask) | shiftDir<Directions::NORTH_WEST>(mask) |
-                                 shiftDir<Directions::SOUTH_EAST>(mask) | shiftDir<Directions::SOUTH_WEST>(mask);
+            masks[squareIndex] =
+                shiftDir<core::Directions::NORTH>(mask) | shiftDir<core::Directions::SOUTH>(mask) |
+                shiftDir<core::Directions::EAST>(mask) | shiftDir<core::Directions::WEST>(mask) |
+                shiftDir<core::Directions::NORTH_EAST>(mask) | shiftDir<core::Directions::NORTH_WEST>(mask) |
+                shiftDir<core::Directions::SOUTH_EAST>(mask) | shiftDir<core::Directions::SOUTH_WEST>(mask);
         }
 
         return masks;
     }
-    inline constexpr BitboardTable KING_ATTACKS_MASKS = initKingAttacksMasks();
+    inline constexpr core::BitboardTable KING_ATTACKS_MASKS = initKingAttacksMasks();
 
     /**
      * @brief Builds rooks attacks masks.
      * @return 1x64 array of attacks masks
      */
-    inline consteval BitboardTable initRookAttacksMasks() noexcept
+    inline consteval core::BitboardTable initRookAttacksMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -281,15 +324,15 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr BitboardTable ROOK_ATTACKS_MASKS = initRookAttacksMasks();
+    inline constexpr core::BitboardTable ROOK_ATTACKS_MASKS = initRookAttacksMasks();
 
     /**
      * @brief Builds bishop attacks masks.
      * @return 1x64 array of attacks masks
      */
-    inline consteval BitboardTable initBishopAttacksMasks() noexcept
+    inline consteval core::BitboardTable initBishopAttacksMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -308,7 +351,7 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr BitboardTable BISHOP_ATTACKS_MASKS = initBishopAttacksMasks();
+    inline constexpr core::BitboardTable BISHOP_ATTACKS_MASKS = initBishopAttacksMasks();
 
     /**
      * @brief Get the relevant occupancy masks for a rook.
@@ -318,9 +361,9 @@ namespace engine::board
      *
      * @return 1x64 array of relevant occupancy masks
      */
-    inline consteval BitboardTable initRookRelevantMasks() noexcept
+    inline consteval core::BitboardTable initRookRelevantMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -340,7 +383,7 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr BitboardTable ROOK_RELEVANT_MASKS = initRookRelevantMasks();
+    inline constexpr core::BitboardTable ROOK_RELEVANT_MASKS = initRookRelevantMasks();
 
     /**
      * @brief Get the relevant occupancy masks for a bishop.
@@ -348,9 +391,9 @@ namespace engine::board
      *
      * @return 1x64 array of relevant occupancy masks
      */
-    inline consteval BitboardTable initBishopRelevantMasks() noexcept
+    inline consteval core::BitboardTable initBishopRelevantMasks() noexcept
     {
-        BitboardTable masks{};
+        core::BitboardTable masks{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -375,7 +418,7 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr BitboardTable BISHOP_RELEVANT_MASKS = initBishopRelevantMasks();
+    inline constexpr core::BitboardTable BISHOP_RELEVANT_MASKS = initBishopRelevantMasks();
 
     /**
      * @brief Builds the rook's attacks table.
@@ -384,9 +427,9 @@ namespace engine::board
      *
      * @return 64x4096 array of rook attacks
      */
-    inline constexpr RookAttacksTable initRookAttacksTable() noexcept
+    inline constexpr core::RookAttacksTable initRookAttacksTable() noexcept
     {
-        RookAttacksTable table{};
+        core::RookAttacksTable table{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -418,43 +461,43 @@ namespace engine::board
                 Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[squareIndex];
 
                 // North
-                Bitboard ray = shiftDir<Directions::NORTH>(Bitboard{1ULL << squareIndex});
+                Bitboard ray = shiftDir<core::Directions::NORTH>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::NORTH>(ray);
+                    ray = shiftDir<core::Directions::NORTH>(ray);
                 }
 
                 // South
-                ray = shiftDir<Directions::SOUTH>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::SOUTH>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::SOUTH>(ray);
+                    ray = shiftDir<core::Directions::SOUTH>(ray);
                 }
 
                 // East
-                ray = shiftDir<Directions::EAST>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::EAST>(ray);
+                    ray = shiftDir<core::Directions::EAST>(ray);
                 }
 
                 // West
-                ray = shiftDir<Directions::WEST>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::WEST>(ray);
+                    ray = shiftDir<core::Directions::WEST>(ray);
                 }
 
                 // Store in table using magic index
@@ -466,7 +509,7 @@ namespace engine::board
 
         return table;
     }
-    inline const RookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
+    inline const core::RookAttacksTable ROOK_ATTACKS_TABLE = initRookAttacksTable();
 
     /**
      * @brief Builds the bishop's attacks table.
@@ -475,9 +518,9 @@ namespace engine::board
      *
      * @return 64x512 array of bishop attacks
      */
-    inline constexpr BishopAttacksTable initBishopAttacksTable() noexcept
+    inline constexpr core::BishopAttacksTable initBishopAttacksTable() noexcept
     {
-        BishopAttacksTable table{};
+        core::BishopAttacksTable table{};
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
@@ -508,43 +551,43 @@ namespace engine::board
                 Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[squareIndex];
 
                 // North-East
-                Bitboard ray = shiftDir<Directions::NORTH_EAST>(Bitboard{1ULL << squareIndex});
+                Bitboard ray = shiftDir<core::Directions::NORTH_EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::NORTH_EAST>(ray);
+                    ray = shiftDir<core::Directions::NORTH_EAST>(ray);
                 }
 
                 // North-West
-                ray = shiftDir<Directions::NORTH_WEST>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::NORTH_WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::NORTH_WEST>(ray);
+                    ray = shiftDir<core::Directions::NORTH_WEST>(ray);
                 }
 
                 // South-East
-                ray = shiftDir<Directions::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::SOUTH_EAST>(ray);
+                    ray = shiftDir<core::Directions::SOUTH_EAST>(ray);
                 }
 
                 // South-West
-                ray = shiftDir<Directions::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
+                ray = shiftDir<core::Directions::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
                 while (!ray.isEmpty())
                 {
                     attacks |= ray;
                     if ((ray & occupancyMasked).isEmpty() == false)
                         break;
-                    ray = shiftDir<Directions::SOUTH_WEST>(ray);
+                    ray = shiftDir<core::Directions::SOUTH_WEST>(ray);
                 }
 
                 // Store in table using magic index
@@ -556,15 +599,15 @@ namespace engine::board
 
         return table;
     }
-    inline const BishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
+    inline const core::BishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
     /**
      * @brief Builds 'between 2 squares' masks.
      * @return 2x64 array of attacks masks
      */
-    inline consteval BetweenMasks initBetweenMasks() noexcept
+    inline consteval core::BetweenMasks initBetweenMasks() noexcept
     {
-        BetweenMasks masks{};
+        core::BetweenMasks masks{};
 
         for (std::size_t fromSquare = 0; fromSquare < 64; fromSquare++)
         {
@@ -587,9 +630,9 @@ namespace engine::board
 
         return masks;
     }
-    inline constexpr BetweenMasks BETWEEN_MASKS = initBetweenMasks();
+    inline constexpr core::BetweenMasks BETWEEN_MASKS = initBetweenMasks();
 
-    inline constexpr CastlingMasks CASTLING_MASKS = {
+    inline constexpr core::CastlingMasks CASTLING_MASKS = {
         Bitboard((1ULL << 5) | (1ULL << 6)), Bitboard((1ULL << 1) | (1ULL << 2) | (1ULL << 3)),
         Bitboard((1ULL << 61) | (1ULL << 62)), Bitboard((1ULL << 57) | (1ULL << 58) | (1ULL << 59))};
 
