@@ -17,9 +17,9 @@
 #define MEMORY_MANAGER_H
 
 /**
- * @namespace utils::memory_manager
+ * @namespace utils
  */
-namespace utils::memory_manager
+namespace utils
 {
     /**
      * @class FixedArena
@@ -80,6 +80,6 @@ namespace utils::memory_manager
       private:
         std::array<char, Capacity> buffer; // Pre-allocated buffer
     };
-} // namespace utils::memory_manager
+} // namespace utils
 
 #endif // MEMORY_MANAGER_H
