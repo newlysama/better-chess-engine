@@ -106,6 +106,16 @@ namespace engine::board
         }
 
         /**
+         * @brief If player is moving his king or rook while castling is enabled
+         * (first time moving them), remove the according castling right.
+         *
+         * @param [in] color      : Team to check castling from
+         * @param [in] piece      : Piece being moved
+         * @param [in] fromSquare : Square piece is on
+         */
+        void checkCastlingRemoval(core::Colors color, const core::Pieces piece, const int fromSquare) noexcept;
+
+        /**
          * @brief Get a piece on a given square.
          *
          * @param [in] squareIndex : the square to check

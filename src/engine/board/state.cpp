@@ -25,7 +25,7 @@ namespace engine::board
         : halfMoveClock(0)
         , fullMoveClock(0)
         , sideToMove(Colors::WHITE)
-        , castlingRights(uint8_t(0))
+        , castlingRights((1 << Castlings::CASTLINGS) - 1)
         ,allPieces{
                     {
                         // -- White pieces (index 0) --
@@ -59,6 +59,51 @@ namespace engine::board
         }
 
         this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
+    }
+
+    void State::checkCastlingRemoval(Colors color, const Pieces piece, const int fromSquare) noexcept
+    {
+        if (color == Colors::WHITE &&
+            (this->hasCastlingRight<Castlings::WHITE_KING_SIDE>() || this->hasCastlingRight<WHITE_QUEEN_SIDE>()))
+        {
+            if (piece == Pieces::KING)
+            {
+                this->clearCastlingRight<Castlings::WHITE_KING_SIDE>();
+                this->clearCastlingRight<Castlings::WHITE_QUEEN_SIDE>();
+                LOG_DEBUG("Removed all white team castling rights");
+            }
+            else if (piece == Pieces::ROOK && fromSquare == 0) // Initial white queen side rook position
+            {
+                this->clearCastlingRight<Castlings::WHITE_QUEEN_SIDE>();
+                LOG_DEBUG("Removed white queen side castling right");
+            }
+            else if (piece == Pieces::ROOK && fromSquare == 7) // Initial white king side rook position
+            {
+                this->clearCastlingRight<Castlings::WHITE_KING_SIDE>();
+                LOG_DEBUG("Removed white king side castling right");
+            }
+        }
+
+        if (color == Colors::BLACK &&
+            (this->hasCastlingRight<Castlings::BLACK_KING_SIDE>() || this->hasCastlingRight<BLACK_QUEEN_SIDE>()))
+        {
+            if (piece == Pieces::KING)
+            {
+                this->clearCastlingRight<Castlings::BLACK_KING_SIDE>();
+                this->clearCastlingRight<Castlings::BLACK_QUEEN_SIDE>();
+                LOG_DEBUG("Removed all black team castling rights");
+            }
+            else if (piece == Pieces::ROOK && fromSquare == 56) // Initial black queen side rook position
+            {
+                this->clearCastlingRight<Castlings::BLACK_QUEEN_SIDE>();
+                LOG_DEBUG("Removed black queen side castling right");
+            }
+            else if (piece == Pieces::ROOK && fromSquare == 63) // Initial black king side rook position
+            {
+                this->clearCastlingRight<Castlings::BLACK_KING_SIDE>();
+                LOG_DEBUG("Removed black king side castling right");
+            }
+        }
     }
 
     Pieces State::getPiece(int squareIndex) const noexcept
@@ -118,6 +163,8 @@ namespace engine::board
     {
         this->unsetPiece(color, piece, fromSquare);
         this->setPiece(color, piece, toSquare);
+
+        this->checkCastlingRemoval(color, piece, fromSquare);
 
         LOG_INFO("Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(toSquare));
