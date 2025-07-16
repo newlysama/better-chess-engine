@@ -16,22 +16,29 @@ namespace engine::game
 {
     using namespace engine::core;
 
-    Move::Move(const int from, const int to, const MoveTypes type) noexcept
-        : _squareFrom(from)
-        , _squareTo(to)
-        , _moveType(type)
+    Move::Move(const int from, const int to, const MoveTypes type, const Pieces fromPiece) noexcept
+        : squareFrom(from)
+        , squareTo(to)
+        , moveType(type)
+        , fromPiece(fromPiece)
     {
     }
 
-    inline constexpr bool Move::operator==(Move& move) noexcept
+    bool Move::operator==(Move& move) const noexcept
     {
-        return this->_squareFrom == move._squareFrom && this->_squareTo == move._squareTo &&
-               this->_moveType == move._moveType;
+        return this->squareFrom == move.squareFrom && this->squareTo == move.squareTo &&
+               this->moveType == move.moveType;
     }
 
-    inline constexpr bool Move::operator!=(Move& move) noexcept
+    bool Move::operator!=(Move& move) const noexcept
     {
-        return this->_squareFrom != move._squareFrom && this->_squareTo != move._squareTo &&
-               this->_moveType != move._moveType;
+        return this->squareFrom != move.squareFrom || this->squareTo != move.squareTo ||
+               this->moveType != move.moveType;
+    }
+
+    bool Move::isSet() const noexcept
+    {
+        // If move is default constructed, both theese values will be 0 initialized.
+        return !(this->squareFrom == 0 && this->squareTo == 0);
     }
 } // namespace engine::game
