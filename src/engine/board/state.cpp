@@ -77,7 +77,7 @@ namespace engine::board
             }
         }
 
-        LOG_ERROR("[State::getPiece()] Trying to access piece at square {}, but no piece was found.", squareIndex);
+        LOG_ERROR("Trying to access piece at square {}, but no piece was found", squareIndex);
         return Pieces::UNKNOWN_PIECE;
     }
 
@@ -91,8 +91,8 @@ namespace engine::board
             }
         }
 
-        LOG_ERROR("[State::getPiece(Color)] Trying to access piece of team {} at square {}, but no piece was found.",
-                  utils::toString(color), squareIndex);
+        LOG_ERROR("Trying to access piece of team {} at square {}, but no piece was found", utils::toString(color),
+                  squareIndex);
 
         return Pieces::UNKNOWN_PIECE;
     }
@@ -103,7 +103,7 @@ namespace engine::board
         this->generalOccupancy.set(squareIndex);
         this->coloredOccupancies[color].set(squareIndex);
 
-        LOG_DEBUG("[State::setPiece()] Added {} {} to {}", utils::toString(color), utils::toString(piece),
+        LOG_DEBUG("Added {} {} to {}", utils::toString(color), utils::toString(piece),
                   utils::squareIndexToString(squareIndex));
     }
 
@@ -113,7 +113,7 @@ namespace engine::board
         this->generalOccupancy.unset(squareIndex);
         this->coloredOccupancies[color].unset(squareIndex);
 
-        LOG_DEBUG("[State::unsetPiece()] Removed {} {} from {}", utils::toString(color), utils::toString(piece),
+        LOG_DEBUG("Removed {} {} from {}", utils::toString(color), utils::toString(piece),
                   utils::squareIndexToString(squareIndex));
     }
 
@@ -122,7 +122,7 @@ namespace engine::board
         this->unsetPiece(color, piece, fromSquare);
         this->setPiece(color, piece, toSquare);
 
-        LOG_INFO("[State::movePiece()] Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
+        LOG_INFO("Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(toSquare));
     }
 
