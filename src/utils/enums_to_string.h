@@ -63,6 +63,8 @@ namespace utils
             return "BLACK";
         case engine::core::Colors::COLORS:
             return "2";
+        case engine::core::Colors::UNKNOWN_COLOR:
+            return "UNKNOWN_COLOR";
         }
         return "UNKNOWN_COLOR";
     }
@@ -89,6 +91,8 @@ namespace utils
             return "RANK_8";
         case engine::core::Ranks::RANKS:
             return "8";
+        case engine::core::Ranks::UNKNOWN_RANK:
+            return "UNKNOWN_RANK";
         }
         return "UNKNOWN_RANK";
     }
@@ -115,6 +119,8 @@ namespace utils
             return "FILE_H";
         case engine::core::Files::FILES:
             return "8";
+        case engine::core::Files::UNKNOWN_FILE:
+            return "UNKNOWN_FILE";
         }
         return "UNKNOWN_FILE";
     }
@@ -161,6 +167,8 @@ namespace utils
             return "NNW";
         case engine::core::Directions::DIRECTIONS:
             return "18";
+        case engine::core::Directions::UNKNOWN_DIRECTION:
+            return "UNKNOWN_DIRECTION";
         }
         return "UNKNOWN_DIRECTION";
     }
@@ -183,6 +191,8 @@ namespace utils
             return "ENPASSANT";
         case engine::core::MoveTypes::MOVE_TYPES:
             return "5";
+        case engine::core::MoveTypes::UNKNOWN_MOVE_TYPE:
+            return "UNKNOWN_MOVE_TYPE";
         }
         return "UNKNOWN_MOVE_TYPE";
     }
