@@ -166,6 +166,7 @@ namespace engine::board
         core::Colors sideToMove; // Whose turn is it ? :)
 
         core::CastlingRights castlingRights; // Informations about enabled castlings.
+        int enPassantSquare;
 
         core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;                   // Occupancy for all pieces
