@@ -37,10 +37,10 @@ namespace engine::board
         /**
          * @brief Constructor.
          *
-         * @param [in] _data_ : Value to initialize _data member
+         * @param [in] data : Value to initialize _data member
          */
-        explicit constexpr Bitboard(const uint64_t& _data_ = 0ULL) noexcept
-            : _data(_data_)
+        constexpr Bitboard(const uint64_t& data = 0ULL) noexcept
+            : _data(data)
         {
         }
 
