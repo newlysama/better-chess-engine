@@ -26,7 +26,7 @@ namespace engine::board
 {
     using namespace engine::core;
 
-    Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept
+    Bitboard slidingAttackRook(const int squareIndex, const Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
         Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[squareIndex];
@@ -78,7 +78,7 @@ namespace engine::board
         return attacks;
     }
 
-    Bitboard slidingAttackBishop(int squareIndex, Bitboard occupancy) noexcept
+    Bitboard slidingAttackBishop(const int squareIndex, const Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
         Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[squareIndex];
@@ -130,7 +130,7 @@ namespace engine::board
         return attacks;
     }
 
-    uint8_t findShiftRook(int squareIndex) noexcept
+    uint8_t findShiftRook(const int squareIndex) noexcept
     {
         return 64 - ROOK_RELEVANT_MASKS[squareIndex].popCount();
     }
@@ -205,7 +205,7 @@ namespace engine::board
         }
     }
 
-    Bitboard findMagicBishop(int squareIndex) noexcept
+    Bitboard findMagicBishop(const int squareIndex) noexcept
     {
         const Bitboard mask = BISHOP_RELEVANT_MASKS[squareIndex];
         const uint8_t shift = findShiftBishop(squareIndex);

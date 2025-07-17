@@ -27,7 +27,7 @@ namespace engine::board
      * @param [in] occupancy   : the given occupancy
      * @return Bitboard : Exact attacks bitboard for that square and occupancy
      */
-    inline Bitboard slidingAttackRook(int squareIndex, Bitboard occupancy) noexcept;
+    inline Bitboard slidingAttackRook(const int squareIndex, const Bitboard occupancy) noexcept;
 
     /**
      * @brief Computes bitboards of attackable squares by a
@@ -37,7 +37,7 @@ namespace engine::board
      * @param [in] occupancy   : the given occupancy
      * @return Bitboard : Exact attacks bitboard for that square and occupancy
      */
-    inline Bitboard slidingAttackBishop(int squareIndex, Bitboard occupancy) noexcept;
+    inline Bitboard slidingAttackBishop(const int squareIndex, const Bitboard occupancy) noexcept;
 
     /**
      * @brief Look for a valid magic bitboard for a rook on the given square.
@@ -48,7 +48,7 @@ namespace engine::board
      * @param [in] squareIndex : the square we looking from
      * @return Bitboard : the valid magic bitboard
      */
-    inline Bitboard findMagicRook(int squareIndex) noexcept;
+    inline Bitboard findMagicRook(const int squareIndex) noexcept;
 
     /**
      * @brief Look for a valid magic bitboard for a bishop on the given square.
@@ -59,7 +59,7 @@ namespace engine::board
      * @param [in] squareIndex : the square we looking from
      * @return Bitboard : the valid magic bitboard
      */
-    inline Bitboard findMagicBishop(int squareIndex) noexcept;
+    inline Bitboard findMagicBishop(const int squareIndex) noexcept;
 
     /**
      * @brief Computed the necessary shift for a rook on squareIndex.
@@ -70,7 +70,7 @@ namespace engine::board
      * @param [in] squareIndex : the square we looking from
      * @return uint8_t : the shift
      */
-    inline uint8_t findShiftRook(int squareIndex) noexcept;
+    inline uint8_t findShiftRook(const int squareIndex) noexcept;
 
     /**
      * @brief Computed the necessary shift for a bishop on squareIndex.
@@ -81,7 +81,7 @@ namespace engine::board
      * @param [in] squareIndex : the square we looking from
      * @return uint8_t : the shift
      */
-    inline uint8_t findShiftBishop(int squareIndex) noexcept;
+    inline uint8_t findShiftBishop(const int squareIndex) noexcept;
 
     /**
      * @brief Main generation function.
