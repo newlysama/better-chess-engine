@@ -40,6 +40,19 @@ namespace utils
         return "UNKNOWN_PIECE";
     }
 
+    inline constexpr engine::core::Pieces fromString(std::string_view s) noexcept
+    {
+        using namespace engine::core;
+        return (s == "pawn")   ? Pieces::PAWN
+             : (s == "knight") ? Pieces::KNIGHT
+             : (s == "bishop") ? Pieces::BISHOP
+             : (s == "rook")   ? Pieces::ROOK
+             : (s == "queen")  ? Pieces::QUEEN
+             : (s == "king")   ? Pieces::KING
+             : (s == "pieces") ? Pieces::PIECES
+                               : Pieces::UNKNOWN_PIECE;
+    }
+
     inline constexpr std::string_view toString(engine::core::Colors v) noexcept
     {
         switch (v)
