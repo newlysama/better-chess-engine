@@ -11,7 +11,7 @@
 #include "engine/printer/printer.h"
 #include "logging/logging.h"
 
-#if defined(BUILD_GENERATE_MAGICS)
+#if defined(GENERATE_MAGICS)
 #include "engine/board/magics_generator.h"
 #endif
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     // Initialize loggers
     logging::init_logger();
 
-#if defined(BUILD_GENERATE_MAGICS)
+#if defined(GENERATE_MAGICS)
     engine::board::initMagics();
 #else
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         engine::printer::printState(game.state);
     }
 
-#endif // BUILD_GENERATE_MAGICS
+#endif // GENERATE_MAGICS
 
     return 0;
 }
