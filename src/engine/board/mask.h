@@ -411,7 +411,7 @@ namespace engine::board
 
     /**
      * @brief Get the relevant occupancy masks for a bishop.
-     * @details Excludes edges squares on diags/anti-diags that goes through each sqaureIndex
+     * @details Excludes edges squares on diags/anti-diags that goes through each squareIndex
      *
      * @return 1x64 array of relevant occupancy masks
      */

@@ -17,8 +17,8 @@ namespace engine::game
     using namespace engine::core;
 
     Move::Move(const int from, const int to, const MoveTypes type, const Pieces fromPiece) noexcept
-        : squareFrom(from)
-        , squareTo(to)
+        : fromSquare(from)
+        , toSquare(to)
         , moveType(type)
         , fromPiece(fromPiece)
         , castling(Castlings::UNKNOWN_CASTLING)
@@ -28,8 +28,8 @@ namespace engine::game
 
     Move::Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece,
                const Castlings castling) noexcept
-        : squareFrom(from)
-        , squareTo(to)
+        : fromSquare(from)
+        , toSquare(to)
         , moveType(type)
         , fromPiece(fromPiece)
         , castling(castling)
@@ -39,19 +39,19 @@ namespace engine::game
 
     bool Move::operator==(Move& move) const noexcept
     {
-        return this->squareFrom == move.squareFrom && this->squareTo == move.squareTo &&
+        return this->fromSquare == move.fromSquare && this->toSquare == move.toSquare &&
                this->moveType == move.moveType;
     }
 
     bool Move::operator!=(Move& move) const noexcept
     {
-        return this->squareFrom != move.squareFrom || this->squareTo != move.squareTo ||
+        return this->fromSquare != move.fromSquare || this->toSquare != move.toSquare ||
                this->moveType != move.moveType;
     }
 
     bool Move::isSet() const noexcept
     {
         // If move is default constructed, both theese values will be 0 initialized.
-        return !(this->squareFrom == 0 && this->squareTo == 0);
+        return !(this->fromSquare == 0 && this->toSquare == 0);
     }
 } // namespace engine::game

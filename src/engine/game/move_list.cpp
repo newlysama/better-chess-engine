@@ -74,19 +74,19 @@ namespace engine::game
         return false;
     }
 
-    void MoveList::processTargets(Bitboard& targets, int squareFrom, MoveTypes moveType, Pieces fromPiece) noexcept
+    void MoveList::processTargets(Bitboard& targets, int fromSquare, MoveTypes moveType, Pieces fromPiece) noexcept
     {
         int count = 0;
         while (targets.getData())
         {
-            int squareTo = targets.lsbIndex();
+            int toSquare = targets.lsbIndex();
 
-            Move move{squareFrom, squareTo, moveType, fromPiece};
+            Move move{fromSquare, toSquare, moveType, fromPiece};
 
             // Check for promotion
             if (fromPiece == Pieces::PAWN)
             {
-                int rankTo = State::getRankIndex(squareTo);
+                int rankTo = State::getRankIndex(toSquare);
                 if (rankTo == 7 || rankTo == 0) [[unlikely]]
                 {
                     move.promotion = true;
@@ -96,7 +96,7 @@ namespace engine::game
             this->add(move);
 
             // Move to the next target
-            targets.unset(squareTo);
+            targets.unset(toSquare);
 
             count++;
         }
@@ -181,34 +181,34 @@ namespace engine::game
         while (pawns.getData())
         {
             // Extract bit index to the next '1'
-            int squareFrom = pawns.lsbIndex();
+            int fromSquare = pawns.lsbIndex();
 
             // Move to the next pawn
-            pawns.unset(squareFrom);
+            pawns.unset(fromSquare);
 
             // Rechable empty squares
-            Bitboard pushTargets = PAWN_PUSHES_MASKS[state.sideToMove][squareFrom] & ~state.generalOccupancy;
+            Bitboard pushTargets = PAWN_PUSHES_MASKS[state.sideToMove][fromSquare] & ~state.generalOccupancy;
 
             // Rechable capture square
             Bitboard captureTargets =
-                PAWN_CAPTURES_MASKS[state.sideToMove][squareFrom] & state.coloredOccupancies[enemyColor];
+                PAWN_CAPTURES_MASKS[state.sideToMove][fromSquare] & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::PAWN);
-            this->processTargets(pushTargets, squareFrom, MoveTypes::QUIET, Pieces::PAWN);
+            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::PAWN);
+            this->processTargets(pushTargets, fromSquare, MoveTypes::QUIET, Pieces::PAWN);
 
             // Generate double pushes if the square between start and dest is empty
-            if ((PAWN_PUSHES_MASKS[state.sideToMove][squareFrom] & state.generalOccupancy) == 0)
+            if ((PAWN_PUSHES_MASKS[state.sideToMove][fromSquare] & state.generalOccupancy) == 0)
             {
                 Bitboard doublePushTargets =
-                    PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][squareFrom] & ~state.generalOccupancy;
+                    PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][fromSquare] & ~state.generalOccupancy;
 
-                this->processTargets(doublePushTargets, squareFrom, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
+                this->processTargets(doublePushTargets, fromSquare, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
             }
 
             // Generate enPassant if enabled
             if (state.enPassantSquare != -1)
             {
-                this->getEnPassantMoves(state, squareFrom);
+                this->getEnPassantMoves(state, fromSquare);
             }
         }
     }
@@ -223,13 +223,13 @@ namespace engine::game
         while (knights.getData())
         {
             // Extract bit index to the next '1'
-            int squareFrom = knights.lsbIndex();
+            int fromSquare = knights.lsbIndex();
 
             // Move to the next knight
-            knights.unset(squareFrom);
+            knights.unset(fromSquare);
 
             // Get the targets
-            Bitboard targets = KNIGHT_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[state.sideToMove];
+            Bitboard targets = KNIGHT_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove];
 
             // Rechable empty squares
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
@@ -237,8 +237,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::KNIGHT);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::KNIGHT);
+            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KNIGHT);
+            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KNIGHT);
         }
     }
 
@@ -252,18 +252,18 @@ namespace engine::game
         while (rooks.getData())
         {
             // Extract bit index to the next '1'
-            int squareFrom = rooks.lsbIndex();
+            int fromSquare = rooks.lsbIndex();
 
             // Move to the next rook
-            rooks.unset(squareFrom);
+            rooks.unset(fromSquare);
 
-            Bitboard relevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
+            Bitboard relevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex = (relevantOcc.getData() * rookMagics[squareFrom].getData()) >> rookShifts[squareFrom];
+            size_t magicIndex = (relevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
 
             // Get the targets
-            Bitboard targets = ROOK_ATTACKS_TABLE[squareFrom][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
+            Bitboard targets = ROOK_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
 
             // Rechable empty squares
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
@@ -271,8 +271,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::ROOK);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::ROOK);
+            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::ROOK);
+            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::ROOK);
         }
     }
 
@@ -286,20 +286,20 @@ namespace engine::game
         while (bishops.getData())
         {
             // Extract bit index to the next '1'
-            int squareFrom = bishops.lsbIndex();
+            int fromSquare = bishops.lsbIndex();
 
             // Move to the next bishop
-            bishops.unset(squareFrom);
+            bishops.unset(fromSquare);
 
-            Bitboard relevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[squareFrom];
+            Bitboard relevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
             size_t magicIndex =
-                (relevantOcc.getData() * bishopMagics[squareFrom].getData()) >> bishopShifts[squareFrom];
+                (relevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
 
             // Get the targets
             Bitboard targets =
-                BISHOP_ATTACKS_TABLE[squareFrom][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
+                BISHOP_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
 
             // Rechable empty squares
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
@@ -307,8 +307,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::BISHOP);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::BISHOP);
+            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::BISHOP);
+            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::BISHOP);
         }
     }
 
@@ -323,31 +323,31 @@ namespace engine::game
         while (queen.getData())
         {
             // Extract queen's index
-            int squareFrom = queen.lsbIndex();
+            int fromSquare = queen.lsbIndex();
 
             // Remove queen's bit
-            queen.unset(squareFrom);
+            queen.unset(fromSquare);
 
             // Magic rook
-            Bitboard rookRelevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[squareFrom];
+            Bitboard rookRelevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[fromSquare];
             size_t rookMagicIndex =
-                (rookRelevantOcc.getData() * rookMagics[squareFrom].getData()) >> rookShifts[squareFrom];
+                (rookRelevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
 
             // Magic bishop
-            Bitboard bishopRelevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[squareFrom];
+            Bitboard bishopRelevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[fromSquare];
             size_t bishopMagicIndex =
-                (bishopRelevantOcc.getData() * bishopMagics[squareFrom].getData()) >> bishopShifts[squareFrom];
+                (bishopRelevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
 
             // Combine rooks and bishops attack tables
             Bitboard attacks =
-                ROOK_ATTACKS_TABLE[squareFrom][rookMagicIndex] | BISHOP_ATTACKS_TABLE[squareFrom][bishopMagicIndex];
+                ROOK_ATTACKS_TABLE[fromSquare][rookMagicIndex] | BISHOP_ATTACKS_TABLE[fromSquare][bishopMagicIndex];
 
             Bitboard targets = attacks & ~state.coloredOccupancies[state.sideToMove];
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
             Bitboard catpureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(catpureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::QUEEN);
-            this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::QUEEN);
+            this->processTargets(catpureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
+            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
         }
     }
 
@@ -358,27 +358,27 @@ namespace engine::game
         Bitboard king = state.allPieces[state.sideToMove][Pieces::KING];
 
         // Extract king's index
-        int squareFrom = king.lsbIndex();
+        int fromSquare = king.lsbIndex();
 
         // Generate classic targets
-        Bitboard targets = KING_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[state.sideToMove];
+        Bitboard targets = KING_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove];
         Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
         Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
         // Generate Castling targets
         if (state.sideToMove == Colors::WHITE)
         {
-            getCastlingMoves<Castlings::WHITE_KING_SIDE>(state, squareFrom);
-            getCastlingMoves<Castlings::WHITE_QUEEN_SIDE>(state, squareFrom);
+            getCastlingMoves<Castlings::WHITE_KING_SIDE>(state, fromSquare);
+            getCastlingMoves<Castlings::WHITE_QUEEN_SIDE>(state, fromSquare);
         }
         else
         {
-            getCastlingMoves<Castlings::BLACK_KING_SIDE>(state, squareFrom);
-            getCastlingMoves<Castlings::BLACK_QUEEN_SIDE>(state, squareFrom);
+            getCastlingMoves<Castlings::BLACK_KING_SIDE>(state, fromSquare);
+            getCastlingMoves<Castlings::BLACK_QUEEN_SIDE>(state, fromSquare);
         }
 
-        this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::KING);
-        this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::KING);
+        this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KING);
+        this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KING);
     }
 
     void MoveList::generateAllMoves(const State& state) noexcept

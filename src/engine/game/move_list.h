@@ -90,10 +90,10 @@ namespace engine::game
          * @brief Generates legal moves from a given square with a specific moveType and targets bitstate.
          *
          * @param [in] targets    : Bitboard of possible destinations
-         * @param [in] squareFrom : Starting square index
+         * @param [in] fromSquare : Starting square index
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
          */
-        void processTargets(board::Bitboard& targets, int squareFrom, core::MoveTypes moveType,
+        void processTargets(board::Bitboard& targets, int fromSquare, core::MoveTypes moveType,
                             core::Pieces fromPiece) noexcept;
 
         /**

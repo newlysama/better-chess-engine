@@ -62,17 +62,17 @@ namespace engine::game
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
             inline void print() const noexcept
             {
-                std::cout << "Square from: " << squareFrom << "\n"
-                          << "Square to:   " << squareTo   << "\n"
+                std::cout << "Square from: " << fromSquare << "\n"
+                          << "Square to:   " << toSquare   << "\n"
                           << "Move type:   " << utils::toString(moveType) << "\n";
             }
         #endif
         // clang-format on
 
-        int squareFrom;           // Start square
-        int squareTo;             // Target square
+        int fromSquare;           // Start square
+        int toSquare;             // Target square
         core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
-        core::Pieces fromPiece;   // Piece type on squareFrom
+        core::Pieces fromPiece;   // Piece type on fromSquare
         core::Castlings castling; // Type if castling
         bool promotion;           // Wether this move is a promotion
     };

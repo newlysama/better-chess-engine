@@ -130,7 +130,7 @@ namespace engine::game
             Move current = this->moveList[i];
 
             // Check if the requested move is in the legal moves list
-            if (current.squareFrom == fromSquare && current.squareTo == toSquare)
+            if (current.fromSquare == fromSquare && current.toSquare == toSquare)
             {
                 move = current;
                 break;
@@ -148,15 +148,15 @@ namespace engine::game
 
     void Game::makeCapture(const game::Move& move, const Colors enemyColor) noexcept
     {
-        Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
-        this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
-        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+        Pieces toRemove = this->state.getPiece(enemyColor, move.toSquare);
+        this->state.unsetPiece(enemyColor, toRemove, move.toSquare);
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
     }
 
     void Game::makeCastling(const Move& move) noexcept
     {
         // Move the king
-        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
 
         // Move the rook
         switch (move.castling)
@@ -182,17 +182,17 @@ namespace engine::game
     void Game::makeEnPassant(const Move& move, const Colors enemyColor) noexcept
     {
         // Move the pawn performing enPassant
-        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
 
         // Determine enPassant captured piece's square
         int captureSquare;
         if (this->state.sideToMove == Colors::WHITE)
         {
-            captureSquare = move.squareTo - 8;
+            captureSquare = move.toSquare - 8;
         }
         else
         {
-            captureSquare = move.squareTo + 8;
+            captureSquare = move.toSquare + 8;
         }
 
         this->state.unsetPiece(enemyColor, Pieces::PAWN, captureSquare);
@@ -202,15 +202,15 @@ namespace engine::game
     {
         Pieces promotionPiece = this->askPromotion();
 
-        if (move.squareTo >= 56) // Rank 8 = White promotion
+        if (move.toSquare >= 56) // Rank 8 = White promotion
         {
-            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.squareTo);
-            this->state.setPiece(Colors::WHITE, promotionPiece, move.squareTo);
+            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.toSquare);
+            this->state.setPiece(Colors::WHITE, promotionPiece, move.toSquare);
         }
         else // Black promotion
         {
-            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.squareTo);
-            this->state.setPiece(Colors::BLACK, promotionPiece, move.squareTo);
+            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.toSquare);
+            this->state.setPiece(Colors::BLACK, promotionPiece, move.toSquare);
         }
     }
 
@@ -227,7 +227,7 @@ namespace engine::game
         // If pawn double push was played, set enPassant square
         if (move.moveType == MoveTypes::DOUBLE_PUSH)
         {
-            this->state.enPassantSquare = (move.squareFrom + move.squareTo) >> 1;
+            this->state.enPassantSquare = (move.fromSquare + move.toSquare) >> 1;
         }
         // If enPassant square was set and we didn't double push, set it back to -1
         else if (this->state.enPassantSquare != -1)
@@ -251,7 +251,7 @@ namespace engine::game
     void Game::playMove(const Move& move) noexcept
     {
         LOG_DEBUG("Playing move: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
-                  utils::squareIndexToString(move.squareFrom), utils::squareIndexToString(move.squareTo),
+                  utils::squareIndexToString(move.fromSquare), utils::squareIndexToString(move.toSquare),
                   utils::toString(move.moveType), utils::toString(move.fromPiece));
 
         Colors enemyColor = this->state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
@@ -274,7 +274,7 @@ namespace engine::game
         // If no special move, just move the piece
         else
         {
-            this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+            this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
         }
 
         // If promotion flag is set, ask and make promotion
