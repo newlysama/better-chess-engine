@@ -50,12 +50,27 @@ namespace engine::game
         std::string askInput() const noexcept;
 
         /**
+         * @brief Asks user for promotion.
+         * Restart until user enters a valid promotion.
+         *
+         * @return Pieces : the requested piece type.
+         */
+        core::Pieces askPromotion() const noexcept;
+
+        /**
          * @brief Parses a user input and use it to build a move.
          *
          * @param [in] input : the user input
          * @return Move : the builded move / Empty move if the input is not valid
          */
         game::Move inputToMove(std::string input) noexcept;
+
+        /**
+         * @brief Make a catpure.
+         *
+         * @param [in] move : capture move
+         */
+        void makeCapture(const game::Move& move, core::Colors enemyColor) noexcept;
 
         /**
          * @brief Special function make castling move.
@@ -71,6 +86,13 @@ namespace engine::game
          * @param [in] enemyColor : color of the captured piece
          */
         void makeEnPassant(const game::Move& move, core::Colors enemyColor) noexcept;
+
+        /**
+         * @brief Asks user for promotion option and perform it.
+         *
+         * @param [in] move : move leading to promotion
+         */
+        void makePromotion(const game::Move& move) noexcept;
 
         /**
          * @brief Update game state after a move was played.

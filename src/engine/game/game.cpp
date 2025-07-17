@@ -47,6 +47,32 @@ namespace engine::game
         return input;
     }
 
+    Pieces Game::askPromotion() const noexcept
+    {
+        std::string promotion;
+        Pieces piece;
+
+        std::cout << "Select a promotion type (lowercase piece name): ";
+
+        while (true)
+        {
+            std::cin >> promotion;
+            piece = utils::fromString(promotion);
+
+            if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN)
+            {
+                LOG_DEBUG("User entered non existing piece: {}", promotion);
+                std::cout << "Please enter a valid piece (queen, rook, bishop or knight): ";
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return piece;
+    }
+
     Move Game::inputToMove(std::string input) noexcept
     {
         if (input.size() != 4)
@@ -120,6 +146,13 @@ namespace engine::game
         return move;
     }
 
+    void Game::makeCapture(const game::Move& move, Colors enemyColor) noexcept
+    {
+        Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
+        this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+    }
+
     void Game::makeCastling(const Move& move) noexcept
     {
         // Move the king
@@ -165,6 +198,22 @@ namespace engine::game
         this->state.unsetPiece(enemyColor, Pieces::PAWN, captureSquare);
     }
 
+    void Game::makePromotion(const game::Move& move) noexcept
+    {
+        Pieces promotionPiece = this->askPromotion();
+
+        if (move.squareTo >= 56) // Rank 8 = White promotion
+        {
+            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.squareTo);
+            this->state.setPiece(Colors::WHITE, promotionPiece, move.squareTo);
+        }
+        else // Black promotion
+        {
+            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.squareTo);
+            this->state.setPiece(Colors::BLACK, promotionPiece, move.squareTo);
+        }
+    }
+
     void Game::update(const Move& move, Colors enemyColor) noexcept
     {
         this->state.halfMoveClock++;
@@ -207,11 +256,10 @@ namespace engine::game
 
         Colors enemyColor = this->state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        // If move is a capture, remove the target piece from occupancies
+        // If move is a capture, move the from piece and remove the target piece
         if (move.moveType == MoveTypes::CAPTURE)
         {
-            Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
-            this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
+            this->makeCapture(move, enemyColor);
         }
         // If move is a castling, move to according rook
         else if (move.moveType == MoveTypes::CASTLE)
@@ -219,13 +267,20 @@ namespace engine::game
             this->makeCastling(move);
         }
         // If move is an enPassant, remove the target piece
-        else if (move.moveType == MoveTypes::ENPASSANT)
+        else if (move.moveType == MoveTypes::ENPASSANT) [[unlikely]]
         {
             this->makeEnPassant(move, enemyColor);
         }
         // If no special move, just move the piece
+        else
         {
             this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+        }
+
+        // If promotion flag is set, ask and make promotion
+        if (move.promotion == true) [[unlikely]]
+        {
+            this->makePromotion(move);
         }
 
         this->update(move, enemyColor);
