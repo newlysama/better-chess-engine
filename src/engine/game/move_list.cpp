@@ -82,6 +82,17 @@ namespace engine::game
             int squareTo = targets.lsbIndex();
 
             Move move{squareFrom, squareTo, moveType, fromPiece};
+
+            // Check for promotion
+            if (fromPiece == Pieces::PAWN)
+            {
+                int rankTo = State::getRankIndex(squareTo);
+                if (rankTo == 7 || rankTo == 0) [[unlikely]]
+                {
+                    move.promotion = true;
+                }
+            }
+
             this->add(move);
 
             // Move to the next target
