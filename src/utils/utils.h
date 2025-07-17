@@ -27,12 +27,12 @@ namespace utils
      * @param [in] squareIndex : the index of the square within a Bitboard
      * @return std::string_view : rank/file string notation or "Unkown" if squareIndex is not valid
      */
-    inline constexpr std::string_view squareIndexToString(int squareIndex)
+    inline std::string_view squareIndexToString(const int squareIndex)
     {
         auto iter = std::find_if(std::begin(engine::core::SQUARE_INDEX), std::end(engine::core::SQUARE_INDEX),
                                  [&squareIndex](auto&& pair) { return pair.second == squareIndex; });
 
-        if (iter == std::end(engine::core::SQUARE_INDEX))
+        if (iter == std::end(engine::core::SQUARE_INDEX)) [[unlikely]]
         {
             LOG_ERROR("[utils::squareIndexToString()] Invalid square index: {}", squareIndex);
             return "Unknown";

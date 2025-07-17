@@ -43,14 +43,15 @@ namespace utils
          * @param [in] bytes : the number of bytes to allocate
          * @return void* : pointer the the writable memory area
          */
-        inline constexpr void* allocate(std::size_t bytes, std::size_t alignment = alignof(std::max_align_t))
+        inline constexpr void* allocate(const std::size_t bytes,
+                                        const std::size_t alignment = alignof(std::max_align_t))
         {
             // Computes offset for alignment
             std::size_t current = writeIndex;
             std::size_t pad = (alignment - (current % alignment)) % alignment;
             std::size_t need = current + pad + bytes;
 
-            if ([[unlikely]] need > Capacity)
+            if (need > Capacity) [[unlikely]]
             {
                 // clang-format off
                 LOG_ERROR(

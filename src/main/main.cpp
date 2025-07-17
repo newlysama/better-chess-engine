@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         engine::game::Move move;
         move = game.inputToMove(userInput);
 
-        if (move.isSet() == false)
+        if (move.isSet() == false) [[unlikely]]
         {
             std::cout << "Please enter a valid input\n";
 

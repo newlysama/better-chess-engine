@@ -59,7 +59,7 @@ namespace engine::game
             std::cin >> promotion;
             piece = utils::fromString(promotion);
 
-            if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN)
+            if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN) [[unlikely]]
             {
                 LOG_DEBUG("User entered non existing piece: {}", promotion);
                 std::cout << "Please enter a valid piece (queen, rook, bishop or knight): ";
@@ -75,7 +75,7 @@ namespace engine::game
 
     Move Game::inputToMove(std::string input) noexcept
     {
-        if (input.size() != 4)
+        if (input.size() != 4) [[unlikely]]
         {
             LOG_DEBUG("User's input had invalid size: {}", input.size());
             return Move{};
@@ -88,12 +88,12 @@ namespace engine::game
         int toSquare;
 
         // Check if from square input is valid
-        if (SQUARE_INDEX.find(fromStr) != SQUARE_INDEX.end())
+        if (SQUARE_INDEX.find(fromStr) != SQUARE_INDEX.end()) [[likely]]
         {
             fromSquare = SQUARE_INDEX.at(fromStr);
 
             // Check if from square input contains a piece from sideToMove team
-            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(fromSquare) == false)
+            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(fromSquare) == false) [[unlikely]]
             {
                 LOG_DEBUG("User entered a fromSquare that does not contains any ally piece");
                 return Move{};
@@ -106,12 +106,12 @@ namespace engine::game
         }
 
         // Check if to square input is valid
-        if (SQUARE_INDEX.find(toStr) != SQUARE_INDEX.end())
+        if (SQUARE_INDEX.find(toStr) != SQUARE_INDEX.end()) [[likely]]
         {
             toSquare = SQUARE_INDEX.at(toStr);
 
             // Check if to square input contains a piece from sideToMove team
-            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(toSquare))
+            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(toSquare)) [[unlikely]]
             {
                 LOG_DEBUG("User entered a toSquare that contains an ally piece");
                 return Move{};
@@ -138,7 +138,7 @@ namespace engine::game
         }
 
         // If the requested move doesn't exists, throw
-        if (!move.isSet())
+        if (!move.isSet()) [[unlikely]]
         {
             LOG_DEBUG("User entered an move that is not legal");
         }
@@ -222,7 +222,15 @@ namespace engine::game
 
     void Game::update(const Move& move, const Colors enemyColor) noexcept
     {
-        this->state.halfMoveClock++;
+        if (move.moveType == MoveTypes::CAPTURE || move.moveType == MoveTypes::ENPASSANT ||
+            move.moveType == MoveTypes::PROMOTION || move.fromPiece == Pieces::PAWN) [[likely]]
+        {
+            this->state.halfMoveClock = 0;
+        }
+        else
+        {
+            this->state.halfMoveClock++;
+        }
 
         // If white just played, increase full move clock
         if (this->state.sideToMove == Colors::WHITE)
@@ -268,7 +276,7 @@ namespace engine::game
             this->makeCapture(move, enemyColor);
         }
         // If move is a castling, move to according rook
-        else if (move.moveType == MoveTypes::CASTLE)
+        else if (move.moveType == MoveTypes::CASTLE) [[unlikely]]
         {
             this->makeCastling(move);
         }

@@ -65,7 +65,7 @@ namespace engine::game
     {
         for (int i = 0; i < this->_size; i++)
         {
-            if (move == this->_moves[i])
+            if (move == this->_moves[i]) [[unlikely]]
             {
                 return true;
             }
@@ -206,7 +206,7 @@ namespace engine::game
             }
 
             // Generate enPassant if enabled
-            if (state.enPassantSquare != -1)
+            if (state.enPassantSquare != -1) [[unlikely]]
             {
                 this->getEnPassantMoves(state, fromSquare);
             }
