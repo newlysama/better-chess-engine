@@ -62,7 +62,7 @@ namespace engine::core
 
     /**
      * @typedef DiagonalMasks
-     * @brief   1x15 array holing each diagonal's mask.
+     * @brief   1x15 array holding each diagonal's mask.
      */
     typedef std::array<board::Bitboard, 15> DiagonalMasks;
 
