@@ -106,6 +106,14 @@ namespace engine::game
         void getCastlingMoves(const board::State& state, int fromSquare) noexcept;
 
         /**
+         * @brief If enPassant enabled, add the corresponding move the the movelist;
+         *
+         * @param [in] state      : Current state of the board
+         * @param [in] fromSquare : Current king square
+         */
+        void getEnPassantMoves(const board::State& state, int fromSquare) noexcept;
+
+        /**
          * @brief Generates legal Pawns moves.
          *
          * @param [in] state : The state to work with
