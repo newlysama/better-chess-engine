@@ -213,6 +213,38 @@ namespace engine::board
     }
 
     /**
+     * @brief Builds pawns double pushes masks, depending on the color.
+     * @return 1x64 array of attacks masks
+     */
+    template <core::Colors Color>
+    inline consteval core::BitboardTable initPawnDoublePushesMasks() noexcept
+    {
+        core::BitboardTable masks{};
+        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        {
+            Bitboard squareBB = Bitboard{1ULL << squareIndex};
+            if constexpr (Color == core::Colors::WHITE)
+            {
+                int rankIndex = squareIndex >> 3;
+
+                if (rankIndex == 1) // Second rank
+                {
+                    masks[squareIndex] |= shiftDir<core::Directions::NORTH_NORTH>(squareBB);
+                }
+            }
+            else
+            {
+                int rankIndex = squareIndex >> 3;
+                if (rankIndex == 6) // 7th rank
+                {
+                    masks[squareIndex] |= shiftDir<core::Directions::SOUTH_SOUTH>(squareBB);
+                }
+            }
+        }
+        return masks;
+    }
+
+    /**
      * @brief Builds pawns pushes masks, depending on the color.
      * @return 1x64 array of attacks masks
      */
@@ -226,23 +258,10 @@ namespace engine::board
             if constexpr (Color == core::Colors::WHITE)
             {
                 masks[squareIndex] = shiftDir<core::Directions::NORTH>(squareBB);
-
-                int rankIndex = squareIndex >> 3;
-
-                if (rankIndex == 1) // Second rank
-                {
-                    masks[squareIndex] |= shiftDir<core::Directions::NORTH_NORTH>(squareBB);
-                }
             }
             else
             {
                 masks[squareIndex] = shiftDir<core::Directions::SOUTH>(squareBB);
-
-                int rankIndex = squareIndex >> 3;
-                if (rankIndex == 6) // 7th rank
-                {
-                    masks[squareIndex] |= shiftDir<core::Directions::SOUTH_SOUTH>(squareBB);
-                }
             }
         }
         return masks;
@@ -251,6 +270,11 @@ namespace engine::board
     inline constexpr std::array<core::BitboardTable, core::Colors::COLORS> PAWN_PUSHES_MASKS{
         initPawnPushesMasks<core::Colors::WHITE>(),
         initPawnPushesMasks<core::Colors::BLACK>()
+    };
+
+    inline constexpr std::array<core::BitboardTable, core::Colors::COLORS> PAWN_DOUBLE_PUSHES_MASKS{
+        initPawnDoublePushesMasks<core::Colors::WHITE>(),
+        initPawnDoublePushesMasks<core::Colors::BLACK>()
     };
 
     inline constexpr std::array<core::BitboardTable, core::Colors::COLORS> PAWN_CAPTURES_MASKS{
