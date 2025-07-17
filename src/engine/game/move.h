@@ -15,6 +15,8 @@
 #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
 #include <iostream>
 #include <string_view>
+
+#include "utils/enums_to_string.h"
 #endif
 
 #include "engine/core/enums.h"
@@ -40,6 +42,12 @@ namespace engine::game
          */
         Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece) noexcept;
 
+        /**
+         * @brief Constructor specifying a castling type.
+         */
+        Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece,
+             const core::Castlings castling) noexcept;
+
         bool operator==(Move& move) const noexcept;
         bool operator!=(Move& move) const noexcept;
 
@@ -54,17 +62,9 @@ namespace engine::game
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
             inline void print() const noexcept
             {
-                std::string_view typeStr =
-                      moveType == core::MoveTypes::CAPTURE    ? "Capture"
-                    : moveType == core::MoveTypes::QUIET      ? "Quiet"
-                    : moveType == core::MoveTypes::PROMOTION  ? "Promotion"
-                    : moveType == core::MoveTypes::CASTLE     ? "Castle"
-                    : moveType == core::MoveTypes::ENPASSANT  ? "En Passant"
-                    : "";
-
                 std::cout << "Square from: " << squareFrom << "\n"
                           << "Square to:   " << squareTo   << "\n"
-                          << "Move type:   " << typeStr      << "\n";
+                          << "Move type:   " << utils::toString(moveType) << "\n";
             }
         #endif
         // clang-format on
@@ -73,6 +73,7 @@ namespace engine::game
         int squareTo;             // Target square
         core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
         core::Pieces fromPiece;   // Piece type on squareFrom
+        core::Castlings castling; // Type if castling
     };
 } // namespace engine::game
 
