@@ -12,11 +12,31 @@ project('chess', 'cpp',
 #        PROJECT MODE          #
 #------------------------------#
 
-mode = get_option('mode')
+mode            = get_option('mode')
+generate_magics = get_option('generate_magics')
+console         = get_option('console')
+server          = get_option('server')
+
+# Global project arguments
+add_project_arguments(
+  '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
+  language: 'cpp'
+)
+
+# Performance arguments
+if mode in ['profile', 'benchmark', 'release']
+  add_project_arguments(
+    '-Doptimization=3',
+    '-march=native',
+    '-mtune=native',
+    '-funroll-loops',
+    '-fomit-frame-pointer',
+    language: 'cpp',
+  )
+endif
 
 if mode == 'debug'
   add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_DEBUG',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     '-Db_sanitize=address',
@@ -27,25 +47,21 @@ if mode == 'debug'
 
 elif mode == 'profile'
   add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_PROFILE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
-    '-Doptimization=3',
+    '-Db_pch=true',
     language: 'cpp'
   )
 
 elif mode == 'release'
   add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_RELEASE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
-    '-Doptimization=3',
     language: 'cpp'
   )
 
 elif mode == 'test'
   add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_TEST',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     '-Db_sanitize=address',
@@ -61,10 +77,9 @@ elif mode == 'test'
 
 elif mode == 'benchmark'
   add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
     '-DBUILD_BENCHMARK',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
-    '-Doptimization=3',
+    '-Db_pch=true',
     language: 'cpp'
   )
 
@@ -72,21 +87,25 @@ elif mode == 'benchmark'
     '-pthread',
     language: 'cpp'
   )
+endif
 
-elif mode == 'generate_magics'
-  add_project_arguments(
-    '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
-    '-DBUILD_GENERATE_MAGICS',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
-    '-Doptimization=3',
-    language: 'cpp'
-  )
+if generate_magics == true
+  if (server == true) or mode in ['profile', 'benchmark', 'release']
+    error('Cannot use generate_magics with server option or release/test/benchmark build modes.')
+  else
+    add_project_arguments(
+      '-DGENERATE_MAGICS',
+      language: 'cpp'
+    )
 
   add_project_link_arguments(
     '-fopenmp',
     language: 'cpp'
   )
+  endif
 endif
+
+
 
 
 #------------------------------#

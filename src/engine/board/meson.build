@@ -7,8 +7,7 @@ board_src = files(
 )
 
 # If we want to generate magics, need openmp
-mode = get_option('mode')
-if mode == 'generate_magics'
+if generate_magics
   board_src += files('magics_generator.cpp')
   openmp_dep = dependency('openmp', required: true)
 endif
