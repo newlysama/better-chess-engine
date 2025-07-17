@@ -188,16 +188,22 @@ namespace engine::game
 
             // Rechable empty squares
             Bitboard pushTargets = PAWN_PUSHES_MASKS[state.sideToMove][squareFrom] & ~state.generalOccupancy;
-            Bitboard doublePushTargets =
-                PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][squareFrom] & ~state.generalOccupancy;
 
             // Rechable capture square
             Bitboard captureTargets =
                 PAWN_CAPTURES_MASKS[state.sideToMove][squareFrom] & state.coloredOccupancies[enemyColor];
 
             this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::PAWN);
-            this->processTargets(doublePushTargets, squareFrom, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
             this->processTargets(pushTargets, squareFrom, MoveTypes::QUIET, Pieces::PAWN);
+
+            // Generate double pushes if the square between start and dest is empty
+            if ((PAWN_PUSHES_MASKS[state.sideToMove][squareFrom] & state.generalOccupancy) == 0)
+            {
+                Bitboard doublePushTargets =
+                    PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][squareFrom] & ~state.generalOccupancy;
+
+                this->processTargets(doublePushTargets, squareFrom, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
+            }
 
             // Generate enPassant if enabled
             if (state.enPassantSquare != -1)
