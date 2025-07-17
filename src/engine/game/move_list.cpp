@@ -344,9 +344,9 @@ namespace engine::game
 
             Bitboard targets = attacks & ~state.coloredOccupancies[state.sideToMove];
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
-            Bitboard catpureTargets = targets & state.coloredOccupancies[enemyColor];
+            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(catpureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
+            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
             this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
         }
     }
