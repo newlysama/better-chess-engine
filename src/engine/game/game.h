@@ -58,11 +58,18 @@ namespace engine::game
         game::Move inputToMove(std::string input) noexcept;
 
         /**
+         * @brief Special function to move the rook in a castling move.
+         *
+         * @param [in] move : the castling move
+         */
+        void moveRookInCastling(const game::Move& move) noexcept;
+
+        /**
          * @brief Play a move.
          *
          * @param [in] move  : The move to play
          */
-        void playMove(const game::Move move) noexcept;
+        void playMove(const game::Move& move) noexcept;
 
         board::State state;      // Game's state
         game::MoveList moveList; // Legal move lists of the current halfMoveClock
