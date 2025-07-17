@@ -58,11 +58,27 @@ namespace engine::game
         game::Move inputToMove(std::string input) noexcept;
 
         /**
-         * @brief Special function to move the rook in a castling move.
+         * @brief Special function make castling move.
          *
          * @param [in] move : the castling move
          */
-        void moveRookInCastling(const game::Move& move) noexcept;
+        void makeCastling(const game::Move& move) noexcept;
+
+        /**
+         * @brief Special function to make enPassant move.
+         *
+         * @param [in] move       : the enPassant move
+         * @param [in] enemyColor : color of the captured piece
+         */
+        void makeEnPassant(const game::Move& move, core::Colors enemyColor) noexcept;
+
+        /**
+         * @brief Update game state after a move was played.
+         *
+         * @param [in] move       : the played move
+         * @param [in] enemyColor : next team to play
+         */
+        void update(const game::Move& move, core::Colors enemyColor) noexcept;
 
         /**
          * @brief Play a move.
