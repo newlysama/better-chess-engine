@@ -28,12 +28,14 @@ namespace engine::printer
     // Array [color][piece] for colored pieces printing
     //  color 0 = black, 1 = white
     inline constexpr std::array<std::array<std::string_view, 6>, 2> PIECE_STR = {
-        {{// black:   p n b r q k
-          "\033[31m\033[0m", "\033[31m\033[0m", "\033[31m󰡜\033[0m", "\033[31m󰡛\033[0m",
-          "\033[31m󰡚\033[0m", "\033[31m󰡗\033[0m"},
+        {
          {// white:   P N B R Q K
-          "\033[32m\033[0m", "\033[32m\033[0m", "\033[32m󰡜\033[0m", "\033[32m󰡛\033[0m",
-          "\033[32m󰡚\033[0m", "\033[32m󰡗\033[0m"}}
+             "\033[32m\033[0m", "\033[32m\033[0m", "\033[32m󰡜\033[0m", "\033[32m󰡛\033[0m",
+             "\033[32m󰡚\033[0m", "\033[32m󰡗\033[0m"},
+         {// black:   p n b r q k
+             "\033[31m\033[0m", "\033[31m\033[0m", "\033[31m󰡜\033[0m", "\033[31m󰡛\033[0m",
+             "\033[31m󰡚\033[0m", "\033[31m󰡗\033[0m"},
+         }
     };
 
     // Tabs to center a bit the state and the header on the terminal
