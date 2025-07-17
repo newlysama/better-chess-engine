@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 #else
 
     engine::game::Game game;
-    game.moveList.generateAllMoves(game.state, engine::core::Colors::WHITE);
+    game.moveList.generateAllMoves(game.state);
     engine::printer::printState(game.state);
 
     while (true)

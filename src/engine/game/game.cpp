@@ -245,7 +245,7 @@ namespace engine::game
                   this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>(),
                   this->state.enPassantSquare);
 
-        this->moveList.generateAllMoves(this->state, enemyColor);
+        this->moveList.generateAllMoves(this->state);
     }
 
     void Game::playMove(const Move& move) noexcept
