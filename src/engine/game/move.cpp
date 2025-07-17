@@ -21,6 +21,17 @@ namespace engine::game
         , squareTo(to)
         , moveType(type)
         , fromPiece(fromPiece)
+        , castling(Castlings::UNKNOWN_CASTLING)
+    {
+    }
+
+    Move::Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece,
+               const Castlings castling) noexcept
+        : squareFrom(from)
+        , squareTo(to)
+        , moveType(type)
+        , fromPiece(fromPiece)
+        , castling(castling)
     {
     }
 
