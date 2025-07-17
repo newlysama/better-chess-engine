@@ -120,8 +120,12 @@ namespace engine::game
         return move;
     }
 
-    void Game::moveRookInCastling(const Move& move) noexcept
+    void Game::makeCastling(const Move& move) noexcept
     {
+        // Move the king
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+
+        // Move the rook
         switch (move.castling)
         {
         case Castlings::WHITE_KING_SIDE:
@@ -142,6 +146,59 @@ namespace engine::game
         }
     }
 
+    void Game::makeEnPassant(const Move& move, Colors enemyColor) noexcept
+    {
+        // Move the pawn performing enPassant
+        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
+
+        // Determine enPassant captured piece's square
+        int captureSquare;
+        if (this->state.sideToMove == Colors::WHITE)
+        {
+            captureSquare = move.squareTo - 8;
+        }
+        else
+        {
+            captureSquare = move.squareTo + 8;
+        }
+
+        this->state.unsetPiece(enemyColor, Pieces::PAWN, captureSquare);
+    }
+
+    void Game::update(const Move& move, Colors enemyColor) noexcept
+    {
+        this->state.halfMoveClock++;
+
+        // If white just played, increase full move clock
+        if (this->state.sideToMove == Colors::WHITE)
+        {
+            this->state.fullMoveClock++;
+        }
+
+        // If pawn double push was played, set enPassant square
+        if (move.moveType == MoveTypes::DOUBLE_PUSH)
+        {
+            this->state.enPassantSquare = (move.squareFrom + move.squareTo) >> 1;
+        }
+        // If enPassant square was set and we didn't double push, set it back to -1
+        else if (this->state.enPassantSquare != -1)
+        {
+            this->state.enPassantSquare = -1;
+        }
+
+        this->state.sideToMove = enemyColor;
+
+        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}] - [White "
+                  "king side castling right: {}] - [White queen side castling right: {}] - [Black king side castling "
+                  "right: {}] - [Black queen side castling right: {}] - En passant square: {}",
+                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove),
+                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>(),
+                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>(),
+                  this->state.enPassantSquare);
+
+        this->moveList.generateAllMoves(this->state, enemyColor);
+    }
+
     void Game::playMove(const Move& move) noexcept
     {
         LOG_DEBUG("Playing move: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
@@ -157,30 +214,20 @@ namespace engine::game
             this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
         }
         // If move is a castling, move to according rook
-        if (move.castling != Castlings::UNKNOWN_CASTLING)
+        else if (move.moveType == MoveTypes::CASTLE)
         {
-            this->moveRookInCastling(move);
+            this->makeCastling(move);
+        }
+        // If move is an enPassant, remove the target piece
+        else if (move.moveType == MoveTypes::ENPASSANT)
+        {
+            this->makeEnPassant(move, enemyColor);
+        }
+        // If no special move, just move the piece
+        {
+            this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
         }
 
-        this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
-
-        // Update game infos
-        this->state.halfMoveClock++;
-
-        if (this->state.sideToMove == Colors::WHITE)
-        {
-            this->state.fullMoveClock++;
-        }
-
-        this->state.sideToMove = enemyColor;
-
-        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}] - [White "
-                  "king side castling right: {}] - [White queen side castling right: {}] - [Black king side castling "
-                  "right: {}] - [Black queen side castling right: {}]",
-                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove),
-                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>(),
-                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>());
-
-        this->moveList.generateAllMoves(this->state, enemyColor);
+        this->update(move, enemyColor);
     }
 } // namespace engine::game
