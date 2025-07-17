@@ -10,6 +10,7 @@
 #ifndef BITBOARD_H_
 #define BITBOARD_H_
 
+#include <assert.h>
 #include <bit>
 #include <cstdint>
 
@@ -38,7 +39,7 @@ namespace engine::board
          *
          * @param [in] _data_ : Value to initialize _data member
          */
-        constexpr Bitboard(const uint64_t& _data_ = 0ULL) noexcept
+        explicit constexpr Bitboard(const uint64_t& _data_ = 0ULL) noexcept
             : _data(_data_)
         {
         }
@@ -203,15 +204,13 @@ namespace engine::board
          */
         inline constexpr int lsbIndex() const noexcept
         {
-            return std::countr_zero(this->_data);
-        }
+            // clang-format off
+            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+                assert(this->_data != 0);
+            #endif
+            // clang-format on
 
-        /**
-         * @brief Pops the LSB.
-         */
-        inline constexpr void popLsb() noexcept
-        {
-            this->_data &= ~(1ULL << this->lsbIndex());
+            return std::countr_zero(this->_data);
         }
 
         /**
@@ -221,7 +220,41 @@ namespace engine::board
          */
         inline constexpr int msbIndex() const noexcept
         {
+            // clang-format off
+            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+                assert(this->_data != 0);
+            #endif
+            // clang-format on
+
             return 63 - std::countl_zero(this->_data);
+        }
+
+        /**
+         * @brief Pops the LSB.
+         */
+        inline constexpr void popLsb() noexcept
+        {
+            // clang-format off
+            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+                assert(this->_data != 0);
+            #endif
+            // clang-format on
+
+            this->_data &= ~(1ULL << this->lsbIndex());
+        }
+
+        /**
+         * @brief Pops the MSB.
+         */
+        inline constexpr void popMsb() noexcept
+        {
+            // clang-format off
+            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+                assert(this->_data != 0);
+            #endif
+            // clang-format on
+
+            this->_data &= ~(1ULL << this->msbIndex());
         }
 
       private:
