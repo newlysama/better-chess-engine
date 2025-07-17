@@ -26,6 +26,7 @@ namespace engine::board
         , fullMoveClock(0)
         , sideToMove(Colors::WHITE)
         , castlingRights((1 << Castlings::CASTLINGS) - 1)
+        , enPassantSquare(1)
         ,allPieces{
                     {
                         // -- White pieces (index 0) --
