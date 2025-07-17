@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
         if (move.isSet() == false)
         {
-            std::cout << "Please enter a valid input";
+            std::cout << "Please enter a valid input\n";
 
             continue;
         }
