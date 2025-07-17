@@ -131,7 +131,8 @@ namespace engine::core
         WHITE_QUEEN_SIDE = 1,
         BLACK_KING_SIDE = 2,
         BLACK_QUEEN_SIDE = 3,
-        CASTLINGS = 4
+        CASTLINGS = 4,
+        UNKNOWN_CASTLING = 255
     };
 } // namespace engine::core
 
