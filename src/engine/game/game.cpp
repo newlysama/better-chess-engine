@@ -148,6 +148,12 @@ namespace engine::game
 
     void Game::makeCapture(const game::Move& move, const Colors enemyColor) noexcept
     {
+        // Since state.unsetPiece() will delete target piece from general occupancy,
+        // state.checkCastlingRemoval() in state.movePiece() won't detect
+        // if we take an enemy rook or not and therefore will not be able
+        // to remove the enemy castling right correctly
+        this->state.checkCastlingRemoval(move.fromPiece, move.fromSquare, move.toSquare);
+
         Pieces toRemove = this->state.getPiece(enemyColor, move.toSquare);
         this->state.unsetPiece(enemyColor, toRemove, move.toSquare);
         this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
@@ -239,7 +245,7 @@ namespace engine::game
 
         LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}] - [White "
                   "king side castling right: {}] - [White queen side castling right: {}] - [Black king side castling "
-                  "right: {}] - [Black queen side castling right: {}] - En passant square: {}",
+                  "right: {}] - [Black queen side castling right: {}] - [En passant square: {}]",
                   this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove),
                   this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>(),
                   this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>(),
