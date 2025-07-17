@@ -113,7 +113,7 @@ namespace engine::board
          * @param [in] piece      : Piece being moved
          * @param [in] fromSquare : Square piece is on
          */
-        void checkCastlingRemoval(core::Colors color, const core::Pieces piece, const int fromSquare) noexcept;
+        void checkCastlingRemoval(const core::Colors color, const core::Pieces piece, const int fromSquare) noexcept;
 
         /**
          * @brief Get a piece on a given square.

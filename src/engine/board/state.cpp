@@ -62,7 +62,7 @@ namespace engine::board
         this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
     }
 
-    void State::checkCastlingRemoval(Colors color, const Pieces piece, const int fromSquare) noexcept
+    void State::checkCastlingRemoval(const Colors color, const Pieces piece, const int fromSquare) noexcept
     {
         if (color == Colors::WHITE &&
             (this->hasCastlingRight<Castlings::WHITE_KING_SIDE>() || this->hasCastlingRight<WHITE_QUEEN_SIDE>()))
