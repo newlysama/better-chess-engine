@@ -186,6 +186,8 @@ namespace utils
             return "BLACK_QUEEN_SIDE";
         case engine::core::Castlings::CASTLINGS:
             return "4";
+        case engine::core::Castlings::UNKNOWN_CASTLING:
+            return "UNKNOWN_CASTLING";
         }
         return "UNKNOWN_CASTLING";
     }
