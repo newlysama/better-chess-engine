@@ -164,6 +164,8 @@ namespace utils
             return "PROMOTION";
         case engine::core::MoveTypes::CASTLE:
             return "CASTLE";
+        case engine::core::MoveTypes::DOUBLE_PUSH:
+            return "DOUBLE_PUSH";
         case engine::core::MoveTypes::ENPASSANT:
             return "ENPASSANT";
         case engine::core::MoveTypes::MOVE_TYPES:
