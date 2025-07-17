@@ -26,7 +26,7 @@ namespace engine::board
         , fullMoveClock(0)
         , sideToMove(Colors::WHITE)
         , castlingRights((1 << Castlings::CASTLINGS) - 1)
-        , enPassantSquare(1)
+        , enPassantSquare(-1)
         ,allPieces{
                     {
                         // -- White pieces (index 0) --
@@ -62,9 +62,9 @@ namespace engine::board
         this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
     }
 
-    void State::checkCastlingRemoval(const Colors color, const Pieces piece, const int fromSquare) noexcept
+    void State::checkCastlingRemoval(const Pieces piece, const int fromSquare, const int toSquare) noexcept
     {
-        if (color == Colors::WHITE &&
+        if (this->sideToMove == Colors::WHITE &&
             (this->hasCastlingRight<Castlings::WHITE_KING_SIDE>() || this->hasCastlingRight<WHITE_QUEEN_SIDE>()))
         {
             if (piece == Pieces::KING)
@@ -85,7 +85,7 @@ namespace engine::board
             }
         }
 
-        if (color == Colors::BLACK &&
+        if (this->sideToMove == Colors::BLACK &&
             (this->hasCastlingRight<Castlings::BLACK_KING_SIDE>() || this->hasCastlingRight<BLACK_QUEEN_SIDE>()))
         {
             if (piece == Pieces::KING)
@@ -103,6 +103,40 @@ namespace engine::board
             {
                 this->clearCastlingRight<Castlings::BLACK_KING_SIDE>();
                 LOG_DEBUG("Removed black king side castling right");
+            }
+        }
+
+        // Check if we are removing enemy's castling right by capturing a rook
+        Colors enemyColor = (this->sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE);
+
+        // If target piece is a rook
+        if (this->getPiece(toSquare))
+        {
+            if (enemyColor == Colors::WHITE)
+            {
+                if (toSquare == 0) // Initial white queen side rook position
+                {
+                    this->clearCastlingRight<Castlings::WHITE_QUEEN_SIDE>();
+                    LOG_DEBUG("Removed white queen side castling right by capture");
+                }
+                else if (toSquare == 7) // Initial white king side rook position
+                {
+                    this->clearCastlingRight<Castlings::WHITE_KING_SIDE>();
+                    LOG_DEBUG("Removed white king side castling right by capture");
+                }
+            }
+            else
+            {
+                if (toSquare == 56) // Initial black queen side rook position
+                {
+                    this->clearCastlingRight<Castlings::BLACK_QUEEN_SIDE>();
+                    LOG_DEBUG("Removed black queen side castling right by capture");
+                }
+                else if (toSquare == 63) // Initial black king side rook position
+                {
+                    this->clearCastlingRight<Castlings::BLACK_KING_SIDE>();
+                    LOG_DEBUG("Removed black king side castling right by capture");
+                }
             }
         }
     }
@@ -165,7 +199,8 @@ namespace engine::board
         this->unsetPiece(color, piece, fromSquare);
         this->setPiece(color, piece, toSquare);
 
-        this->checkCastlingRemoval(color, piece, fromSquare);
+        // If we move a rook or the king, check for castling rights removal
+        this->checkCastlingRemoval(piece, fromSquare, toSquare);
 
         LOG_INFO("Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(toSquare));
