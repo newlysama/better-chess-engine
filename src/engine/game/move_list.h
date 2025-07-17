@@ -97,6 +97,15 @@ namespace engine::game
                             core::Pieces fromPiece) noexcept;
 
         /**
+         * @brief If castling enabled, add the corresponding move to the movelist.
+         *
+         * @param [in] state      : Current state of the board
+         * @param [in] fromSquare : Current king square
+         */
+        template <core::Castlings C>
+        void getCastlingMoves(const board::State& state, int fromSquare) noexcept;
+
+        /**
          * @brief Generates legal Pawns moves.
          *
          * @param [in] state : The state to work with

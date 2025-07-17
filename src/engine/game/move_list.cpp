@@ -91,6 +91,49 @@ namespace engine::game
         LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
     }
 
+    template <Castlings C>
+    void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
+    {
+        // Can't castle
+        if (!state.hasCastlingRight<C>())
+        {
+            return;
+        }
+
+        // Chose the right castling mask
+        // between the rook and the king
+        // (squares that have to be empty)
+        Bitboard between = CASTLING_MASKS[C];
+        int toSquare = 0;
+
+        switch (C)
+        {
+        case WHITE_KING_SIDE:
+            toSquare = 6;
+            break;
+        case WHITE_QUEEN_SIDE:
+            toSquare = 2;
+            break;
+        case BLACK_KING_SIDE:
+            toSquare = 62;
+            break;
+        case BLACK_QUEEN_SIDE:
+            toSquare = 58;
+            break;
+        default:
+            break;
+        }
+
+        // Check that square between rook and king are free
+        if ((state.generalOccupancy & between).getData() != 0ULL)
+            return;
+
+        Move castle{fromSquare, toSquare, MoveTypes::CASTLE, Pieces::KING, C};
+        this->add(castle);
+
+        LOG_DEBUG("Generated {} castling legal move", utils::toString(C));
+    }
+
     /**
      * @todo Generate EnPassant and Promotions
      */
@@ -260,9 +303,22 @@ namespace engine::game
         // Extract king's index
         int squareFrom = king.lsbIndex();
 
+        // Generate classic targets
         Bitboard targets = KING_ATTACKS_MASKS[squareFrom] & ~state.coloredOccupancies[color];
         Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
         Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+
+        // Generate Castling targets
+        if (color == Colors::WHITE)
+        {
+            getCastlingMoves<Castlings::WHITE_KING_SIDE>(state, squareFrom);
+            getCastlingMoves<Castlings::WHITE_QUEEN_SIDE>(state, squareFrom);
+        }
+        else
+        {
+            getCastlingMoves<Castlings::BLACK_KING_SIDE>(state, squareFrom);
+            getCastlingMoves<Castlings::BLACK_QUEEN_SIDE>(state, squareFrom);
+        }
 
         this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::KING);
         this->processTargets(quietTargets, squareFrom, MoveTypes::QUIET, Pieces::KING);
