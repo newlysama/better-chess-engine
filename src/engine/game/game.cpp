@@ -146,7 +146,7 @@ namespace engine::game
         return move;
     }
 
-    void Game::makeCapture(const game::Move& move, Colors enemyColor) noexcept
+    void Game::makeCapture(const game::Move& move, const Colors enemyColor) noexcept
     {
         Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
         this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
@@ -179,7 +179,7 @@ namespace engine::game
         }
     }
 
-    void Game::makeEnPassant(const Move& move, Colors enemyColor) noexcept
+    void Game::makeEnPassant(const Move& move, const Colors enemyColor) noexcept
     {
         // Move the pawn performing enPassant
         this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
@@ -214,7 +214,7 @@ namespace engine::game
         }
     }
 
-    void Game::update(const Move& move, Colors enemyColor) noexcept
+    void Game::update(const Move& move, const Colors enemyColor) noexcept
     {
         this->state.halfMoveClock++;
 
