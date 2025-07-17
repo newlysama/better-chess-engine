@@ -22,6 +22,7 @@ namespace engine::game
         , moveType(type)
         , fromPiece(fromPiece)
         , castling(Castlings::UNKNOWN_CASTLING)
+        , promotion(false)
     {
     }
 
@@ -32,6 +33,7 @@ namespace engine::game
         , moveType(type)
         , fromPiece(fromPiece)
         , castling(castling)
+        , promotion(false)
     {
     }
 

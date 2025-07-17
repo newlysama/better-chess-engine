@@ -74,6 +74,7 @@ namespace engine::game
         core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
         core::Pieces fromPiece;   // Piece type on squareFrom
         core::Castlings castling; // Type if castling
+        bool promotion;           // Wether this move is a promotion
     };
 } // namespace engine::game
 
