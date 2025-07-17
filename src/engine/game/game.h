@@ -68,7 +68,8 @@ namespace engine::game
         /**
          * @brief Make a catpure.
          *
-         * @param [in] move : capture move
+         * @param [in] move       : capture move
+         * @param [in] enemyColor : enemy color
          */
         void makeCapture(const game::Move& move, const core::Colors enemyColor) noexcept;
 
