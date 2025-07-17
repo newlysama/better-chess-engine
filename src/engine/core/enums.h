@@ -117,8 +117,9 @@ namespace engine::core
         CAPTURE = 1,
         PROMOTION = 2,
         CASTLE = 3,
-        ENPASSANT = 4,
-        MOVE_TYPES = 5
+        DOUBLE_PUSH = 4,
+        ENPASSANT = 5,
+        MOVE_TYPES = 6
     };
 
     /**
