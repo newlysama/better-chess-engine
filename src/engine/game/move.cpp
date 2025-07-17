@@ -37,13 +37,13 @@ namespace engine::game
     {
     }
 
-    bool Move::operator==(Move& move) const noexcept
+    bool Move::operator==(const Move& move) const noexcept
     {
         return this->fromSquare == move.fromSquare && this->toSquare == move.toSquare &&
                this->moveType == move.moveType;
     }
 
-    bool Move::operator!=(Move& move) const noexcept
+    bool Move::operator!=(const Move& move) const noexcept
     {
         return this->fromSquare != move.fromSquare || this->toSquare != move.toSquare ||
                this->moveType != move.moveType;

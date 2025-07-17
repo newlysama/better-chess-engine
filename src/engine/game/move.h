@@ -48,8 +48,8 @@ namespace engine::game
         Move(const int from, const int to, const core::MoveTypes type, const core::Pieces fromPiece,
              const core::Castlings castling) noexcept;
 
-        bool operator==(Move& move) const noexcept;
-        bool operator!=(Move& move) const noexcept;
+        bool operator==(const Move& move) const noexcept;
+        bool operator!=(const Move& move) const noexcept;
 
         /**
          * @brief Check if a move is set (not set when default constructed).
@@ -69,8 +69,8 @@ namespace engine::game
         #endif
         // clang-format on
 
-        int fromSquare;           // Start square
-        int toSquare;             // Target square
+        int fromSquare = 0;       // Start square
+        int toSquare = 0;         // Target square
         core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
         core::Pieces fromPiece;   // Piece type on fromSquare
         core::Castlings castling; // Type if castling
