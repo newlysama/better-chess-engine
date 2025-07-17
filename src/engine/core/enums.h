@@ -39,7 +39,8 @@ namespace engine::core
     {
         WHITE = 0,
         BLACK = 1,
-        COLORS = 2
+        COLORS = 2,
+        UNKNOWN_COLOR = 255
     };
 
     /**
@@ -57,6 +58,7 @@ namespace engine::core
         RANK_7 = 6,
         RANK_8 = 7,
         RANKS = 8,
+        UNKNOWN_RANK = 255
     };
 
     /**
@@ -74,6 +76,7 @@ namespace engine::core
         FILE_G = 6,
         FILE_H = 7,
         FILES = 8,
+        UNKNOWN_FILE = 255
     };
 
     /**
@@ -104,7 +107,9 @@ namespace engine::core
         WSW = 15,
         WNW = 16,
         NNW = 17,
-        DIRECTIONS = 18
+
+        DIRECTIONS = 18,
+        UNKNOWN_DIRECTION = 255
     };
 
     /**
@@ -119,7 +124,8 @@ namespace engine::core
         CASTLE = 3,
         DOUBLE_PUSH = 4,
         ENPASSANT = 5,
-        MOVE_TYPES = 6
+        MOVE_TYPES = 6,
+        UNKNOWN_MOVE_TYPE = 255
     };
 
     /**
