@@ -10,6 +10,7 @@
 #include "move_list.h"
 
 #include <assert.h>
+#include <cmath>
 
 #include "engine/board/magic_const.h"
 #include "engine/board/mask.h"
@@ -17,6 +18,7 @@
 
 #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
 #include "utils/enums_to_string.h"
+#include "utils/utils.h"
 #endif
 
 /**
@@ -134,6 +136,27 @@ namespace engine::game
         LOG_DEBUG("Generated {} castling legal move", utils::toString(C));
     }
 
+    void MoveList::getEnPassantMoves(const State& state, int fromSquare) noexcept
+    {
+        int rankFrom = State::getRankIndex(fromSquare);
+
+        if ((state.sideToMove == Colors::WHITE && rankFrom == 4) ||
+            (state.sideToMove == Colors::BLACK && rankFrom == 3))
+        {
+            int fileFrom = State::getFileIndex(fromSquare);
+            int fileEnPassant = State::getFileIndex(state.enPassantSquare);
+
+            if (std::abs(fileFrom - fileEnPassant) == 1)
+            {
+                Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::ENPASSANT, Pieces::PAWN};
+                this->add(enPassant);
+
+                LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.moveType),
+                          utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.enPassantSquare));
+            }
+        }
+    }
+
     /**
      * @todo Generate EnPassant and Promotions
      */
@@ -153,12 +176,20 @@ namespace engine::game
 
             // Rechable empty squares
             Bitboard pushTargets = PAWN_PUSHES_MASKS[color][squareFrom] & ~state.generalOccupancy;
+            Bitboard doublePushTargets = PAWN_DOUBLE_PUSHES_MASKS[color][squareFrom] & ~state.generalOccupancy;
 
             // Rechable capture square
             Bitboard captureTargets = PAWN_CAPTURES_MASKS[color][squareFrom] & state.coloredOccupancies[enemyColor];
 
             this->processTargets(captureTargets, squareFrom, MoveTypes::CAPTURE, Pieces::PAWN);
+            this->processTargets(doublePushTargets, squareFrom, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
             this->processTargets(pushTargets, squareFrom, MoveTypes::QUIET, Pieces::PAWN);
+
+            // Generate enPassant if enabled
+            if (state.enPassantSquare != -1)
+            {
+                this->getEnPassantMoves(state, squareFrom);
+            }
         }
     }
 
