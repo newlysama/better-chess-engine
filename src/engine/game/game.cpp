@@ -14,9 +14,9 @@
 
 #include "engine/core/const.h"
 #include "logging/logging.h"
+#include "utils/enums_to_string.h"
 
 #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-#include "utils/enums_to_string.h"
 #include "utils/utils.h"
 #endif
 
@@ -120,7 +120,29 @@ namespace engine::game
         return move;
     }
 
-    void Game::playMove(const Move move) noexcept
+    void Game::moveRookInCastling(const Move& move) noexcept
+    {
+        switch (move.castling)
+        {
+        case Castlings::WHITE_KING_SIDE:
+            this->state.movePiece(Colors::WHITE, Pieces::ROOK, 7, 5);
+            break;
+        case Castlings::WHITE_QUEEN_SIDE:
+            this->state.movePiece(Colors::WHITE, Pieces::ROOK, 0, 3);
+            break;
+        case Castlings::BLACK_KING_SIDE:
+            this->state.movePiece(Colors::BLACK, Pieces::ROOK, 63, 61);
+            break;
+        case Castlings::BLACK_QUEEN_SIDE:
+            this->state.movePiece(Colors::BLACK, Pieces::ROOK, 56, 59);
+            break;
+        default:
+            LOG_ERROR("Move castling type is invalid: {}", utils::toString(move.castling));
+            break;
+        }
+    }
+
+    void Game::playMove(const Move& move) noexcept
     {
         LOG_DEBUG("Playing move: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
                   utils::squareIndexToString(move.squareFrom), utils::squareIndexToString(move.squareTo),
@@ -133,6 +155,11 @@ namespace engine::game
         {
             Pieces toRemove = this->state.getPiece(enemyColor, move.squareTo);
             this->state.unsetPiece(enemyColor, toRemove, move.squareTo);
+        }
+        // If move is a castling, move to according rook
+        if (move.castling != Castlings::UNKNOWN_CASTLING)
+        {
+            this->moveRookInCastling(move);
         }
 
         this->state.movePiece(this->state.sideToMove, move.fromPiece, move.squareFrom, move.squareTo);
