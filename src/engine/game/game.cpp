@@ -232,8 +232,8 @@ namespace engine::game
             this->state.halfMoveClock++;
         }
 
-        // If white just played, increase full move clock
-        if (this->state.sideToMove == Colors::WHITE)
+        // If black just played, increase full move clock
+        if (this->state.sideToMove == Colors::BLACK)
         {
             this->state.fullMoveClock++;
         }

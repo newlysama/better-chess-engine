@@ -23,7 +23,7 @@ namespace engine::board
 
     State::State() noexcept
         : halfMoveClock(0)
-        , fullMoveClock(0)
+        , fullMoveClock(1)
         , sideToMove(Colors::WHITE)
         , castlingRights((1 << Castlings::CASTLINGS) - 1)
         , enPassantSquare(-1)
