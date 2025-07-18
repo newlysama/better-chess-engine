@@ -223,7 +223,7 @@ namespace engine::game
     void Game::update(const Move& move, const Colors enemyColor) noexcept
     {
         if (move.moveType == MoveTypes::CAPTURE || move.moveType == MoveTypes::ENPASSANT ||
-            move.moveType == MoveTypes::PROMOTION || move.fromPiece == Pieces::PAWN) [[likely]]
+            move.moveType == MoveTypes::PROMOTION || move.fromPiece == Pieces::PAWN)
         {
             this->state.halfMoveClock = 0;
         }
