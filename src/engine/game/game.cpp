@@ -9,10 +9,6 @@
 
 #include "engine/game/game.h"
 
-#include <iostream>
-#include <string>
-
-#include "engine/core/const.h"
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
@@ -33,137 +29,6 @@ namespace engine::game
         : state(State{})
         , moveList(MoveList{})
     {
-    }
-
-    std::string Game::askInput() const noexcept
-    {
-        std::string input;
-
-        if (this->state.halfMoveClock >= 100)
-        {
-            std::cout << "Select a move to play (format ex: a1a2 OR 'draw'): ";
-        }
-        else
-        {
-            std::cout << "Select a move to play (format ex: a1a2): ";
-        }
-
-        std::cin >> input;
-
-        LOG_DEBUG("Got user console input: {}", input);
-
-        return input;
-    }
-
-    std::string Game::askDraw() const noexcept
-    {
-        std::string input;
-
-        std::cout << "Player " << utils::toString(this->state.sideToMove) << " asked for a draw, accept ? (yes/no): ";
-        std::cin >> input;
-
-        LOG_DEBUG("Draw response from enemy player: {}", input);
-
-        return input;
-    }
-
-    Pieces Game::askPromotion() const noexcept
-    {
-        std::string promotion;
-        Pieces piece;
-
-        std::cout << "Select a promotion type (lowercase piece name): ";
-
-        while (true)
-        {
-            std::cin >> promotion;
-            piece = utils::fromString(promotion);
-
-            if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN) [[unlikely]]
-            {
-                LOG_DEBUG("User entered non existing piece: {}", promotion);
-                std::cout << "Please enter a valid piece (queen, rook, bishop or knight): ";
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        return piece;
-    }
-
-    Move Game::inputToMove(std::string input) noexcept
-    {
-        if (input.size() != 4) [[unlikely]]
-        {
-            LOG_DEBUG("User's input had invalid size: {}", input.size());
-            return Move{};
-        }
-
-        std::string fromStr = input.substr(0, 2);
-        std::string toStr = input.substr(2, 2);
-
-        int fromSquare;
-        int toSquare;
-
-        // Check if from square input is valid
-        if (SQUARE_INDEX.find(fromStr) != SQUARE_INDEX.end()) [[likely]]
-        {
-            fromSquare = SQUARE_INDEX.at(fromStr);
-
-            // Check if from square input contains a piece from sideToMove team
-            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(fromSquare) == false) [[unlikely]]
-            {
-                LOG_DEBUG("User entered a fromSquare that does not contains any ally piece");
-                return Move{};
-            }
-        }
-        else
-        {
-            LOG_DEBUG("User entered a fromSquare that does not exist");
-            return Move{};
-        }
-
-        // Check if to square input is valid
-        if (SQUARE_INDEX.find(toStr) != SQUARE_INDEX.end()) [[likely]]
-        {
-            toSquare = SQUARE_INDEX.at(toStr);
-
-            // Check if to square input contains a piece from sideToMove team
-            if (this->state.coloredOccupancies[this->state.sideToMove].isSet(toSquare)) [[unlikely]]
-            {
-                LOG_DEBUG("User entered a toSquare that contains an ally piece");
-                return Move{};
-            }
-        }
-        else
-        {
-            LOG_DEBUG("User entered a toSquare that does not exist");
-            return Move{};
-        }
-
-        // If the requested move exists, assign it
-        Move move{};
-        for (std::size_t i = 0; i < this->moveList.size(); i++)
-        {
-            Move current = this->moveList[i];
-
-            // Check if the requested move is in the legal moves list
-            if (current.fromSquare == fromSquare && current.toSquare == toSquare)
-            {
-                move = current;
-                break;
-            }
-        }
-
-        // If the requested move doesn't exists, throw
-        if (!move.isSet()) [[unlikely]]
-        {
-            LOG_DEBUG("User entered an move that is not legal");
-        }
-
-        return move;
     }
 
     void Game::makeCapture(const game::Move& move, const Colors enemyColor) noexcept
@@ -226,17 +91,15 @@ namespace engine::game
 
     void Game::makePromotion(const game::Move& move) noexcept
     {
-        Pieces promotionPiece = this->askPromotion();
-
         if (move.toSquare >= 56) // Rank 8 = White promotion
         {
             this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.toSquare);
-            this->state.setPiece(Colors::WHITE, promotionPiece, move.toSquare);
+            this->state.setPiece(Colors::WHITE, move.promotionPiece, move.toSquare);
         }
         else // Black promotion
         {
             this->state.unsetPiece(Colors::BLACK, Pieces::PAWN, move.toSquare);
-            this->state.setPiece(Colors::BLACK, promotionPiece, move.toSquare);
+            this->state.setPiece(Colors::BLACK, move.promotionPiece, move.toSquare);
         }
     }
 
@@ -311,7 +174,7 @@ namespace engine::game
             this->state.movePiece(this->state.sideToMove, move.fromPiece, move.fromSquare, move.toSquare);
         }
 
-        // If promotion flag is set, ask and make promotion
+        // If promotion piece is set, make promotion
         if (move.promotion == true) [[unlikely]]
         {
             this->makePromotion(move);

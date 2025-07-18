@@ -10,7 +10,7 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#include <cstdint>
+#include <expected>
 
 #include "engine/board/state.h"
 #include "engine/game/move_list.h"
@@ -41,36 +41,6 @@ namespace engine::game
          * @brief Default destructor.
          */
         ~Game() noexcept = default;
-
-        /**
-         * @brief Ask the user the move he wants to play.
-         *
-         * @return std::string : the user's input
-         */
-        std::string askInput() const noexcept;
-
-        /**
-         * @brief If previous player called a draw, ask it to the next player.
-         *
-         * @return std::string : response from next player (yes/no)
-         */
-        std::string askDraw() const noexcept;
-
-        /**
-         * @brief Asks user for promotion.
-         * Restart until user enters a valid promotion.
-         *
-         * @return Pieces : the requested piece type.
-         */
-        core::Pieces askPromotion() const noexcept;
-
-        /**
-         * @brief Parses a user input and use it to build a move.
-         *
-         * @param [in] input : the user input
-         * @return Move : the builded move / Empty move if the input is not valid
-         */
-        game::Move inputToMove(std::string input) noexcept;
 
         /**
          * @brief Make a catpure.
@@ -116,6 +86,45 @@ namespace engine::game
          * @param [in] move  : The move to play
          */
         void playMove(const game::Move& move) noexcept;
+
+// Console playing mode specific function
+#if defined(PLAY_CONSOLE)
+        /**
+         * @brief Ask the user the move he wants to play.
+         *
+         * @return std::string : the user's input
+         */
+        std::string askInput() const noexcept;
+
+        /**
+         * @brief If previous player called a draw, ask it to the next player.
+         *
+         * @return std::string : response from next player (yes/no)
+         */
+        std::string askDraw() const noexcept;
+
+        /**
+         * @brief Asks user for promotion.
+         * Restart until user enters a valid promotion.
+         *
+         * @return Pieces : the requested piece type.
+         */
+        core::Pieces askPromotion() const noexcept;
+
+        /**
+         * @brief Parses a user input and use it to build a move.
+         *
+         * @param [in] input : the user input
+         * @return std::expected : built move if input is valid or error message if not valid
+         */
+        std::expected<Move, std::string> inputToMove(std::string input) noexcept;
+
+        /**
+         * @brief Main loop function to play the game in the console.
+         */
+        void playConsole() noexcept;
+
+#endif // PLAY_CONSOLE
 
         board::State state;      // Game's state
         game::MoveList moveList; // Legal move lists of the current halfMoveClock
