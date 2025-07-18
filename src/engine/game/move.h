@@ -73,8 +73,10 @@ namespace engine::game
         int toSquare = 0;         // Target square
         core::MoveTypes moveType; // Move type (Capture, EnPassant, etc...)
         core::Pieces fromPiece;   // Piece type on fromSquare
-        core::Castlings castling; // Type if castling
-        bool promotion;           // Wether this move is a promotion
+
+        core::Castlings castling;                                  // Type if castling
+        bool promotion = false;                                    // Wether this move is a promotion or not
+        core::Pieces promotionPiece = core::Pieces::UNKNOWN_PIECE; // Piece to promote in
     };
 } // namespace engine::game
 
