@@ -198,16 +198,14 @@ namespace engine::game
 
             if (!draw) [[likely]]
             {
-                auto move = this->inputToMove(userInput).or_else([](std::string error) {
-                    LOG_DEBUG(error);
-                    std::println("{}", error);
+                auto move = this->inputToMove(userInput);
 
-                    return std::expected<Move, std::string>{};
-                });
-
-                //
                 if (!move)
+                {
+                    LOG_DEBUG(move.error());
+                    std::println("{}", move.error());
                     continue;
+                }
 
                 if (move.value().promotion == true) [[unlikely]]
                 {
