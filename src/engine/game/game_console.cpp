@@ -12,6 +12,7 @@
 #include <iostream>
 #include <print>
 
+#include "engine/core/const.h"
 #include "engine/game/game.h"
 #include "engine/printer/printer.h"
 #include "logging/logging.h"
@@ -101,7 +102,7 @@ namespace engine::game
     {
         if (input.size() != 4)
         {
-            return std::unexpected("Invalid input size: " + std::to_string(input.size()));
+            return std::unexpected(std::format("Invalid input size: {}", input.size()));
         }
         else if (input == "draw" && this->state.halfMoveClock < 100) [[unlikely]]
         {
@@ -121,7 +122,7 @@ namespace engine::game
         }
         else
         {
-            return std::unexpected("Entered an initial square does not exist: " + fromStr);
+            return std::unexpected(std::format("Entered an initial square does not exist: {}", fromStr));
         }
 
         // Check if to square input is valid
@@ -131,7 +132,7 @@ namespace engine::game
         }
         else
         {
-            return std::unexpected("Entered a destination square does not exist: " + toStr);
+            return std::unexpected(std::format("Entered a destination square does not exist: {}", toStr));
         }
 
         // If the requested move exists, assign it
@@ -151,7 +152,7 @@ namespace engine::game
         // If the requested move doesn't exists, throw
         if (!move.isSet())
         {
-            return std::unexpected("Entered move is not legal: " + fromStr + " --> " + toStr);
+            return std::unexpected(std::format("Entered move is not legal: {} --> {}", fromStr, toStr));
         }
 
         return move;
