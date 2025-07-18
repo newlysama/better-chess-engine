@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 #elif defined(PLAY_CONSOLE)
     playConsole();
 #else
-    return;
+    return 0;
 #endif
 
     return 0;
