@@ -39,10 +39,30 @@ namespace engine::game
     {
         std::string input;
 
-        std::cout << "Select a move to play (format ex: a1a2): ";
+        if (this->state.halfMoveClock >= 100)
+        {
+            std::cout << "Select a move to play (format ex: a1a2 OR 'draw'): ";
+        }
+        else
+        {
+            std::cout << "Select a move to play (format ex: a1a2): ";
+        }
+
         std::cin >> input;
 
         LOG_DEBUG("Got user console input: {}", input);
+
+        return input;
+    }
+
+    std::string Game::askDraw() const noexcept
+    {
+        std::string input;
+
+        std::cout << "Player " << utils::toString(this->state.sideToMove) << " asked for a draw, accept ? (yes/no): ";
+        std::cin >> input;
+
+        LOG_DEBUG("Draw response from enemy player: {}", input);
 
         return input;
     }
@@ -215,7 +235,7 @@ namespace engine::game
         }
         else // Black promotion
         {
-            this->state.unsetPiece(Colors::WHITE, Pieces::PAWN, move.toSquare);
+            this->state.unsetPiece(Colors::BLACK, Pieces::PAWN, move.toSquare);
             this->state.setPiece(Colors::BLACK, promotionPiece, move.toSquare);
         }
     }

@@ -50,6 +50,13 @@ namespace engine::game
         std::string askInput() const noexcept;
 
         /**
+         * @brief If previous player called a draw, ask it to the next player.
+         *
+         * @return std::string : response from next player (yes/no)
+         */
+        std::string askDraw() const noexcept;
+
+        /**
          * @brief Asks user for promotion.
          * Restart until user enters a valid promotion.
          *
