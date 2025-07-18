@@ -90,8 +90,8 @@ elif mode == 'benchmark'
 endif
 
 if generate_magics == true
-  if (server == true) or mode in ['profile', 'benchmark', 'release']
-    error('Cannot use generate_magics with server option or release/test/benchmark build modes.')
+  if (server == true) or (console == true) or mode in ['profile', 'benchmark', 'release']
+    error('Cannot use generate_magics with server/console option or release/test/benchmark build modes.')
   else
     add_project_arguments(
       '-DGENERATE_MAGICS',
@@ -105,7 +105,16 @@ if generate_magics == true
   endif
 endif
 
-
+if console == true
+  if generate_magics == true
+    error('Cannot use console with generate_magic option.')
+  else
+    add_project_arguments(
+      '-DPLAY_CONSOLE',
+      language: 'cpp'
+    )
+  endif
+endif
 
 
 #------------------------------#
