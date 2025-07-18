@@ -34,6 +34,14 @@ namespace engine::core
     typedef std::array<board::Bitboard, Colors::COLORS> ColoredOccupancies;
 
     /**
+     * @typedef TargetsBitboards
+     * @brief   1x2 array holding each team's targets bitboard.
+     * @details
+     * Each bitboard holds every square that its team can reach through a move
+     */
+    typedef std::array<board::Bitboard, Colors::COLORS> TargetsBitboards;
+
+    /**
      * @typedef CastlingRights
      * @brief   8 bits unsigned int where bits represent a type of castling right.
      * @details
