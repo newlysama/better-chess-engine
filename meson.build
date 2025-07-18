@@ -1,4 +1,6 @@
-project('chess', 'cpp',
+project(
+  'better-chess-engine',
+  'cpp',
   version : '0.1.0',
   default_options: [
     'cpp_std=c++23',
@@ -6,6 +8,16 @@ project('chess', 'cpp',
     'warning_level=3',
     'default_library=static',
     ]
+)
+
+add_global_arguments(
+  '-stdlib=libc++',
+  language: 'cpp'
+)
+
+add_project_link_arguments(
+  '-stdlib=libc++',
+  language: 'cpp'
 )
 
 #------------------------------#
