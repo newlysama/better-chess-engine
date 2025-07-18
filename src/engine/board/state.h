@@ -163,12 +163,12 @@ namespace engine::board
         void movePiece(const core::Colors color, const core::Pieces piece, const int fromSquare,
                        const int toSquare) noexcept;
 
-        uint16_t halfMoveClock;  // Half move counter
-        uint16_t fullMoveClock;  // Full move counter
-        core::Colors sideToMove; // Whose turn is it ? :)
+        uint16_t halfMoveClock = 0;                    // Half move counter
+        uint16_t fullMoveClock = 1;                    // Full move counter
+        core::Colors sideToMove = core::Colors::WHITE; // Whose turn is it ? :)
+        core::CastlingRights castlingRights;           // Informations about enabled castlings.
 
-        core::CastlingRights castlingRights; // Informations about enabled castlings.
-        int enPassantSquare;
+        int enPassantSquare = -1; // When En Passant is enabled, this var is set
 
         core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;                   // Occupancy for all pieces

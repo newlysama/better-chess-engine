@@ -31,7 +31,6 @@ namespace engine::game
 
     MoveList::MoveList() noexcept
         : _moves{}
-        , _size(0)
     {
     }
 

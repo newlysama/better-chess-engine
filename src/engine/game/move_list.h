@@ -162,7 +162,7 @@ namespace engine::game
         void generateKingMoves(const board::State& state) noexcept;
 
         game::Move _moves[256]; // Actual list of moves
-        int _size;              // Current size of the list
+        int _size = 0;          // Current size of the list
 
         // Bitboards holding each reachable square for each team
         core::TargetsBitboards targetsBitboards;
