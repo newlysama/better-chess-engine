@@ -1,0 +1,12 @@
+# Boost
+libboost-dev
+libboost-system-dev
+libboost-thread-dev
+libboost-coroutine-dev
+
+# OpenMP
+libopenmpt-modplug1
+libopenmpt0t64
+
+# SPDLog
+libspdlog-dev

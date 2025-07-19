@@ -4,20 +4,9 @@ project(
   version : '0.1.0',
   default_options: [
     'cpp_std=c++23',
-    'wrap_mode=forcefallback',
     'warning_level=3',
     'default_library=static',
     ]
-)
-
-add_global_arguments(
-  '-stdlib=libc++',
-  language: 'cpp'
-)
-
-add_project_link_arguments(
-  '-stdlib=libc++',
-  language: 'cpp'
 )
 
 #------------------------------#
@@ -136,7 +125,12 @@ endif
 # spdlog (subprojects/spdlog.wrap → export spdlog_dep)
 spdlog_dep = dependency(
   'spdlog',
-  fallback: ['spdlog', 'spdlog_dep'],
+  required: true
+)
+
+boost_dep = dependency(
+  'boost',
+  modules : ['system', 'coroutine', 'thread'],
   required: true
 )
 
@@ -144,7 +138,6 @@ spdlog_dep = dependency(
 if mode == 'test'
   gtest_dep = dependency(
     'gtest',
-    fallback: ['gtest', 'gtest_dep'],
     required: mode == 'test'
   )
 endif
@@ -153,7 +146,6 @@ endif
 if mode == 'benchmark'
   benchmark_dep = dependency(
     'google-benchmark',
-    fallback: ['google-benchmark', 'google_benchmark_dep'],
     required: mode == 'benchmark'
   )
 endif
