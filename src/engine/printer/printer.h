@@ -7,10 +7,10 @@
  * @brief Allows to print the game state in stdout.
  */
 
-#ifndef PRINT_GAME_H
-#define PRINT_GAME_H
+#ifndef PRINTER_H_
+#define PRINTER_H_
 
-#include <iostream>
+#include <print>
 
 #include "engine/board/state.h"
 #include "utils/enums_to_string.h"
@@ -47,13 +47,13 @@ namespace engine::printer
      */
     inline void printHeader() noexcept
     {
-        std::cout << HEADER_TAB << "   ________  __________________\n";
-        std::cout << HEADER_TAB << "  / ____/ / / / ____/ ___/ ___/\n";
-        std::cout << HEADER_TAB << " / /   / /_/ / __/  \\__ \\__ \\\n";
-        std::cout << HEADER_TAB << "/ /___/ __  / /___ ___/ /__/ /\n";
-        std::cout << HEADER_TAB << "\\____/_/ /_/_____//____/____/\n";
+        std::println("{}   ________  __________________", HEADER_TAB);
+        std::println("{}  / ____/ / / / ____/ ___/ ___/", HEADER_TAB);
+        std::println("{} / /   / /_/ / __/  \\__ \\__ \\", HEADER_TAB);
+        std::println("{}/ /___/ __  / /___ ___/ /__/ /", HEADER_TAB);
+        std::println("{}\\____/_/ /_/_____//____/____/", HEADER_TAB);
 
-        std::cout << "\n";
+        std::println();
     }
 
     /**
@@ -61,7 +61,7 @@ namespace engine::printer
      */
     inline void printRankStart(const int rankIndex) noexcept
     {
-        std::cout << BOARD_TAB << rankIndex << " |";
+        std::print("{}{} |", BOARD_TAB, rankIndex);
     }
 
     /**
@@ -69,11 +69,11 @@ namespace engine::printer
      */
     inline void printFiles() noexcept
     {
-        std::cout << BOARD_TAB << "  ";
+        std::print("{}  ", BOARD_TAB);
 
         for (int file = 0; file < 8; file++)
         {
-            std::cout << "   " << static_cast<char>('A' + file) << "  ";
+            std::print("   {}  ", static_cast<char>('A' + file));
         }
     }
 
@@ -105,8 +105,8 @@ namespace engine::printer
     {
         for (int rankIndex = 7; rankIndex >= 0; rankIndex--)
         {
-            std::cout << BOARD_TAB << "  -------------------------------------------------\n";
-            std::cout << BOARD_TAB << "  |     |     |     |     |     |     |     |     |\n";
+            std::println("{}  -------------------------------------------------", BOARD_TAB);
+            std::println("{}  |     |     |     |     |     |     |     |     |", BOARD_TAB);
 
             printRankStart(rankIndex + 1);
 
@@ -116,17 +116,18 @@ namespace engine::printer
                 int squareIndex = board::State::getSquareIndex(rankIndex, fileIndex);
                 std::string_view piece = getPiece(state, squareIndex);
 
-                std::cout << "  " << piece << "  |";
+                std::print("  {}  |", piece);
             }
+            std::println();
 
-            std::cout << "\n";
-            std::cout << BOARD_TAB << "  |     |     |     |     |     |     |     |     |\n";
+            std::println("{}  |     |     |     |     |     |     |     |     |", BOARD_TAB);
         }
 
-        std::cout << BOARD_TAB << "  -------------------------------------------------\n";
+        std::println("{}  -------------------------------------------------", BOARD_TAB);
 
         printFiles();
-        std::cout << "\n\n\n";
+
+        std::println("\n\n");
     }
 
     inline void printState(const board::State& state) noexcept
@@ -134,10 +135,10 @@ namespace engine::printer
         printHeader();
         printBoard(state);
 
-        std::cout << "Side to move:    " << utils::toString(state.sideToMove) << "\n"
-                  << "Half Move Clock: " << state.halfMoveClock << "\n"
-                  << "Full Move Clock: " << state.fullMoveClock << "\n";
+        std::println("Side to move:    {}", utils::toString(state.sideToMove));
+        std::println("Half Move Clock: {}", state.halfMoveClock);
+        std::println("Full Move Clock: {}", state.fullMoveClock);
     }
 } // namespace engine::printer
 
-#endif // PRINT_GAME_H
+#endif // PRINTER_H_
