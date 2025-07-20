@@ -91,7 +91,7 @@ elif mode == 'benchmark'
 endif
 
 if generate_magics == true
-  if (server == true) or (console == true) or mode in ['profile', 'benchmark', 'release']
+  if (server == true) or (console == true) or mode in ['test', 'benchmark', 'release']
     error('Cannot use generate_magics with server/console option or release/test/benchmark build modes.')
   else
     add_project_arguments(
