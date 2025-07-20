@@ -123,7 +123,7 @@ namespace engine::core
         PROMOTION = 2,
         CASTLE = 3,
         DOUBLE_PUSH = 4,
-        ENPASSANT = 5,
+        EN_PASSANT = 5,
         MOVE_TYPES = 6,
         UNKNOWN_MOVE_TYPE = 255
     };
