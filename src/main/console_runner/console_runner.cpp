@@ -15,9 +15,9 @@
 #include "engine/core/const.h"
 #include "logging/logging.h"
 #include "ui/console/console_ui.h"
+#include "utils/enums_to_string.h"
 
 #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-#include "utils/enums_to_string.h"
 #include "utils/utils.h"
 #endif
 
