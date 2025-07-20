@@ -187,8 +187,8 @@ namespace utils
             return "CASTLE";
         case engine::core::MoveTypes::DOUBLE_PUSH:
             return "DOUBLE_PUSH";
-        case engine::core::MoveTypes::ENPASSANT:
-            return "ENPASSANT";
+        case engine::core::MoveTypes::EN_PASSANT:
+            return "EN_PASSANT";
         case engine::core::MoveTypes::MOVE_TYPES:
             return "5";
         case engine::core::MoveTypes::UNKNOWN_MOVE_TYPE:
