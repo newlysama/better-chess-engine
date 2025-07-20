@@ -44,39 +44,12 @@ namespace engine::board
         Bitboard{0xFF00'0000'0000'0000ULL}  // rank 8
     };
 
-    // Ranks mask to allow clear access when we want to perform stuff on a specific rank
-    inline constexpr Bitboard RANK_1_MASK = RANKS_MASKS[0];
-    inline constexpr Bitboard RANK_2_MASK = RANKS_MASKS[1];
-    inline constexpr Bitboard RANK_3_MASK = RANKS_MASKS[2];
-    inline constexpr Bitboard RANK_4_MASK = RANKS_MASKS[3];
-    inline constexpr Bitboard RANK_5_MASK = RANKS_MASKS[4];
-    inline constexpr Bitboard RANK_6_MASK = RANKS_MASKS[5];
-    inline constexpr Bitboard RANK_7_MASK = RANKS_MASKS[6];
-    inline constexpr Bitboard RANK_8_MASK = RANKS_MASKS[7];
-
-    // Files mask to allow clear access when we want to perform stuff on a specific file
-    inline constexpr Bitboard FILE_A_MASK = FILES_MASKS[0];
-    inline constexpr Bitboard FILE_B_MASK = FILES_MASKS[1];
-    inline constexpr Bitboard FILE_C_MASK = FILES_MASKS[2];
-    inline constexpr Bitboard FILE_D_MASK = FILES_MASKS[3];
-    inline constexpr Bitboard FILE_E_MASK = FILES_MASKS[4];
-    inline constexpr Bitboard FILE_F_MASK = FILES_MASKS[5];
-    inline constexpr Bitboard FILE_G_MASK = FILES_MASKS[6];
-    inline constexpr Bitboard FILE_H_MASK = FILES_MASKS[7];
-
-    // 'Not file' masks
-    inline constexpr Bitboard NOT_AB_MASK = ~(FILE_A_MASK | FILE_B_MASK);
-    inline constexpr Bitboard NOT_GH_MASK = ~(FILE_G_MASK | FILE_H_MASK);
-
-    // Corners masks
-    inline constexpr Bitboard A1_MASK = FILE_A_MASK & RANK_1_MASK;
-    inline constexpr Bitboard H8_MASK = FILE_H_MASK & RANK_8_MASK;
-    inline constexpr Bitboard A8_MASK = FILE_A_MASK & RANK_8_MASK;
-    inline constexpr Bitboard H1_MASK = FILE_H_MASK & RANK_1_MASK;
-
     // 'Not edge' masks
-    inline constexpr Bitboard NOT_RANK_EDGES_MASK = ~(RANK_1_MASK | RANK_8_MASK);
-    inline constexpr Bitboard NOT_FILE_EDGES_MASK = ~(FILE_A_MASK | FILE_H_MASK);
+    inline constexpr Bitboard NOT_RANK_EDGES_MASK =
+        ~(RANKS_MASKS[core::Ranks::RANK_1] | RANKS_MASKS[core::Ranks::RANK_8]);
+
+    inline constexpr Bitboard NOT_FILE_EDGES_MASK =
+        ~(FILES_MASKS[core::Files::FILE_A] | FILES_MASKS[core::Files::FILE_H]);
 
     /**
      * @brief Shifts a given Bitboard in a given direction.
@@ -87,58 +60,84 @@ namespace engine::board
     template <core::Directions D>
     constexpr Bitboard shiftDir(Bitboard b)
     {
+        // clang-format off
         switch (D)
         {
-        // ——— Glissants & roi/pion ———
+        // ——— Sliding / King / Pawn ———
         case core::Directions::NORTH:
-            return (b & ~RANK_8_MASK) << 8;
-        case core::Directions::NORTH_EAST:
-            return (b & ~RANK_8_MASK & ~FILE_H_MASK) << 9;
-        case core::Directions::EAST:
-            return (b & ~FILE_H_MASK) << 1;
-        case core::Directions::SOUTH_EAST:
-            return (b & ~RANK_1_MASK & ~FILE_H_MASK) >> 7;
-        case core::Directions::SOUTH:
-            return (b & ~RANK_1_MASK) >> 8;
-        case core::Directions::SOUTH_WEST:
-            return (b & ~RANK_1_MASK & ~FILE_A_MASK) >> 9;
-        case core::Directions::WEST:
-            return (b & ~FILE_A_MASK) >> 1;
-        case core::Directions::NORTH_WEST:
-            return (b & ~RANK_8_MASK & ~FILE_A_MASK) << 7;
-        case core::Directions::NORTH_NORTH:
-            return (b & ~RANK_8_MASK & ~RANK_7_MASK) << 16;
-        case core::Directions::SOUTH_SOUTH:
-            return (b & ~RANK_1_MASK & ~RANK_2_MASK) >> 16;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8]) << 8;
 
-        // ——— Cavaliers ———
+        case core::Directions::NORTH_EAST:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_H]) << 9;
+
+        case core::Directions::EAST:
+            return (b & ~FILES_MASKS[core::Files::FILE_H]) << 1;
+
+        case core::Directions::SOUTH_EAST:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_H]) >> 7;
+
+        case core::Directions::SOUTH:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1]) >> 8;
+
+        case core::Directions::SOUTH_WEST:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_A]) >> 9;
+
+        case core::Directions::WEST:
+            return (b & ~FILES_MASKS[core::Files::FILE_A]) >> 1;
+
+        case core::Directions::NORTH_WEST:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_A]) << 7;
+
+        case core::Directions::NORTH_NORTH:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7]) << 16;
+
+        case core::Directions::SOUTH_SOUTH:
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2]) >> 16;
+
+        // ——— Knights ———
         // two North + one East
         case core::Directions::NNE:
-            return (b & ~RANK_8_MASK & ~RANK_7_MASK & ~FILE_H_MASK) << 17;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7]&
+                    ~FILES_MASKS[core::Files::FILE_H]) << 17;
+
         // one North + two East
         case core::Directions::ENE:
-            return (b & ~RANK_8_MASK & ~FILE_H_MASK & ~FILE_G_MASK) << 10;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_H] &
+                    ~FILES_MASKS[core::Files::FILE_G]) << 10;
+
         // one South + two East
         case core::Directions::ESE:
-            return (b & ~RANK_1_MASK & ~FILE_H_MASK & ~FILE_G_MASK) >> 6;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_H] &
+                    ~FILES_MASKS[core::Files::FILE_G]) >> 6;
+
         // two South + one East
         case core::Directions::SSE:
-            return (b & ~RANK_1_MASK & ~RANK_2_MASK & ~FILE_H_MASK) >> 15;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2] &
+                    ~FILES_MASKS[core::Files::FILE_H]) >> 15;
+
         // two South + one West
         case core::Directions::SSW:
-            return (b & ~RANK_1_MASK & ~RANK_2_MASK & ~FILE_A_MASK) >> 17;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2] &
+                    ~FILES_MASKS[core::Files::FILE_A]) >> 17;
+
         // one South + two West
         case core::Directions::WSW:
-            return (b & ~RANK_1_MASK & ~FILE_A_MASK & ~FILE_B_MASK) >> 10;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_A] &
+                    ~FILES_MASKS[core::Files::FILE_B]) >> 10;
+
         // one North + two West
         case core::Directions::WNW:
-            return (b & ~RANK_8_MASK & ~FILE_A_MASK & ~FILE_B_MASK) << 6;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_A] &
+                    ~FILES_MASKS[core::Files::FILE_B]) << 6;
+
         // two North + one West
         case core::Directions::NNW:
-            return (b & ~RANK_8_MASK & ~RANK_7_MASK & ~FILE_A_MASK) << 15;
+            return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7] &
+                  ~FILES_MASKS[core::Files::FILE_A]) << 15;
         }
+        // clang-format on
 
-        return 0ULL; // (jamais atteint)
+        return 0ULL;
     }
 
     /**
@@ -654,15 +653,19 @@ namespace engine::board
                 // horizontal
                 if (deltaRank == 0 && deltaFile != 0)
                     delta = (deltaFile > 0 ? 1 : -1);
+
                 // vertical
                 else if (deltaFile == 0 && deltaRank != 0)
                     delta = (deltaRank > 0 ? 8 : -8);
+
                 // diagonal '\'
                 else if (deltaRank == deltaFile)
                     delta = (deltaRank > 0 ? 9 : -9);
+
                 // anti-diagonal '/'
                 else if (deltaRank == -deltaFile)
                     delta = (deltaRank > 0 ? 7 : -7);
+
                 else
                     continue; // not aligned
 
