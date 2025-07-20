@@ -6,11 +6,5 @@
 build/
 builddir/
 
-# Deps
-subprojects/benchmark-1.8.4
-subprojects/googletest-1.17.0
-subprojects/spdlog-1.15.3
-subprojects/packagecache
-
 # Logs
 logs/
