@@ -40,7 +40,7 @@ namespace logging
         // Fill sink depending on the build mode
         if (isRelease)
         {
-            sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(conf::paths::log_file_path, true);
+            sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(conf::paths::logFilePath, true);
         }
 
         else
