@@ -140,7 +140,7 @@ namespace console_runner
         {
             Move current = this->game.moveList[i];
 
-            if (current.fromSquare == fromSquare && current.toSquare == toSquare)
+            if (current.getFromSquare() == fromSquare && current.getToSquare() == toSquare)
             {
                 return current;
             }
@@ -222,9 +222,9 @@ namespace console_runner
                 continue;
             }
 
-            if (move.value().promotion == true) [[unlikely]]
+            if (move.value().isPromotion() == true) [[unlikely]]
             {
-                move.value().promotionPiece = this->askPromotion();
+                move.value().setPromotionPiece(this->askPromotion());
             }
 
             this->game.playMove(move.value());

@@ -1,6 +1,5 @@
 #- Source Files -#
 game_src = files(
-  'move.cpp',
   'move_list.cpp',
   'game.cpp'
 )

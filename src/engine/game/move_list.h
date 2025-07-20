@@ -59,7 +59,7 @@ namespace engine::game
          * @param [in] move : the move to look for
          * @return bool : weather the move is present or not
          */
-        bool contains(const game::Move move) noexcept;
+        bool contains(const game::Move& move) noexcept;
 
         /**
          * @brief Make a move.

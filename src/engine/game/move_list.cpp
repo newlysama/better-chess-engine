@@ -60,11 +60,11 @@ namespace engine::game
         return this->_moves[index];
     }
 
-    bool MoveList::contains(Move move) noexcept
+    bool MoveList::contains(const Move& move) noexcept
     {
         for (int i = 0; i < this->_size; i++)
         {
-            if (move == this->_moves[i]) [[unlikely]]
+            if (move == this->_moves[i])
             {
                 return true;
             }
@@ -82,16 +82,6 @@ namespace engine::game
 
             Move move{fromSquare, toSquare, moveType, fromPiece};
 
-            // Check for promotion
-            if (fromPiece == Pieces::PAWN)
-            {
-                int rankTo = State::getRankIndex(toSquare);
-                if (rankTo == 7 || rankTo == 0) [[unlikely]]
-                {
-                    move.promotion = true;
-                }
-            }
-
             this->add(move);
 
             // Move to the next target
@@ -103,11 +93,11 @@ namespace engine::game
         LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
     }
 
-    template <Castlings C>
+    template <Castlings Castling>
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
-        if (!state.hasCastlingRight<C>())
+        if (!state.hasCastlingRight<Castling>())
         {
             return;
         }
@@ -115,10 +105,10 @@ namespace engine::game
         // Chose the right castling mask
         // between the rook and the king
         // (squares that have to be empty)
-        Bitboard between = CASTLING_MASKS[C];
+        Bitboard between = CASTLING_MASKS[Castling];
         int toSquare = 0;
 
-        switch (C)
+        switch (Castling)
         {
         case WHITE_KING_SIDE:
             toSquare = 6;
@@ -140,10 +130,10 @@ namespace engine::game
         if ((state.generalOccupancy & between).getData() != 0ULL)
             return;
 
-        Move castle{fromSquare, toSquare, MoveTypes::CASTLE, Pieces::KING, C};
+        Move castle{fromSquare, toSquare, MoveTypes::CASTLE, Pieces::KING, Castling};
         this->add(castle);
 
-        LOG_DEBUG("Generated {} castling legal move", utils::toString(C));
+        LOG_DEBUG("Generated {} castling legal move", utils::toString(Castling));
     }
 
     void MoveList::getEnPassantMoves(const State& state, int fromSquare) noexcept
@@ -158,10 +148,10 @@ namespace engine::game
 
             if (std::abs(fileFrom - fileEnPassant) == 1)
             {
-                Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::ENPASSANT, Pieces::PAWN};
+                Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
                 this->add(enPassant);
 
-                LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.moveType),
+                LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
                           utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.enPassantSquare));
             }
         }
