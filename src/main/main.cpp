@@ -14,6 +14,10 @@
 #include "engine/board/magics_generator.h"
 #endif
 
+#if defined(PLAY_CONSOLE)
+#include "main/console_runner/console_runner.h"
+#endif
+
 int main(int argc, char* argv[])
 {
     (void)argc;
@@ -28,7 +32,8 @@ int main(int argc, char* argv[])
 #if defined(GENERATE_MAGICS)
     engine::board::initMagics();
 #elif defined(PLAY_CONSOLE)
-    game.playConsole();
+    console_runner::ConsoleRunner runer{};
+    runer.runGame();
 #else
     LOG_INFO("DEFAULT BUILD");
     return 0;
