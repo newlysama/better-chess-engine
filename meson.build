@@ -128,11 +128,12 @@ spdlog_dep = dependency(
   required: true
 )
 
-boost_dep = dependency(
-  'boost',
-  modules : ['system', 'coroutine', 'thread'],
-  required: true
-)
+if generate_magics == true
+  openmp_dep = dependency(
+    'openmp',
+    required: true
+  )
+endif
 
 # GoogleTest (subprojects/gtest.wrap → export gtest_dep)
 if mode == 'test'
@@ -164,6 +165,11 @@ inc_src = include_directories('src')
 subdir('src/logging')
 subdir('src/engine/board')
 subdir('src/engine/game')
+
+if console == true
+  subdir('src/ui/console')
+  subdir('src/main/console_runner')
+endif
 
 if mode not in ['test', 'benchmark']
   subdir('src/main')
