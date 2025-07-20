@@ -8,10 +8,6 @@ game_src = files(
 #- Include Dirs -#
 incs = [inc_src]
 
-if console == true
-  game_src += 'game_console.cpp'
-endif
-
 #- Game Library -#
 game_lib = library(
   'game',

@@ -87,45 +87,6 @@ namespace engine::game
          */
         void playMove(const game::Move& move) noexcept;
 
-// Console playing mode specific function
-#if defined(PLAY_CONSOLE)
-        /**
-         * @brief Ask the user the move he wants to play.
-         *
-         * @return std::string : the user's input
-         */
-        std::string askInput() const noexcept;
-
-        /**
-         * @brief If previous player called a draw, ask it to the next player.
-         *
-         * @return std::string : response from next player (yes/no)
-         */
-        std::string askDraw() const noexcept;
-
-        /**
-         * @brief Asks user for promotion.
-         * Restart until user enters a valid promotion.
-         *
-         * @return Pieces : the requested piece type.
-         */
-        core::Pieces askPromotion() const noexcept;
-
-        /**
-         * @brief Parses a user input and use it to build a move.
-         *
-         * @param [in] input : the user input
-         * @return std::expected : built move if input is valid or error message if not valid
-         */
-        std::expected<Move, std::string> inputToMove(std::string input) noexcept;
-
-        /**
-         * @brief Main loop function to play the game in the console.
-         */
-        void playConsole() noexcept;
-
-#endif // PLAY_CONSOLE
-
         board::State state;      // Game's state
         game::MoveList moveList; // Legal move lists of the current halfMoveClock
     };
