@@ -96,7 +96,7 @@ namespace ui::console
         static constexpr std::string_view BORDER = "│";
 
         static constexpr std::array<std::string_view, engine::core::Pieces::PIECES> pieceSymbol = {
-            "", "", "󰡛", "󰡜", "󰡚", "󰡗"};
+            "", "", "󰡜", "󰡛", "󰡚", "󰡗"};
 
         static constexpr std::string_view RANK_INDENT = "            ";
         static constexpr std::string_view BOARD_INDENT = "              ";
