@@ -11,7 +11,6 @@
 #define PATHS_H_
 
 #include <filesystem>
-#include <string>
 
 /**
  * @namespace conf::paths
@@ -19,10 +18,12 @@
 namespace conf::paths
 {
     // Path to the directory from where the binary is executed
-    inline const std::filesystem::path root_path = std::filesystem::path(PROJECT_ROOT);
+    inline const std::filesystem::path rootPath = std::filesystem::path(PROJECT_ROOT);
 
     // Path to log files
-    inline const std::string log_file_path = (root_path / "logs" / "engine.log").string();
+    inline const std::string logFilePath = (rootPath / "logs" / "engine.log").string();
+
+    inline const std::string consoleUIHeaderPath = (rootPath / "src" / "ui" / "console" / "header.txt").string();
 } // namespace conf::paths
 
 #endif // PATHS_H_
