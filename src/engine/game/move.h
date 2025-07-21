@@ -140,8 +140,29 @@ namespace engine::game
 
         void setPromotionPiece(core::Pieces piece) noexcept
         {
+            // Since possible promotion pieces have values that does not match
+            // the reserved bit indices in _data, we need to map them.
+            unsigned p;
+            switch (piece)
+            {
+            case core::Pieces::KNIGHT:
+                p = 0;
+                break;
+            case core::Pieces::BISHOP:
+                p = 1;
+                break;
+            case core::Pieces::ROOK:
+                p = 2;
+                break;
+            case core::Pieces::QUEEN:
+                p = 3;
+                break;
+            default:
+                p = 4;
+            }
+
             _data &= ~(0xFu << 16); // clear existing bits if any
-            _data |= (1u << (16 + static_cast<unsigned>(piece)));
+            _data |= (1u << (16 + static_cast<unsigned>(p)));
         }
 
         void setMoveType(core::MoveTypes type) noexcept
@@ -197,6 +218,7 @@ namespace engine::game
             std::println("From    : {}", getFromSquare());
             std::println("To      : {}", getToSquare());
             std::println("Type    : {}", utils::toString(getMoveType()));
+            std::println("Piece   : {}", utils::toString(getFromPiece()));
             std::println("Promo   : {}", utils::toString(getPromotionPiece()));
             std::println("Castle  : {}", utils::toString(getCastlingType()));
         }
@@ -206,6 +228,7 @@ namespace engine::game
             LOG_DEBUG("From    : {}", getFromSquare());
             LOG_DEBUG("To      : {}", getToSquare());
             LOG_DEBUG("Type    : {}", utils::toString(getMoveType()));
+            LOG_DEBUG("Piece   : {}", utils::toString(getFromPiece()));
             LOG_DEBUG("Promo   : {}", utils::toString(getPromotionPiece()));
             LOG_DEBUG("Castle  : {}", utils::toString(getCastlingType()));
         }
