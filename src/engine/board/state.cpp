@@ -9,10 +9,10 @@
 
 #include "engine/board/state.h"
 
-#include "engine/core/const.h"
+#include <exception>
+
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
-#include "utils/utils.h"
 
 /**
  * @namespace engine::board
@@ -54,6 +54,53 @@ namespace engine::board
         }
 
         this->generalOccupancy = this->coloredOccupancies[Colors::WHITE] | this->coloredOccupancies[Colors::BLACK];
+    }
+
+    State::State(const std::array<std::string, 6> fenNotation)
+    {
+        std::expected<void, std::string> res{};
+
+        res = this->setOccupanciesFromFen(fenNotation[0]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
+
+        res = this->setSideToMoveFromFen(fenNotation[1]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
+
+        res = this->setCastlingRightsFromFen(fenNotation[2]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
+
+        res = this->setEnPassantSquareFromFen(fenNotation[3]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
+
+        res = this->setHalfMoveClockFromFen(fenNotation[4]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
+
+        res = this->setFullMoveClockFromFen(fenNotation[5]);
+        if (!res.has_value())
+        {
+            LOG_ERROR(res.error());
+            throw std::invalid_argument(res.error());
+        }
     }
 
     void State::checkCastlingRemoval(const Pieces piece, const int fromSquare, const int toSquare) noexcept

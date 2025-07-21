@@ -11,10 +11,14 @@
 #define STATE_H_
 
 #include <cstdint>
-#include <memory>
+#include <ctype.h>
+#include <expected>
+#include <sstream>
 
 #include "engine/board/bitboard.h"
+#include "engine/core/const.h"
 #include "engine/core/types.h"
+#include "utils/utils.h"
 
 /**
  * @namespace engine::board
@@ -35,7 +39,7 @@ namespace engine::board
         /**
          * @brief Constructor from FEN notation.
          */
-        State(const std::string_view fenNotation) noexcept;
+        State(const std::array<std::string, 6> fenNotation);
 
         /**
          * @brief Destructor.
@@ -188,6 +192,220 @@ namespace engine::board
         core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;                   // Occupancy for all pieces
         core::ColoredOccupancies coloredOccupancies; // Team specific occupancies
+
+      private:
+        /*****************************************
+         *          FEN PARSING METHODS          *
+         *****************************************/
+
+        /**
+         * @brief Internal function that splits the occupancy part of the fen notation
+         * into an array of 8 strings.
+         *
+         * @param [in] fen : occupancy part of the fen notation
+         * @return std::expected<std::array<std::string, 8>, std::string> :
+         * the built array or error message if fen not valid
+         */
+        inline std::expected<std::array<std::string, 8>, std::string> getFenOccupancies(const std::string& fen) noexcept
+        {
+            std::array<std::string, 8> parts;
+            std::string token;
+            std::istringstream iss(fen);
+
+            for (int i = 7; i >= 0; i--)
+            {
+                if (!std::getline(iss, token, '/'))
+                {
+                    return std::unexpected("FEN's occupancy part error: less than 8 fields.");
+                }
+
+                parts[i] = token;
+            }
+
+            return parts;
+        }
+
+        /**
+         * @brief Fills the occupancy bitboards from pre-computed substring of the FEN notation.
+         *
+         * @param [in] fen : occupancy part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen error
+         */
+        inline std::expected<void, std::string> setOccupanciesFromFen(const std::string& fen) noexcept
+        {
+            std::expected<std::array<std::string, 8>, std::string> parts = getFenOccupancies(fen);
+
+            // Check that the substring is valid
+            if (!parts.has_value())
+            {
+                return std::unexpected(parts.error());
+            }
+
+            for (std::size_t rank = 0; rank < 8; rank++)
+            {
+                std::size_t file = 0;
+                for (std::size_t index = 0; index < parts.value()[rank].size(); index++)
+                {
+                    const unsigned char c = parts.value()[rank][index];
+                    if (isdigit(c))
+                    {
+                        // If c is a digit, check that it is valid
+                        if (c - '0' > 8)
+                        {
+                            return std::unexpected(
+                                std::format("FEN's occupancy part error: digit is > 8 : {}", c - '0'));
+                        }
+
+                        // -1 because the for loop is gonna make +1
+                        file += (c - '0');
+                    }
+                    else
+                    {
+                        // Check that we get a valid square
+                        std::size_t square = getSquareIndex(rank, file);
+                        if (square < 0 || square > 63)
+                        {
+                            return std::unexpected(std::format("FEN's occupancy part error: out of range "
+                                                               "square: {} from file {} and rank {}",
+                                                               square, file, rank));
+                        }
+
+                        std::pair<core::Colors, core::Pieces> pair = utils::fenCharToPiece(c);
+                        if (pair.first == core::Colors::UNKNOWN_COLOR && pair.second == core::Pieces::UNKNOWN_PIECE)
+                        {
+                            return std::unexpected(std::format("FEN's occupancy part error: invalid piece {}",
+                                                               parts.value()[rank][index]));
+                        }
+
+                        this->allPieces[pair.first][pair.second].set(square);
+                        this->coloredOccupancies[pair.first].set(square);
+                        this->generalOccupancy.set(square);
+
+                        file++;
+                    }
+                }
+
+                if (file != 8)
+                {
+                    return std::unexpected(std::format("FEN's occupancy part error: invalid number of files {}", file));
+                }
+            }
+
+            return std::expected<void, std::string>{};
+        }
+
+        /**
+         * @brief Set the sideToMove field.
+         *
+         * @param [in] fen : side to move part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         */
+        inline std::expected<void, std::string> setSideToMoveFromFen(const std::string_view fen) noexcept
+        {
+            if (fen != "b" && fen != "w")
+            {
+                return std::unexpected(std::format("FEN's side to move part error: {}", fen));
+            }
+
+            this->sideToMove = fen == "b" ? core::Colors::BLACK : core::Colors::WHITE;
+            return std::expected<void, std::string>{};
+        }
+
+        /**
+         * @brief Fills the castlingRights field.
+         *
+         * @param [in] fen : castling rights part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         */
+        inline std::expected<void, std::string> setCastlingRightsFromFen(const std::string_view fen) noexcept
+        {
+            if (fen == "-")
+            {
+                return std::expected<void, std::string>{};
+            }
+
+            // clang-format off
+            for (const unsigned char c : fen)
+            {
+                std::pair<core::Colors, core::Pieces> pair = utils::fenCharToPiece(c);
+                core::Castlings castle = pair.first == core::Colors::WHITE && pair.second == core::Pieces::KING ? core::Castlings::WHITE_KING_SIDE
+                                       : pair.first == core::Colors::WHITE && pair.second == core::Pieces::QUEEN ? core::Castlings::WHITE_QUEEN_SIDE
+                                       : pair.first == core::Colors::BLACK && pair.second == core::Pieces::KING ? core::Castlings::BLACK_KING_SIDE
+                                       : pair.first == core::Colors::BLACK && pair.second == core::Pieces::QUEEN ? core::Castlings::BLACK_QUEEN_SIDE
+                                       : core::Castlings::UNKNOWN_CASTLING;
+
+                if (castle == core::Castlings::UNKNOWN_CASTLING)
+                {
+                    return std::unexpected(std::format("FEN's castling rights error: invalid piece {}", fen));
+                }
+            }
+            // clang-format on
+
+            return std::expected<void, std::string>{};
+        }
+
+        /**
+         * @brief Fills the enPassantSquare field.
+         *
+         * @param [in] fen : en passant square part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         */
+        inline std::expected<void, std::string> setEnPassantSquareFromFen(const std::string_view fen) noexcept
+        {
+            if (fen == "-")
+            {
+                return std::expected<void, std::string>{};
+            }
+
+            if (core::SQUARE_INDEX.find(fen) == core::SQUARE_INDEX.end())
+            {
+                return std::unexpected(std::format("FEN's en passant square error: invalid square {}", fen));
+            }
+
+            this->enPassantSquare = core::SQUARE_INDEX.at(fen);
+            return std::expected<void, std::string>{};
+        }
+
+        /**
+         * @brief Fills the halfMoveClock field.
+         *
+         * @param [in] fen : half move clock part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         */
+        inline std::expected<void, std::string> setHalfMoveClockFromFen(const std::string_view fen) noexcept
+        {
+            int clock{};
+            auto [endPtr, ec] = std::from_chars(fen.data(), fen.data() + fen.size(), clock);
+
+            if (ec != std::errc() || *endPtr != '\0')
+            {
+                return std::unexpected(std::format("FEN's half move clock error: {}", fen));
+            }
+
+            this->halfMoveClock = clock;
+
+            return std::expected<void, std::string>{};
+        }
+
+        /**
+         * @brief Fills the fullMoveClock field.
+         *
+         * @param [in] fen : full move clock part of the FEN notation
+         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         */
+        inline std::expected<void, std::string> setFullMoveClockFromFen(const std::string_view fen) noexcept
+        {
+            int clock{};
+            auto [endPtr, ec] = std::from_chars(fen.data(), fen.data() + fen.size(), clock);
+
+            if (ec != std::errc() || *endPtr != '\0')
+            {
+                return std::unexpected(std::format("FEN's half move clock error: {}", fen));
+            }
+
+            this->fullMoveClock = clock;
+            return std::expected<void, std::string>{};
+        }
     };
 
 } // namespace engine::board
