@@ -87,7 +87,19 @@ namespace engine::board
 
         case core::Directions::NORTH_WEST:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_A]) << 7;
+        }
+        // clang-format on
 
+        return Bitboard{0ULL};
+    }
+
+    template <core::SpecialDirections D>
+    constexpr Bitboard shiftDir(Bitboard b) noexcept
+    {
+        // clang-format off
+        switch (D)
+        {
+        //  ——— Pawns double push ———
         case core::Directions::NORTH_NORTH:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7]) << 16;
 
@@ -137,7 +149,7 @@ namespace engine::board
         }
         // clang-format on
 
-        return 0ULL;
+        return Bitboard{0ULL};
     }
 
     /**
@@ -186,6 +198,173 @@ namespace engine::board
     }
     inline constexpr core::DiagonalMasks ANTI_DIAGONALS_MASKS = initAntiDiagonalsMasks();
 
+    inline consteval core::RayMasks initRayMasks() noexcept
+    {
+        core::RayMasks rayMasks{};
+
+        for (int square = 0; square < 64; ++square)
+        {
+            Bitboard squareBB = Bitboard{1ULL << square};
+
+            for (int d = 0; d < core::DIRECTIONS; ++d)
+            {
+                core::Directions dir = static_cast<core::Directions>(d);
+                Bitboard ray{};
+                Bitboard b = squareBB;
+
+                switch (dir)
+                {
+                case core::NORTH:
+                    while (true)
+                    {
+                        b = shiftDir<core::NORTH>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::SOUTH:
+                    while (true)
+                    {
+                        b = shiftDir<core::SOUTH>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::EAST:
+                    while (true)
+                    {
+                        b = shiftDir<core::EAST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::WEST:
+                    while (true)
+                    {
+                        b = shiftDir<core::WEST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::NORTH_EAST:
+                    while (true)
+                    {
+                        b = shiftDir<core::NORTH_EAST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::NORTH_WEST:
+                    while (true)
+                    {
+                        b = shiftDir<core::NORTH_WEST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::SOUTH_EAST:
+                    while (true)
+                    {
+                        b = shiftDir<core::SOUTH_EAST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                case core::SOUTH_WEST:
+                    while (true)
+                    {
+                        b = shiftDir<core::SOUTH_WEST>(b);
+                        if (b == 0)
+                            break;
+                        ray |= b;
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+
+                rayMasks[square][d] = ray;
+            }
+        }
+
+        return rayMasks;
+    }
+    inline constexpr core::RayMasks RAY_MASKS = initRayMasks();
+
+    /**
+     * @brief Builds 'between 2 squares' masks.
+     * @return 2x64 array of between masks
+     */
+    inline consteval core::BetweenMasks initBetweenMasks() noexcept
+    {
+        core::BetweenMasks masks{};
+
+        for (int fromSquare = 0; fromSquare < 64; fromSquare++)
+        {
+            int fromRank = fromSquare / 8;
+            int fromFile = fromSquare % 8;
+
+            for (int toSquare = 0; toSquare < 64; toSquare++)
+            {
+                if (fromSquare == toSquare)
+                    continue;
+
+                int toRank = toSquare / 8;
+                int toFile = toSquare % 8;
+
+                int deltaRank = toRank - fromRank;
+                int deltaFile = toFile - fromFile;
+
+                int delta = 0;
+
+                // horizontal
+                if (deltaRank == 0 && deltaFile != 0)
+                    delta = (deltaFile > 0 ? 1 : -1);
+
+                // vertical
+                else if (deltaFile == 0 && deltaRank != 0)
+                    delta = (deltaRank > 0 ? 8 : -8);
+
+                // diagonal '\'
+                else if (deltaRank == deltaFile)
+                    delta = (deltaRank > 0 ? 9 : -9);
+
+                // anti-diagonal '/'
+                else if (deltaRank == -deltaFile)
+                    delta = (deltaRank > 0 ? 7 : -7);
+
+                else
+                    continue; // not aligned
+
+                Bitboard betweenMask = 0;
+                for (int square = fromSquare + delta; square != toSquare; square += delta)
+                {
+                    betweenMask.set(square);
+                }
+
+                masks[fromSquare][toSquare] = betweenMask;
+            }
+        }
+
+        return masks;
+    }
+    inline constexpr core::BetweenMasks BETWEEN_MASKS = initBetweenMasks();
+
     /**
      * @brief Builds pawns attacks masks, depending on the color.
      * @return 1x64 array of attacks masks
@@ -228,7 +407,7 @@ namespace engine::board
 
                 if (rankIndex == 1) // Second rank
                 {
-                    masks[squareIndex] |= shiftDir<core::Directions::NORTH_NORTH>(squareBB);
+                    masks[squareIndex] |= shiftDir<core::SpecialDirections::NORTH_NORTH>(squareBB);
                 }
             }
             else
@@ -236,7 +415,7 @@ namespace engine::board
                 int rankIndex = squareIndex >> 3;
                 if (rankIndex == 6) // 7th rank
                 {
-                    masks[squareIndex] |= shiftDir<core::Directions::SOUTH_SOUTH>(squareBB);
+                    masks[squareIndex] |= shiftDir<core::SpecialDirections::SOUTH_SOUTH>(squareBB);
                 }
             }
         }
@@ -292,10 +471,11 @@ namespace engine::board
         for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
         {
             Bitboard squareBB = Bitboard{1ULL << squareIndex};
-            masks[squareIndex] = shiftDir<core::Directions::NNE>(squareBB) | shiftDir<core::Directions::ENE>(squareBB) |
-                                 shiftDir<core::Directions::ESE>(squareBB) | shiftDir<core::Directions::SSE>(squareBB) |
-                                 shiftDir<core::Directions::SSW>(squareBB) | shiftDir<core::Directions::WSW>(squareBB) |
-                                 shiftDir<core::Directions::WNW>(squareBB) | shiftDir<core::Directions::NNW>(squareBB);
+            masks[squareIndex] =
+                shiftDir<core::SpecialDirections::NNE>(squareBB) | shiftDir<core::SpecialDirections::ENE>(squareBB) |
+                shiftDir<core::SpecialDirections::ESE>(squareBB) | shiftDir<core::SpecialDirections::SSE>(squareBB) |
+                shiftDir<core::SpecialDirections::SSW>(squareBB) | shiftDir<core::SpecialDirections::WSW>(squareBB) |
+                shiftDir<core::SpecialDirections::WNW>(squareBB) | shiftDir<core::SpecialDirections::NNW>(squareBB);
         }
         return masks;
     }
@@ -480,52 +660,41 @@ namespace engine::board
                     tempMask.unset(square); // Clear LSB
                 }
 
-                Bitboard attacks = 0;
+                Bitboard attacks = 0ULL;
                 Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[squareIndex];
 
-                // North
-                Bitboard ray = shiftDir<core::Directions::NORTH>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
+                // directions rook : N, S, E, W
+                constexpr std::array<core::Directions, 4> dirs = {core::Directions::NORTH, core::Directions::SOUTH,
+                                                                  core::Directions::EAST, core::Directions::WEST};
+
+                for (auto dir : dirs)
                 {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::NORTH>(ray);
+                    Bitboard fullRay = RAY_MASKS[squareIndex][dir];
+
+                    // Check for blockers
+                    Bitboard blockers = fullRay & occupancyMasked;
+                    if (blockers.isEmpty() == false)
+                    {
+                        // Get the nearest block
+                        int blockerSquare =
+                            (dir == core::NORTH || dir == core::EAST) ? blockers.lsbIndex() : blockers.msbIndex();
+
+                        // Get all squares between squareIndex and the blocker
+                        Bitboard rayToBlock =
+                            BETWEEN_MASKS[squareIndex][blockerSquare] | Bitboard(1ULL << blockerSquare);
+                        attacks |= rayToBlock;
+                    }
+                    else
+                    {
+                        // No blocker = we take the full ray
+                        attacks |= fullRay;
+                    }
                 }
 
-                // South
-                ray = shiftDir<core::Directions::SOUTH>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::SOUTH>(ray);
-                }
-
-                // East
-                ray = shiftDir<core::Directions::EAST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::EAST>(ray);
-                }
-
-                // West
-                ray = shiftDir<core::Directions::WEST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::WEST>(ray);
-                }
-
-                // Store in table using magic index
+                // Get magic index
                 uint64_t magicIndex =
                     (occupancyBB.getData() * rookMagics[squareIndex].getData()) >> rookShifts[squareIndex];
+
                 table[squareIndex][magicIndex] = attacks;
             }
         }
@@ -573,49 +742,39 @@ namespace engine::board
                 Bitboard attacks = 0;
                 Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[squareIndex];
 
-                // North-East
-                Bitboard ray = shiftDir<core::Directions::NORTH_EAST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
+                // directions Bishop
+                constexpr std::array<core::Directions, 4> dirs = {
+                    core::Directions::NORTH_WEST, core::Directions::NORTH_EAST, core::Directions::SOUTH_WEST,
+                    core::Directions::SOUTH_EAST};
+
+                for (auto dir : dirs)
                 {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::NORTH_EAST>(ray);
+                    Bitboard fullRay = RAY_MASKS[squareIndex][dir];
+
+                    // Check for blockers
+                    Bitboard blockers = fullRay & occupancyMasked;
+                    if (blockers.isEmpty() == false)
+                    {
+                        // Get the nearest block
+                        int blockerSquare =
+                            (dir == core::NORTH || dir == core::EAST) ? blockers.lsbIndex() : blockers.msbIndex();
+
+                        // Get all squares between squareIndex and the blocker
+                        Bitboard rayToBlock =
+                            BETWEEN_MASKS[squareIndex][blockerSquare] | Bitboard(1ULL << blockerSquare);
+                        attacks |= rayToBlock;
+                    }
+                    else
+                    {
+                        // No blocker = we take the full ray
+                        attacks |= fullRay;
+                    }
                 }
 
-                // North-West
-                ray = shiftDir<core::Directions::NORTH_WEST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::NORTH_WEST>(ray);
-                }
-
-                // South-East
-                ray = shiftDir<core::Directions::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::SOUTH_EAST>(ray);
-                }
-
-                // South-West
-                ray = shiftDir<core::Directions::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
-                while (!ray.isEmpty())
-                {
-                    attacks |= ray;
-                    if ((ray & occupancyMasked).isEmpty() == false)
-                        break;
-                    ray = shiftDir<core::Directions::SOUTH_WEST>(ray);
-                }
-
-                // Store in table using magic index
+                // Get magic index
                 uint64_t magicIndex =
                     (occupancyBB.getData() * bishopMagics[squareIndex].getData()) >> bishopShifts[squareIndex];
+
                 table[squareIndex][magicIndex] = attacks;
             }
         }
@@ -623,65 +782,6 @@ namespace engine::board
         return table;
     }
     inline const core::BishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
-
-    /**
-     * @brief Builds 'between 2 squares' masks.
-     * @return 2x64 array of between masks
-     */
-    inline consteval core::BetweenMasks initBetweenMasks() noexcept
-    {
-        core::BetweenMasks masks{};
-
-        for (int fromSquare = 0; fromSquare < 64; fromSquare++)
-        {
-            int fromRank = fromSquare / 8;
-            int fromFile = fromSquare % 8;
-
-            for (int toSquare = 0; toSquare < 64; toSquare++)
-            {
-                if (fromSquare == toSquare)
-                    continue;
-
-                int toRank = toSquare / 8;
-                int toFile = toSquare % 8;
-
-                int deltaRank = toRank - fromRank;
-                int deltaFile = toFile - fromFile;
-
-                int delta = 0;
-
-                // horizontal
-                if (deltaRank == 0 && deltaFile != 0)
-                    delta = (deltaFile > 0 ? 1 : -1);
-
-                // vertical
-                else if (deltaFile == 0 && deltaRank != 0)
-                    delta = (deltaRank > 0 ? 8 : -8);
-
-                // diagonal '\'
-                else if (deltaRank == deltaFile)
-                    delta = (deltaRank > 0 ? 9 : -9);
-
-                // anti-diagonal '/'
-                else if (deltaRank == -deltaFile)
-                    delta = (deltaRank > 0 ? 7 : -7);
-
-                else
-                    continue; // not aligned
-
-                Bitboard betweenMask = 0;
-                for (int square = fromSquare + delta; square != toSquare; square += delta)
-                {
-                    betweenMask.set(square);
-                }
-
-                masks[fromSquare][toSquare] = betweenMask;
-            }
-        }
-
-        return masks;
-    }
-    inline constexpr core::BetweenMasks BETWEEN_MASKS = initBetweenMasks();
 
     inline constexpr core::CastlingMasks CASTLING_MASKS = {
         Bitboard{(1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 1) | (1ULL << 2) | (1ULL << 3)},

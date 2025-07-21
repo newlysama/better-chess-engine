@@ -23,6 +23,8 @@ namespace engine::board
 
     State::State() noexcept
         : castlingRights((1 << core::Castlings::CASTLINGS) - 1)
+        , whitePinned{}
+        , blackPinned{}
         , allPieces{
             {// -- White pieces (index 0) --
              {
@@ -186,8 +188,22 @@ namespace engine::board
                   utils::squareIndexToString(squareIndex));
     }
 
+    void State::getPinnedPieces(const core::Colors color) noexcept
+    {
+    }
+
     void State::movePiece(const Colors color, const Pieces piece, const int fromSquare, const int toSquare) noexcept
     {
+        // Keep track of the kings indices
+        if (fromSquare == this->whiteKingIndex)
+        {
+            this->whiteKingIndex = toSquare;
+        }
+        else if (fromSquare == blackKingIndex)
+        {
+            this->blackKingIndex = toSquare;
+        }
+
         this->unsetPiece(color, piece, fromSquare);
         this->setPiece(color, piece, toSquare);
 

@@ -163,9 +163,6 @@ namespace engine::game
 
         game::Move _moves[256]; // Actual list of moves
         int _size = 0;          // Current size of the list
-
-        // Bitboards holding each reachable square for each team
-        core::TargetsBitboards targetsBitboards;
     };
 } // namespace engine::game
 

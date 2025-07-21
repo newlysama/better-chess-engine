@@ -34,14 +34,6 @@ namespace engine::core
     typedef std::array<board::Bitboard, Colors::COLORS> ColoredOccupancies;
 
     /**
-     * @typedef TargetsBitboards
-     * @brief   1x2 array holding each team's targets bitboard.
-     * @details
-     * Each bitboard holds every square that its team can reach through a move
-     */
-    typedef std::array<board::Bitboard, Colors::COLORS> TargetsBitboards;
-
-    /**
      * @typedef CastlingRights
      * @brief   8 bits unsigned int where bits represent a type of castling right.
      * @details
@@ -73,6 +65,12 @@ namespace engine::core
      * @brief   1x15 array holding each diagonal's mask.
      */
     typedef std::array<board::Bitboard, 15> DiagonalMasks;
+
+    /**
+     * @typedef RayMasks
+     * @brief   64x8 array holding each ray mask for each direction from each square.
+     */
+    typedef std::array<std::array<board::Bitboard, Directions::DIRECTIONS>, 64> RayMasks;
 
     /**
      * @typedef BitboardTable

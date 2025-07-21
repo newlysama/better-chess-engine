@@ -152,6 +152,17 @@ namespace engine::board
         }
 
         /**
+         * @brief Get a bit's value at a specific index.
+         *
+         * @param [in] index : index to look at
+         * @return in : the bit's value
+         */
+        inline constexpr int at(int index) const noexcept
+        {
+            return int((this->_data >> index) & 1ULL);
+        }
+
+        /**
          * @brief  Get the number of bits set to 1.
          *
          * @return int : the number of bits set to 1

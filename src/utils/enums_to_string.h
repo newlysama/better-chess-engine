@@ -145,32 +145,45 @@ namespace utils
             return "SOUTH_EAST";
         case engine::core::Directions::SOUTH_WEST:
             return "SOUTH_WEST";
-        case engine::core::Directions::NORTH_NORTH:
-            return "NORTH_NORTH";
-        case engine::core::Directions::SOUTH_SOUTH:
-            return "SOUTH_SOUTH";
-        case engine::core::Directions::NNE:
-            return "NNE";
-        case engine::core::Directions::ENE:
-            return "ENE";
-        case engine::core::Directions::ESE:
-            return "ESE";
-        case engine::core::Directions::SSE:
-            return "SSE";
-        case engine::core::Directions::SSW:
-            return "SSW";
-        case engine::core::Directions::WSW:
-            return "WSW";
-        case engine::core::Directions::WNW:
-            return "WNW";
-        case engine::core::Directions::NNW:
-            return "NNW";
         case engine::core::Directions::DIRECTIONS:
-            return "18";
+            return "8";
         case engine::core::Directions::UNKNOWN_DIRECTION:
             return "UNKNOWN_DIRECTION";
         }
         return "UNKNOWN_DIRECTION";
+    }
+
+    inline constexpr std::string_view toString(engine::core::SpecialDirections v)
+    {
+        switch (v)
+        {
+        case engine::core::SpecialDirections::NORTH_NORTH:
+            return "NORTH_NORTH";
+        case engine::core::SpecialDirections::SOUTH_SOUTH:
+            return "SOUTH_SOUTH";
+        case engine::core::SpecialDirections::NNE:
+            return "NNE";
+        case engine::core::SpecialDirections::ENE:
+            return "ENE";
+        case engine::core::SpecialDirections::ESE:
+            return "ESE";
+        case engine::core::SpecialDirections::SSE:
+            return "SSE";
+        case engine::core::SpecialDirections::SSW:
+            return "SSW";
+        case engine::core::SpecialDirections::WSW:
+            return "WSW";
+        case engine::core::SpecialDirections::WNW:
+            return "WNW";
+        case engine::core::SpecialDirections::NNW:
+            return "NNW";
+        case engine::core::SpecialDirections::SPECIAL_DIRS:
+            return "10";
+        case engine::core::SpecialDirections::UNKNOWN_SPECIAL_DIR:
+            return "UNKNOWN_SPECIAL_DIR";
+        }
+
+        return "UNKNOWN_SPECIAL_DIR";
     }
 
     inline constexpr std::string_view toString(engine::core::MoveTypes v) noexcept

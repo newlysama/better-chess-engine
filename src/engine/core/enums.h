@@ -93,23 +93,32 @@ namespace engine::core
         NORTH_WEST = 5,
         SOUTH_EAST = 6,
         SOUTH_WEST = 7,
+        DIRECTIONS = 8,
+        UNKNOWN_DIRECTION = 255
+    };
 
+    /**
+     * @enum SpecialDirections
+     * @brief Enum of special directions for
+     * pawns double push / knight moves.
+     */
+    enum SpecialDirections
+    {
         // Pawn specific dirs
-        NORTH_NORTH = 8,
-        SOUTH_SOUTH = 9,
+        NORTH_NORTH = 0,
+        SOUTH_SOUTH = 1,
 
         // Knight specific dirs
-        NNE = 10,
-        ENE = 11,
-        ESE = 12,
-        SSE = 13,
-        SSW = 14,
-        WSW = 15,
-        WNW = 16,
-        NNW = 17,
-
-        DIRECTIONS = 18,
-        UNKNOWN_DIRECTION = 255
+        NNE = 2,
+        ENE = 3,
+        ESE = 4,
+        SSE = 5,
+        SSW = 6,
+        WSW = 7,
+        WNW = 8,
+        NNW = 9,
+        SPECIAL_DIRS = 10,
+        UNKNOWN_SPECIAL_DIR = 255
     };
 
     /**

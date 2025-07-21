@@ -153,6 +153,13 @@ namespace engine::board
         void unsetPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
 
         /**
+         * @brief Fill color's corresponding pinned pieces mask.
+         *
+         * @param color : color to look for
+         */
+        void getPinnedPieces(const core::Colors color) noexcept;
+
+        /**
          * @brief Move a given piece.
          *
          * @param [in] color      : Team to move the piece from
@@ -169,6 +176,14 @@ namespace engine::board
         core::CastlingRights castlingRights;           // Informations about enabled castlings.
 
         int enPassantSquare = -1; // When En Passant is enabled, this var is set
+
+        // Default starting square for kings
+        int whiteKingIndex = 3;
+        int blackKingIndex = 60;
+
+        // Maintain bitboards for each pinned piece
+        core::BitboardTable whitePinned;
+        core::BitboardTable blackPinned;
 
         core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;                   // Occupancy for all pieces
