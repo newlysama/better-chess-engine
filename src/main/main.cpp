@@ -32,7 +32,10 @@ int main(int argc, char* argv[])
 #if defined(GENERATE_MAGICS)
     engine::board::initMagics();
 #elif defined(PLAY_CONSOLE)
-    console_runner::ConsoleRunner runer{};
+    // BASE BOARD FEN : rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+    std::string fenNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    console_runner::ConsoleRunner runer{fenNotation};
     runer.runGame();
 #else
     LOG_INFO("DEFAULT BUILD");

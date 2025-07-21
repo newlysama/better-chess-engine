@@ -35,6 +35,11 @@ namespace console_runner
     {
     }
 
+    ConsoleRunner::ConsoleRunner(std::string& fenNotation)
+        : game(Game{fenNotation})
+    {
+    }
+
     std::string ConsoleRunner::askInput() const noexcept
     {
         std::string input;

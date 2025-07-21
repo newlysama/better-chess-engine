@@ -31,6 +31,8 @@ namespace console_runner
          */
         ConsoleRunner() noexcept;
 
+        ConsoleRunner(std::string& fenNotation);
+
         /**
          * @brief Default destructor.
          */
