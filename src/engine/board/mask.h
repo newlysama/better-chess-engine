@@ -100,50 +100,50 @@ namespace engine::board
         switch (D)
         {
         //  ——— Pawns double push ———
-        case core::Directions::NORTH_NORTH:
+        case core::SpecialDirections::NORTH_NORTH:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7]) << 16;
 
-        case core::Directions::SOUTH_SOUTH:
+        case core::SpecialDirections::SOUTH_SOUTH:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2]) >> 16;
 
         // ——— Knights ———
         // two North + one East
-        case core::Directions::NNE:
+        case core::SpecialDirections::NNE:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7]&
                     ~FILES_MASKS[core::Files::FILE_H]) << 17;
 
         // one North + two East
-        case core::Directions::ENE:
+        case core::SpecialDirections::ENE:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_H] &
                     ~FILES_MASKS[core::Files::FILE_G]) << 10;
 
         // one South + two East
-        case core::Directions::ESE:
+        case core::SpecialDirections::ESE:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_H] &
                     ~FILES_MASKS[core::Files::FILE_G]) >> 6;
 
         // two South + one East
-        case core::Directions::SSE:
+        case core::SpecialDirections::SSE:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2] &
                     ~FILES_MASKS[core::Files::FILE_H]) >> 15;
 
         // two South + one West
-        case core::Directions::SSW:
+        case core::SpecialDirections::SSW:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~RANKS_MASKS[core::Ranks::RANK_2] &
                     ~FILES_MASKS[core::Files::FILE_A]) >> 17;
 
         // one South + two West
-        case core::Directions::WSW:
+        case core::SpecialDirections::WSW:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_1] & ~FILES_MASKS[core::Files::FILE_A] &
                     ~FILES_MASKS[core::Files::FILE_B]) >> 10;
 
         // one North + two West
-        case core::Directions::WNW:
+        case core::SpecialDirections::WNW:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~FILES_MASKS[core::Files::FILE_A] &
                     ~FILES_MASKS[core::Files::FILE_B]) << 6;
 
         // two North + one West
-        case core::Directions::NNW:
+        case core::SpecialDirections::NNW:
             return (b & ~RANKS_MASKS[core::Ranks::RANK_8] & ~RANKS_MASKS[core::Ranks::RANK_7] &
                   ~FILES_MASKS[core::Files::FILE_A]) << 15;
         }
