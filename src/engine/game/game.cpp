@@ -9,6 +9,8 @@
 
 #include "engine/game/game.h"
 
+#include <exception>
+
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
@@ -29,6 +31,26 @@ namespace engine::game
         : state(State{})
         , moveList(MoveList{})
     {
+    }
+
+    Game::Game(const std::string& fenNotation)
+        : moveList(MoveList{})
+    {
+        std::array<std::string, 6> parts;
+        std::string token;
+        std::istringstream iss(fenNotation);
+
+        for (std::size_t i = 0; i < 6; i++)
+        {
+            if (!std::getline(iss, token, ' '))
+            {
+                throw std::invalid_argument("FEN's occupancy part error: less than 8 fields.");
+            }
+
+            parts[i] = token;
+        }
+
+        state = State{parts};
     }
 
     void Game::makeCapture(const game::Move& move, const Colors enemyColor) noexcept
