@@ -55,7 +55,7 @@ namespace console_runner
 
         std::cin >> input;
 
-        LOG_DEBUG("Got user console input: {}", input);
+        LOG_INFO("Got user console input: {}", input);
 
         return input;
     }
@@ -71,7 +71,7 @@ namespace console_runner
 
             if (input == "yes" || input == "no")
             {
-                LOG_DEBUG("Draw response from enemy player: {}", input);
+                LOG_INFO("Draw response from enemy player: {}", input);
                 return input;
             }
             else
@@ -95,7 +95,7 @@ namespace console_runner
 
             if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN) [[unlikely]]
             {
-                LOG_DEBUG("User entered non existing piece: {}", promotion);
+                LOG_INFO("User entered non existing piece: {}", promotion);
                 std::print("Please enter a valid piece (queen, rook, bishop or knight): ");
             }
             else
@@ -156,7 +156,7 @@ namespace console_runner
 
     bool ConsoleRunner::handleDrawRequest() noexcept
     {
-        LOG_DEBUG("Player {} is calling a draw", utils::toString(this->game.state.sideToMove));
+        LOG_INFO("Player {} is calling a draw", utils::toString(this->game.state.sideToMove));
 
         if (this->game.state.halfMoveClock >= 100)
         {
@@ -167,14 +167,14 @@ namespace console_runner
 
                 if (drawResponse == "yes")
                 {
-                    LOG_DEBUG("Both players acctepted the draw. Ending the this->");
+                    LOG_INFO("Both players acctepted the draw. Ending the this->");
                     std::println("Game ended on a draw");
 
                     return true;
                 }
                 else
                 {
-                    LOG_DEBUG("Enemy player refused the draw request, continuing");
+                    LOG_INFO("Enemy player refused the draw request, continuing");
                     std::println("Enemy player refused the draw request, continuing");
 
                     return false;
@@ -183,7 +183,7 @@ namespace console_runner
         }
         else
         {
-            LOG_DEBUG("Draw request is not valid, current Half Move Clock is {}", this->game.state.halfMoveClock);
+            LOG_INFO("Draw request is not valid, current Half Move Clock is {}", this->game.state.halfMoveClock);
             std::println("Cannot draw until Half Move Clock reaches 100.");
 
             return false;
