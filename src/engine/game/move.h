@@ -39,7 +39,7 @@ namespace engine::game
      *
      * ==> Theese ones are juste flags, never combined (1 bit = 1 piece or 1 type)
      *      Bits 12 -> 15 : Types of castling (if any)
-     *      Bits 16 -> 19 : Promotion piece (if any)
+     *      Bits 16 -> 19 : Promotion piece (if any) (0: Knhight - 1: Bishop - 2: Rook - 3: Queen)
      *      Bits 20 -> 25 : Type of move
      *      Bits 26 -> 31 : Intial square piece
      */
@@ -98,8 +98,22 @@ namespace engine::game
         {
             // 4 bits of promotion piece, starting at bit 16
             unsigned index = extractFlag(16, 4);
-            return index < static_cast<unsigned>(core::Pieces::PIECES) ? static_cast<core::Pieces>(index)
-                                                                       : core::Pieces::UNKNOWN_PIECE;
+
+            // Since possible promotion pieces have values that does not match
+            // the reserved bit indices in _data, we need to map them.
+            switch (index)
+            {
+            case 0:
+                return core::Pieces::KNIGHT;
+            case 1:
+                return core::Pieces::BISHOP;
+            case 2:
+                return core::Pieces::ROOK;
+            case 3:
+                return core::Pieces::QUEEN;
+            default:
+                return core::Pieces::UNKNOWN_PIECE;
+            }
         }
 
         core::MoveTypes getMoveType() const noexcept
