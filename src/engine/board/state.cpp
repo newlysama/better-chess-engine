@@ -242,13 +242,13 @@ namespace engine::board
     void State::movePiece(const Colors color, const Pieces piece, const int fromSquare, const int toSquare) noexcept
     {
         // Keep track of the kings indices
-        if (fromSquare == this->whiteKingIndex)
+        if (fromSquare == this->whiteKingSquare)
         {
-            this->whiteKingIndex = toSquare;
+            this->whiteKingSquare = toSquare;
         }
-        else if (fromSquare == blackKingIndex)
+        else if (fromSquare == blackKingSquare)
         {
-            this->blackKingIndex = toSquare;
+            this->blackKingSquare = toSquare;
         }
 
         this->unsetPiece(color, piece, fromSquare);

@@ -182,8 +182,8 @@ namespace engine::board
         int enPassantSquare = -1; // When En Passant is enabled, this var is set
 
         // Default starting square for kings
-        int whiteKingIndex = 3;
-        int blackKingIndex = 60;
+        int whiteKingSquare = 3;
+        int blackKingSquare = 60;
 
         // Maintain bitboards for each pinned piece
         core::BitboardTable whitePinned;
@@ -280,6 +280,19 @@ namespace engine::board
                         this->allPieces[pair.first][pair.second].set(square);
                         this->coloredOccupancies[pair.first].set(square);
                         this->generalOccupancy.set(square);
+
+                        // Set the king's square
+                        if (pair.second == core::Pieces::KING)
+                        {
+                            if (pair.first == core::Colors::WHITE)
+                            {
+                                this->whiteKingSquare = square;
+                            }
+                            else
+                            {
+                                this->blackKingSquare = square;
+                            }
+                        }
 
                         file++;
                     }
