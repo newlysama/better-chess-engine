@@ -94,10 +94,9 @@ namespace engine::board
         /**
          * @brief Enable a type of castling.
          */
-        template <core::Castlings Type>
-        inline constexpr void setCastlingRight() noexcept
+        inline constexpr void setCastlingRight(core::Castlings castle) noexcept
         {
-            this->castlingRights |= (uint8_t{1} << static_cast<unsigned>(Type));
+            this->castlingRights |= (uint8_t{1} << static_cast<unsigned>(castle));
         }
 
         /**
@@ -351,6 +350,8 @@ namespace engine::board
                 {
                     return std::unexpected(std::format("FEN's castling rights error: invalid piece {}", fen));
                 }
+
+                this->setCastlingRight(castle);
             }
             // clang-format on
 
@@ -396,7 +397,6 @@ namespace engine::board
             }
 
             this->halfMoveClock = clock;
-
             return std::expected<void, std::string>{};
         }
 
