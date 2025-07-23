@@ -22,7 +22,7 @@ namespace engine::board
     using namespace engine::core;
 
     State::State() noexcept
-        : castlingRights((1 << core::Castlings::CASTLINGS) - 1)
+        : castlingRights((1 << Castlings::CASTLINGS) - 1)
         , whitePinned{}
         , blackPinned{}
         , allPieces{
