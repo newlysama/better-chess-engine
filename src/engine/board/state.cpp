@@ -14,9 +14,6 @@
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     using namespace engine::core;
@@ -26,7 +23,7 @@ namespace engine::board
         , whitePinned{}
         , blackPinned{}
         , allPieces{
-            {// -- White pieces (index 0) --
+            {// -- White pieces --
              {
                  Bitboard{0x0000'0000'0000'FF00ULL}, // pawns
                  Bitboard{0x0000'0000'0000'0042ULL}, // knights
@@ -34,7 +31,7 @@ namespace engine::board
                  Bitboard{0x0000'0000'0000'0081ULL}, // rooks
                  Bitboard{0x0000'0000'0000'0008ULL}, // queen
                  Bitboard{0x0000'0000'0000'0010ULL}  // king
-             }, // -- Black pieces (index 1) --
+             }, // -- Black pieces --
              {
                  Bitboard{0x00FF'0000'0000'0000ULL}, // pawns
                  Bitboard{0x4200'0000'0000'0000ULL}, // knights

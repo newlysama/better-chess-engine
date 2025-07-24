@@ -4,7 +4,7 @@
  * @copyright Copyright 2025 Better Chess Engine
  * @par       This project is released under the MIT License
  *
- * @brief Game state representation
+ * @brief Game API
  */
 
 #ifndef GAME_H_
@@ -15,14 +15,13 @@
 #include "engine/board/state.h"
 #include "engine/game/move_list.h"
 
-/**
- * @namespace engine::game
- */
 namespace engine::game
 {
     /**
      * @class Game
-     * @brief Holds the game state
+     * @brief Game API.
+     * Holds the current state, the current legal moves list, and
+     * handles the different move requests.
      */
     class Game
     {

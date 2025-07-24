@@ -19,9 +19,6 @@
 #include "engine/board/mask.h"
 #include "logging/logging.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     using namespace engine::core;

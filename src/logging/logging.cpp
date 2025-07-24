@@ -15,9 +15,6 @@
 
 #include "conf/paths.h"
 
-/**
- * @namespace logging
- */
 namespace logging
 {
 #if defined(BUILD_RELEASE)

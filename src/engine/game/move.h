@@ -22,9 +22,6 @@
 
 #include "engine/core/enums.h"
 
-/**
- * @namespace engine::game
- */
 namespace engine::game
 {
     /**
@@ -227,7 +224,7 @@ namespace engine::game
 
         // clang-format off
         #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-        void print() const noexcept
+        inline void print() const noexcept
         {
             std::println("From    : {}", getFromSquare());
             std::println("To      : {}", getToSquare());
@@ -237,7 +234,7 @@ namespace engine::game
             std::println("Castle  : {}", utils::toString(getCastlingType()));
         }
 
-        void log() const noexcept
+        inline void log() const noexcept
         {
             LOG_DEBUG("From    : {}", getFromSquare());
             LOG_DEBUG("To      : {}", getToSquare());

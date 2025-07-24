@@ -16,9 +16,6 @@
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
-/**
- * @namespace ui::console
- */
 namespace ui::console
 {
     using namespace conf::paths;

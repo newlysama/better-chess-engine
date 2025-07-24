@@ -13,9 +13,6 @@
 #include <string_view>
 #include <unordered_map>
 
-/**
- * @namespace engine::core
- */
 namespace engine::core
 {
     // clang-format off

@@ -16,9 +16,6 @@
 #include "engine/core/const.h"
 #include "logging/logging.h"
 
-/**
- * @namespace utils
- */
 namespace utils
 {
     /**
@@ -34,8 +31,7 @@ namespace utils
 
         if (iter == std::end(engine::core::SQUARE_INDEX)) [[unlikely]]
         {
-            LOG_ERROR("[utils::squareIndexToString()] Invalid square index: {}", squareIndex);
-            return "Unknown";
+            return "None";
         }
 
         return iter->first;

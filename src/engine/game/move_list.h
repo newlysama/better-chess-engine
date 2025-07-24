@@ -13,13 +13,11 @@
 #include "engine/board/state.h"
 #include "engine/game/move.h"
 
-/**
- * @namespace engine::game
- */
 namespace engine::game
 {
     /**
      * @class MoveList
+     * @brief Handles the move generation.
      */
     class MoveList
     {

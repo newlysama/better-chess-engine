@@ -4,7 +4,7 @@
  * @copyright Copyright 2025 Better Chess Engine
  * @par       This project is released under the MIT License
  *
- * @brief Bitboard representation.
+ * @brief Bitboard wrapper.
  */
 
 #ifndef BITBOARD_H_
@@ -14,9 +14,6 @@
 #include <bit>
 #include <cstdint>
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     /**

@@ -16,9 +16,6 @@
 #include "engine/board/bitboard.h"
 #include "engine/core/enums.h"
 
-/**
- * @namespace engine::core
- */
 namespace engine::core
 {
     /**

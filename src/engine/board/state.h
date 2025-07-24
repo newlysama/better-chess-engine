@@ -20,13 +20,11 @@
 #include "engine/core/types.h"
 #include "utils/utils.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     /**
      * @class State
+     * @brief Holds the current game state.
      */
     class State
     {

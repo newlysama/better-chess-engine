@@ -21,9 +21,6 @@
 #include "utils/utils.h"
 #endif
 
-/**
- * @namespace engine::game
- */
 namespace engine::game
 {
     using namespace engine::core;
@@ -75,7 +72,11 @@ namespace engine::game
 
     void MoveList::processTargets(Bitboard& targets, int fromSquare, MoveTypes moveType, Pieces fromPiece) noexcept
     {
-        int count = 0;
+        // clang-format off
+        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+            uint8_t count = 0;
+        #endif
+
         while (targets.getData())
         {
             int toSquare = targets.lsbIndex();
@@ -87,10 +88,18 @@ namespace engine::game
             // Move to the next target
             targets.unset(toSquare);
 
-            count++;
+            #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+                count++;
+            #endif
         }
 
-        LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
+        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+            if (count > 0)
+            {
+                LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
+            }
+        #endif
+        // clang-format on
     }
 
     template <Castlings Castling>
@@ -133,7 +142,7 @@ namespace engine::game
         Move castle{fromSquare, toSquare, MoveTypes::CASTLE, Pieces::KING, Castling};
         this->add(castle);
 
-        LOG_DEBUG("Generated {} castling legal move", utils::toString(Castling));
+        LOG_DEBUG("Generated {} legal move", utils::toString(Castling));
     }
 
     void MoveList::getEnPassantMoves(const State& state, int fromSquare) noexcept

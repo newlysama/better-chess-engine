@@ -12,9 +12,6 @@
 
 #include <filesystem>
 
-/**
- * @namespace conf::paths
- */
 namespace conf::paths
 {
     // Path to the directory from where the binary is executed

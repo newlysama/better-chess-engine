@@ -21,9 +21,6 @@
 #include "utils/utils.h"
 #endif
 
-/**
- * @namespace console_runner
- */
 namespace console_runner
 {
     using namespace ui::console;

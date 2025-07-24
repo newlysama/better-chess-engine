@@ -17,9 +17,6 @@
 #include "engine/core/enums.h"
 #include "engine/core/types.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     inline constexpr core::FilesMasks FILES_MASKS = {
@@ -55,7 +52,7 @@ namespace engine::board
      * @brief Shifts a given Bitboard in a given direction.
      *
      * @param [in] bb : Bitboard to shift
-     * @return Bitboard : the shifted bitboard
+     * @return the shifted bitboard
      */
     template <core::Directions D>
     constexpr Bitboard shiftDir(Bitboard b)
@@ -93,6 +90,12 @@ namespace engine::board
         return Bitboard{0ULL};
     }
 
+    /**
+     * @brief Special shiftDir to handle Pawn double pushes and Knight directions
+     *
+     * @param [in] b : Bitboard to shift
+     * @return : the shifted Bitboard
+     */
     template <core::SpecialDirections D>
     constexpr Bitboard shiftDir(Bitboard b) noexcept
     {
@@ -154,7 +157,7 @@ namespace engine::board
 
     /**
      * @brief Builds diagonals masks.
-     * @return 1x15 array of attacks masks
+     * @return 1x15 array of diagonals masks
      */
     inline consteval core::DiagonalMasks initDiagonalsMasks() noexcept
     {
@@ -163,10 +166,10 @@ namespace engine::board
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             // file's index - rank's index + 7 -> range [0,14]
-            std::size_t file = squareIndex & 7;
-            std::size_t rank = squareIndex >> 3;
+            int file = squareIndex & 7;
+            int rank = squareIndex >> 3;
 
-            std::size_t maskIndex = file - rank + 7;
+            int maskIndex = file - rank + 7;
 
             masks[maskIndex] |= Bitboard{1ULL << squareIndex};
         }
@@ -177,7 +180,7 @@ namespace engine::board
 
     /**
      * @brief Builds anti-diagonals masks.
-     * @return 1x15 array of attacks masks
+     * @return 1x15 array of anti-diagonals masks
      */
     inline consteval core::DiagonalMasks initAntiDiagonalsMasks() noexcept
     {
@@ -185,11 +188,11 @@ namespace engine::board
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
-            std::size_t file = squareIndex & 7;
-            std::size_t rank = squareIndex >> 3;
+            int file = squareIndex & 7;
+            int rank = squareIndex >> 3;
 
             // file's index + rank's index -> range [0,14]
-            std::size_t maskIndex = file + rank;
+            int maskIndex = file + rank;
 
             masks[maskIndex] |= Bitboard{1ULL << squareIndex};
         }
@@ -198,96 +201,101 @@ namespace engine::board
     }
     inline constexpr core::DiagonalMasks ANTI_DIAGONALS_MASKS = initAntiDiagonalsMasks();
 
+    /**
+     * @brief Init ray masks
+     *
+     * @return 64x8 array of each mask (each direction for each square)
+     */
     inline consteval core::RayMasks initRayMasks() noexcept
     {
         core::RayMasks rayMasks{};
 
-        for (int square = 0; square < 64; ++square)
+        for (int square = 0; square < 64; square++)
         {
             Bitboard squareBB = Bitboard{1ULL << square};
 
-            for (int d = 0; d < core::DIRECTIONS; ++d)
+            for (int direction = 0; direction < core::DIRECTIONS; direction++)
             {
-                core::Directions dir = static_cast<core::Directions>(d);
+                core::Directions dir = static_cast<core::Directions>(direction);
                 Bitboard ray{};
                 Bitboard b = squareBB;
 
                 switch (dir)
                 {
-                case core::NORTH:
+                case core::Directions::NORTH:
                     while (true)
                     {
-                        b = shiftDir<core::NORTH>(b);
+                        b = shiftDir<core::Directions::NORTH>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::SOUTH:
+                case core::Directions::SOUTH:
                     while (true)
                     {
-                        b = shiftDir<core::SOUTH>(b);
+                        b = shiftDir<core::Directions::SOUTH>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::EAST:
+                case core::Directions::EAST:
                     while (true)
                     {
-                        b = shiftDir<core::EAST>(b);
+                        b = shiftDir<core::Directions::EAST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::WEST:
+                case core::Directions::WEST:
                     while (true)
                     {
-                        b = shiftDir<core::WEST>(b);
+                        b = shiftDir<core::Directions::WEST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::NORTH_EAST:
+                case core::Directions::NORTH_EAST:
                     while (true)
                     {
-                        b = shiftDir<core::NORTH_EAST>(b);
+                        b = shiftDir<core::Directions::NORTH_EAST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::NORTH_WEST:
+                case core::Directions::NORTH_WEST:
                     while (true)
                     {
-                        b = shiftDir<core::NORTH_WEST>(b);
+                        b = shiftDir<core::Directions::NORTH_WEST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::SOUTH_EAST:
+                case core::Directions::SOUTH_EAST:
                     while (true)
                     {
-                        b = shiftDir<core::SOUTH_EAST>(b);
+                        b = shiftDir<core::Directions::SOUTH_EAST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
                     }
                     break;
 
-                case core::SOUTH_WEST:
+                case core::Directions::SOUTH_WEST:
                     while (true)
                     {
-                        b = shiftDir<core::SOUTH_WEST>(b);
+                        b = shiftDir<core::Directions::SOUTH_WEST>(b);
                         if (b == 0)
                             break;
                         ray |= b;
@@ -298,7 +306,7 @@ namespace engine::board
                     break;
                 }
 
-                rayMasks[square][d] = ray;
+                rayMasks[square][direction] = ray;
             }
         }
 

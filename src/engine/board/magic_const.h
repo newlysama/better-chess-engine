@@ -16,9 +16,6 @@
 #include "engine/board/bitboard.h"
 #include "engine/core/types.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     inline constexpr core::BitboardTable rookMagics = {

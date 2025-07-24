@@ -10,9 +10,6 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
-/**
- * @namespace engine::core
- */
 namespace engine::core
 {
     /**

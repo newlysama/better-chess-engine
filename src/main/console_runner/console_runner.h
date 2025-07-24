@@ -15,13 +15,11 @@
 #include "engine/core/enums.h"
 #include "engine/game/game.h"
 
-/**
- * @namespace console_runner
- */
 namespace console_runner
 {
     /**
      * @class ConsoleRunner
+     * @brief Handles the game loop in console mode.
      */
     class ConsoleRunner
     {

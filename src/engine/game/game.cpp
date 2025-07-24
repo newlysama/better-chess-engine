@@ -18,9 +18,6 @@
 #include "utils/utils.h"
 #endif
 
-/**
- * @namespace engine::game
- */
 namespace engine::game
 {
 
@@ -79,19 +76,19 @@ namespace engine::game
         {
         case Castlings::WHITE_KING_SIDE:
             this->state.movePiece(Colors::WHITE, Pieces::ROOK, 7, 5);
-            LOG_INFO("Performed {}", utils::toString(move.getCastlingType()));
+            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::WHITE_QUEEN_SIDE:
             this->state.movePiece(Colors::WHITE, Pieces::ROOK, 0, 3);
-            LOG_INFO("Performed {}", utils::toString(move.getCastlingType()));
+            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::BLACK_KING_SIDE:
             this->state.movePiece(Colors::BLACK, Pieces::ROOK, 63, 61);
-            LOG_INFO("Performed {}", utils::toString(move.getCastlingType()));
+            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::BLACK_QUEEN_SIDE:
             this->state.movePiece(Colors::BLACK, Pieces::ROOK, 56, 59);
-            LOG_INFO("Performed {}", utils::toString(move.getCastlingType()));
+            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         default:
             LOG_ERROR("Move castling type is invalid: {}", utils::toString(move.getCastlingType()));
@@ -169,20 +166,22 @@ namespace engine::game
 
         this->state.sideToMove = enemyColor;
 
-        LOG_DEBUG("Board state updated: [Half move clock: {}] - [Full move clock: {}] - [Side to move: {}] - [White "
-                  "king side castling right: {}] - [White queen side castling right: {}] - [Black king side castling "
-                  "right: {}] - [Black queen side castling right: {}] - [En passant square: {}]",
-                  this->state.halfMoveClock, this->state.fullMoveClock, utils::toString(this->state.sideToMove),
-                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>(),
-                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>(),
-                  this->state.enPassantSquare);
+        LOG_DEBUG("===== BOARD STATE UPDATED =====");
+        LOG_DEBUG("New side to move: {}", utils::toString(this->state.sideToMove));
+        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", this->state.halfMoveClock, this->state.fullMoveClock);
+        LOG_DEBUG("White King Side Castling Right: {} - White Queen Side Castling Right: {}",
+                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>());
+        LOG_DEBUG("Black King Side Castling Right: {} - Black Queen Side Castling Right: {}",
+                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>());
+        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(this->state.enPassantSquare));
+        LOG_DEBUG("===============================");
 
         this->moveList.generateAllMoves(this->state);
     }
 
     void Game::playMove(const Move& move) noexcept
     {
-        LOG_DEBUG("Playing move: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
+        LOG_DEBUG("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
                   utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
                   utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 

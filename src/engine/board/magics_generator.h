@@ -14,9 +14,6 @@
 
 #include "engine/board/bitboard.h"
 
-/**
- * @namespace engine::board
- */
 namespace engine::board
 {
     /**
