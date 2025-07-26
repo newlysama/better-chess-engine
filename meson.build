@@ -57,7 +57,7 @@ elif mode == 'profile'
 elif mode == 'release'
   add_project_arguments(
     '-DBUILD_RELEASE',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN',
     language: 'cpp'
   )
 
@@ -79,7 +79,7 @@ elif mode == 'test'
 elif mode == 'benchmark'
   add_project_arguments(
     '-DBUILD_BENCHMARK',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN',
     '-Db_pch=true',
     language: 'cpp'
   )
@@ -138,15 +138,6 @@ if mode == 'benchmark'
   )
 endif
 
-#------------------------------#
-#         INCLUDE DIRS         #
-#------------------------------#
 
 inc_src = include_directories('src')
-
-
-#------------------------------#
-#           SUB DIRS           #
-#------------------------------#
-
 subdir('src/')
