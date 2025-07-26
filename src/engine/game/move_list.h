@@ -81,7 +81,7 @@ namespace engine::game
          * @param [in] state : The state to work with
          * @param [in] color : Color to play
          */
-        void generateAllMoves(const board::State& state) noexcept;
+        void generateAllMoves(board::State& state) noexcept;
 
       private:
         /**
@@ -91,8 +91,8 @@ namespace engine::game
          * @param [in] fromSquare : Starting square index
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
          */
-        void processTargets(board::Bitboard& targets, int fromSquare, core::MoveTypes moveType,
-                            core::Pieces fromPiece) noexcept;
+        void processTargets(const board::State& state, board::Bitboard& targets, const int fromSquare,
+                            const core::MoveTypes moveType, const core::Pieces fromPiece) noexcept;
 
         /**
          * @brief If castling enabled, add the corresponding move to the movelist.
