@@ -60,7 +60,7 @@ namespace engine::game
 
         Pieces toRemove = this->state.getPiece(enemyColor, move.getToSquare());
         this->state.unsetPiece(enemyColor, toRemove, move.getToSquare());
-        this->state.movePiece(this->state.sideToMove, move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         LOG_INFO("{} {} captured by {} {}", utils::toString(enemyColor), utils::toString(toRemove),
                  utils::toString(state.sideToMove), utils::toString(move.getFromPiece()));
@@ -69,25 +69,25 @@ namespace engine::game
     void Game::makeCastling(const Move& move) noexcept
     {
         // Move the king
-        this->state.movePiece(this->state.sideToMove, move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         // Move the rook
         switch (move.getCastlingType())
         {
         case Castlings::WHITE_KING_SIDE:
-            this->state.movePiece(Colors::WHITE, Pieces::ROOK, 7, 5);
+            this->state.movePiece(Pieces::ROOK, 7, 5);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::WHITE_QUEEN_SIDE:
-            this->state.movePiece(Colors::WHITE, Pieces::ROOK, 0, 3);
+            this->state.movePiece(Pieces::ROOK, 0, 3);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::BLACK_KING_SIDE:
-            this->state.movePiece(Colors::BLACK, Pieces::ROOK, 63, 61);
+            this->state.movePiece(Pieces::ROOK, 63, 61);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castlings::BLACK_QUEEN_SIDE:
-            this->state.movePiece(Colors::BLACK, Pieces::ROOK, 56, 59);
+            this->state.movePiece(Pieces::ROOK, 56, 59);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         default:
@@ -99,7 +99,7 @@ namespace engine::game
     void Game::makeEnPassant(const Move& move, const Colors enemyColor) noexcept
     {
         // Move the pawn performing enPassant
-        this->state.movePiece(this->state.sideToMove, move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         // Determine enPassant captured piece's square
         int captureSquare;
@@ -177,6 +177,12 @@ namespace engine::game
         LOG_DEBUG("===============================");
 
         this->moveList.generateAllMoves(this->state);
+
+        // GAME OVER BABY
+        if (this->moveList.size() == 0)
+        {
+            this->state.isCheckMate = true;
+        }
     }
 
     void Game::playMove(const Move& move) noexcept
@@ -205,8 +211,7 @@ namespace engine::game
         // If no special move, just move the piece
         else
         {
-            this->state.movePiece(this->state.sideToMove, move.getFromPiece(), move.getFromSquare(),
-                                  move.getToSquare());
+            this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
         }
 
         // If promotion piece is set, make promotion
