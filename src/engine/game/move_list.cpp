@@ -59,7 +59,7 @@ namespace engine::game
 
     bool MoveList::contains(const Move& move) noexcept
     {
-        for (int i = 0; i < this->_size; i++)
+        for (std::size_t i = 0; i < this->_size; i++)
         {
             if (move == this->_moves[i])
             {
