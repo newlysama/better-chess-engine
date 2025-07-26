@@ -1,0 +1,50 @@
+name: better-chess-ci
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:    [ debug, profile, release ]
+        console: [ true, false ]
+        generate_magics: [ true, false ]
+
+        exclude:
+          - console: true
+            generate_magics: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache meson ninja-build clang build-essential libspdlog-dev libopenmpt-dev
+          echo "CC='ccache clang'"    >> $GITHUB_ENV
+          echo "CXX='ccache clang++'" >> $GITHUB_ENV
+
+      # Caching
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ccache
+            ~/.cache/meson
+          key: ${{ runner.os }}-${{ matrix.mode }}-${{ matrix.console }}-${{ matrix.generate_magics }}-v1
+
+      - name: Configure
+        run: |
+          opts="-Dmode=${{ matrix.mode }}"
+          if [[ "${{ matrix.console }}" == "true" ]]; then
+            opts="$opts -Dconsole=true"
+          fi
+          if [[ "${{ matrix.generate_magics }}" == "true" ]]; then
+            opts="$opts -Dgenerate_magics=true"
+          fi
+          meson setup build $opts
+
+      - name: Build
+        run: ninja -C build
