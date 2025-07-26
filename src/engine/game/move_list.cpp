@@ -95,8 +95,18 @@ namespace engine::game
             }
         }
 
-        LOG_DEBUG("Generated {} {} {} legal moves", targets.popCount(), utils::toString(fromPiece),
-                  utils::toString(moveType));
+        // clang-format off
+        #if !defined (BUILD_BENCHMARK) && !defined(BUILD_RELEASE)
+            if (targets.popCount() > 0)
+            {
+                LOG_DEBUG("Generated {} {} {} legal moves",
+                            targets.popCount(),
+                            utils::toString(fromPiece),
+                            utils::toString(moveType)
+                        );
+            }
+        #endif
+        // clang-format on
 
         while (targets.m_data)
         {
