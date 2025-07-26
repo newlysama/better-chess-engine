@@ -41,7 +41,7 @@ namespace console_runner
     {
         std::string input;
 
-        if (this->game.state.halfMoveClock >= 100)
+        if (this->game.state.m_halfMoveClock >= 100)
         {
             std::print("Select a move to play (format ex: a1a2 OR 'draw'): ");
         }
@@ -60,7 +60,7 @@ namespace console_runner
     std::string ConsoleRunner::askDraw() const noexcept
     {
         std::string input;
-        std::print("{} player asked for a draw, accept ? (yes/no): ", utils::toString(this->game.state.sideToMove));
+        std::print("{} player asked for a draw, accept ? (yes/no): ", utils::toString(this->game.state.m_sideToMove));
 
         while (true)
         {
@@ -153,9 +153,9 @@ namespace console_runner
 
     bool ConsoleRunner::handleDrawRequest() noexcept
     {
-        LOG_INFO("Player {} is calling a draw", utils::toString(this->game.state.sideToMove));
+        LOG_INFO("Player {} is calling a draw", utils::toString(this->game.state.m_sideToMove));
 
-        if (this->game.state.halfMoveClock >= 100)
+        if (this->game.state.m_halfMoveClock >= 100)
         {
             while (true)
             {
@@ -180,7 +180,7 @@ namespace console_runner
         }
         else
         {
-            LOG_INFO("Draw request is not valid, current Half Move Clock is {}", this->game.state.halfMoveClock);
+            LOG_INFO("Draw request is not valid, current Half Move Clock is {}", this->game.state.m_halfMoveClock);
             std::println("Cannot draw until Half Move Clock reaches 100.");
 
             return false;
@@ -234,7 +234,7 @@ namespace console_runner
             // Print new state
             ConsoleUI::RenderState(this->game.state);
 
-            if (this->game.state.isCheckMate)
+            if (this->game.state.m_isCheckMate)
             {
                 Colors winner = Colors::WHITE ? Colors::BLACK : Colors::WHITE;
                 LOG_INFO("{} team won the game.", utils::toString(winner));

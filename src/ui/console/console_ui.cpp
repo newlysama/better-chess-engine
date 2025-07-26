@@ -75,7 +75,7 @@ namespace ui::console
         {
             for (int piece = 0; piece < Pieces::PIECES; piece++)
             {
-                Bitboard bb = state.allPieces[color][piece];
+                Bitboard bb = state.m_piecesBB[color][piece];
                 if (bb.isSet(square))
                 {
                     return ConsoleUI::getColoredPiece(static_cast<Colors>(color), static_cast<Pieces>(piece));
@@ -121,9 +121,9 @@ namespace ui::console
 
     void ConsoleUI::printInfos(engine::board::State& state) noexcept
     {
-        std::println("{}Half move clock : {}", ConsoleUI::RANK_INDENT, state.halfMoveClock);
-        std::println("{}Full move clock : {}", ConsoleUI::RANK_INDENT, state.fullMoveClock);
-        std::println("{}Side to move    : {}", ConsoleUI::RANK_INDENT, utils::toString(state.sideToMove));
+        std::println("{}Half move clock : {}", ConsoleUI::RANK_INDENT, state.m_halfMoveClock);
+        std::println("{}Full move clock : {}", ConsoleUI::RANK_INDENT, state.m_fullMoveClock);
+        std::println("{}Side to move    : {}", ConsoleUI::RANK_INDENT, utils::toString(state.m_sideToMove));
     }
 
     void ConsoleUI::RenderState(engine::board::State& state) noexcept

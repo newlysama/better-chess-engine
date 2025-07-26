@@ -63,7 +63,7 @@ namespace engine::game
         this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         LOG_INFO("{} {} captured by {} {}", utils::toString(enemyColor), utils::toString(toRemove),
-                 utils::toString(state.sideToMove), utils::toString(move.getFromPiece()));
+                 utils::toString(state.m_sideToMove), utils::toString(move.getFromPiece()));
     }
 
     void Game::makeCastling(const Move& move) noexcept
@@ -103,7 +103,7 @@ namespace engine::game
 
         // Determine enPassant captured piece's square
         int captureSquare;
-        if (this->state.sideToMove == Colors::WHITE)
+        if (this->state.m_sideToMove == Colors::WHITE)
         {
             captureSquare = move.getToSquare() - 8;
         }
@@ -140,40 +140,41 @@ namespace engine::game
         if (move.getMoveType() == MoveTypes::CAPTURE || move.getMoveType() == MoveTypes::EN_PASSANT ||
             move.getMoveType() == MoveTypes::PROMOTION || move.getFromPiece() == Pieces::PAWN)
         {
-            this->state.halfMoveClock = 0;
+            this->state.m_halfMoveClock = 0;
         }
         else
         {
-            this->state.halfMoveClock++;
+            this->state.m_halfMoveClock++;
         }
 
         // If black just played, increase full move clock
-        if (this->state.sideToMove == Colors::BLACK)
+        if (this->state.m_sideToMove == Colors::BLACK)
         {
-            this->state.fullMoveClock++;
+            this->state.m_fullMoveClock++;
         }
 
         // If pawn double push was played, set enPassant square
         if (move.getMoveType() == MoveTypes::DOUBLE_PUSH)
         {
-            this->state.enPassantSquare = (move.getFromSquare() + move.getToSquare()) >> 1;
+            this->state.m_epSquare = (move.getFromSquare() + move.getToSquare()) >> 1;
         }
         // If enPassant square was set and we didn't double push, set it back to -1
-        else if (this->state.enPassantSquare != -1)
+        else if (this->state.m_epSquare != -1)
         {
-            this->state.enPassantSquare = -1;
+            this->state.m_epSquare = -1;
         }
 
-        this->state.sideToMove = enemyColor;
+        this->state.m_sideToMove = enemyColor;
 
         LOG_DEBUG("===== BOARD STATE UPDATED =====");
-        LOG_DEBUG("New side to move: {}", utils::toString(this->state.sideToMove));
-        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", this->state.halfMoveClock, this->state.fullMoveClock);
+        LOG_DEBUG("New side to move: {}", utils::toString(this->state.m_sideToMove));
+        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", this->state.m_halfMoveClock,
+                  this->state.m_fullMoveClock);
         LOG_DEBUG("White King Side Castling Right: {} - White Queen Side Castling Right: {}",
                   this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>());
         LOG_DEBUG("Black King Side Castling Right: {} - Black Queen Side Castling Right: {}",
                   this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>());
-        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(this->state.enPassantSquare));
+        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(this->state.m_epSquare));
         LOG_DEBUG("===============================");
 
         this->moveList.generateAllMoves(this->state);
@@ -181,7 +182,7 @@ namespace engine::game
         // GAME OVER BABY
         if (this->moveList.size() == 0)
         {
-            this->state.isCheckMate = true;
+            this->state.m_isCheckMate = true;
         }
     }
 
@@ -191,7 +192,7 @@ namespace engine::game
                   utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
                   utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
-        Colors enemyColor = this->state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = this->state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
         // If move is a capture, move the from piece and remove the target piece
         if (move.getMoveType() == MoveTypes::CAPTURE)

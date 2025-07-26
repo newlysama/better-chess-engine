@@ -86,7 +86,7 @@ namespace engine::board
         template <core::Castlings Type>
         inline constexpr bool hasCastlingRight() const noexcept
         {
-            return ((this->castlingRights >> static_cast<unsigned>(Type)) & 1U) != 0;
+            return ((m_castlingRights >> static_cast<unsigned>(Type)) & 1U) != 0;
         }
 
         /**
@@ -94,7 +94,7 @@ namespace engine::board
          */
         inline constexpr void setCastlingRight(core::Castlings castle) noexcept
         {
-            this->castlingRights |= (uint8_t{1} << static_cast<unsigned>(castle));
+            m_castlingRights |= (uint8_t{1} << static_cast<unsigned>(castle));
         }
 
         /**
@@ -103,7 +103,7 @@ namespace engine::board
         template <core::Castlings Type>
         inline constexpr void clearCastlingRight() noexcept
         {
-            this->castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
+            m_castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
         }
 
         /**
@@ -179,28 +179,28 @@ namespace engine::board
          *               ATTRIBUTES              *
          *****************************************/
 
-        uint16_t halfMoveClock = 0;                    // Half move counter
-        uint16_t fullMoveClock = 1;                    // Full move counter
-        core::Colors sideToMove = core::Colors::WHITE; // Whose turn is it ? :)
+        uint16_t m_halfMoveClock = 0;                    // Half move counter
+        uint16_t m_fullMoveClock = 1;                    // Full move counter
+        core::Colors m_sideToMove = core::Colors::WHITE; // Whose turn is it ? :)
 
         // Informations about enabled castlings
-        core::CastlingRights castlingRights = (1 << core::Castlings::CASTLINGS) - 1;
+        core::CastlingRights m_castlingRights = (1 << core::Castlings::CASTLINGS) - 1;
 
-        int enPassantSquare = -1; // When En Passant is enabled, this var is set
+        int m_epSquare = -1; // When En Passant is enabled, this var is set
 
-        core::KingSquares kingSquares; // Default starting square for kings
-        bool isChecked = false;        // Check state for the current king
-        bool isDoubleChecked = false;  // Double check state for the current king
-        bool isCheckMate = false;      // GAME OVER BABY
+        core::KingSquares m_kgSquares;  // Square for each king
+        bool m_isChecked = false;       // Check state for the current king
+        bool m_isDoubleChecked = false; // Double check state for the current king
+        bool m_isCheckMate = false;     // GAME OVER BABY
 
-        core::PinnedPieces pinnedPieces;        // Bitboards of available destinations for each pinned piece
-        Bitboard enemyTargetedSquares;          // Squares targeted by enemy moves
-        Bitboard checkers = Bitboard{0ULL};     // Bitboard of pieces that put the current king in check
-        Bitboard blockSquares = Bitboard{0ULL}; // Bitboard of squares that block a king's check from sliding pieces
+        core::PinnedPieces m_pinnedBB;          // Bitboards of available destinations for each pinned piece
+        Bitboard m_targetsBB;                   // Squares targeted by enemy moves
+        Bitboard m_checkersBB = Bitboard{0ULL}; // Bitboard of squares that put the current king in check
+        Bitboard m_blockersBB = Bitboard{0ULL}; // Bitboard of squares that block a king's check from sliding pieces
 
-        core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
-        Bitboard generalOccupancy;                   // Occupancy for all pieces
-        core::ColoredOccupancies coloredOccupancies; // Team specific occupancies
+        core::PiecesBitboards m_piecesBB;      // Occupancy for each team and each piece
+        Bitboard m_allOccBB;                   // Occupancy for all pieces
+        core::ColoredOccupancies m_teamsOccBB; // Team specific occupancies
 
       private:
         /*****************************************
@@ -286,14 +286,14 @@ namespace engine::board
                                                                parts.value()[rank][index]));
                         }
 
-                        this->allPieces[pair.first][pair.second].set(square);
-                        this->coloredOccupancies[pair.first].set(square);
-                        this->generalOccupancy.set(square);
+                        m_piecesBB[pair.first][pair.second].set(square);
+                        m_teamsOccBB[pair.first].set(square);
+                        m_allOccBB.set(square);
 
                         // Set the king's square
                         if (pair.second == core::Pieces::KING)
                         {
-                            this->kingSquares[pair.first] = square;
+                            m_kgSquares[pair.first] = square;
                         }
 
                         file++;
@@ -310,7 +310,7 @@ namespace engine::board
         }
 
         /**
-         * @brief Set the sideToMove field.
+         * @brief Set the m_sideToMove field.
          *
          * @param [in] fen : side to move part of the FEN notation
          * @return std::expected<void, std::string> : nothing / error message if fen is invalid
@@ -322,7 +322,7 @@ namespace engine::board
                 return std::unexpected(std::format("FEN's side to move part error: {}", fen));
             }
 
-            this->sideToMove = fen == "b" ? core::Colors::BLACK : core::Colors::WHITE;
+            m_sideToMove = fen == "b" ? core::Colors::BLACK : core::Colors::WHITE;
             return std::expected<void, std::string>{};
         }
 
@@ -362,7 +362,7 @@ namespace engine::board
         }
 
         /**
-         * @brief Fills the enPassantSquare field.
+         * @brief Fills the m_epSquare field.
          *
          * @param [in] fen : en passant square part of the FEN notation
          * @return std::expected<void, std::string> : nothing / error message if fen is invalid
@@ -379,12 +379,12 @@ namespace engine::board
                 return std::unexpected(std::format("FEN's en passant square error: invalid square {}", fen));
             }
 
-            this->enPassantSquare = core::SQUARE_INDEX.at(fen);
+            m_epSquare = core::SQUARE_INDEX.at(fen);
             return std::expected<void, std::string>{};
         }
 
         /**
-         * @brief Fills the halfMoveClock field.
+         * @brief Fills the m_halfMoveClock field.
          *
          * @param [in] fen : half move clock part of the FEN notation
          * @return std::expected<void, std::string> : nothing / error message if fen is invalid
@@ -399,12 +399,12 @@ namespace engine::board
                 return std::unexpected(std::format("FEN's half move clock error: {}", fen));
             }
 
-            this->halfMoveClock = clock;
+            m_halfMoveClock = clock;
             return std::expected<void, std::string>{};
         }
 
         /**
-         * @brief Fills the fullMoveClock field.
+         * @brief Fills the m_fullMoveClock field.
          *
          * @param [in] fen : full move clock part of the FEN notation
          * @return std::expected<void, std::string> : nothing / error message if fen is invalid
@@ -419,7 +419,7 @@ namespace engine::board
                 return std::unexpected(std::format("FEN's half move clock error: {}", fen));
             }
 
-            this->fullMoveClock = clock;
+            m_fullMoveClock = clock;
             return std::expected<void, std::string>{};
         }
     };

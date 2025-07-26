@@ -49,7 +49,7 @@ namespace engine::game
         void playMove(const game::Move& move) noexcept;
 
         board::State state;      // Game's state
-        game::MoveList moveList; // Legal move lists of the current halfMoveClock
+        game::MoveList moveList; // Legal move lists of the current m_halfMoveClock
 
       private:
         /**

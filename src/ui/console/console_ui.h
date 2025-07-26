@@ -48,7 +48,7 @@ namespace ui::console
         static std::string getColoredPiece(engine::core::Colors color, engine::core::Pieces piece) noexcept;
 
         /**
-         * @brief Look through allPieces bitboard to get the piece on a specific square.
+         * @brief Look through m_piecesBB bitboard to get the piece on a specific square.
          * If no piece found, return empty string for an empty square.
          *
          * @param [in] state  : current state

@@ -74,7 +74,7 @@ namespace engine::game
                                   const Pieces fromPiece) noexcept
     {
         // Filter pinned pieces moves
-        Bitboard pinnedTargets = state.pinnedPieces[state.sideToMove][fromSquare];
+        Bitboard pinnedTargets = state.m_pinnedBB[state.m_sideToMove][fromSquare];
         if (pinnedTargets.isEmpty() == false && fromPiece != Pieces::KING)
         {
             targets &= pinnedTargets;
@@ -83,15 +83,15 @@ namespace engine::game
         // If the king is in simple check, we can only
         // capture checking pieces, and only move to
         // square that block checking sliding pieces (if any)
-        if (state.isChecked)
+        if (state.m_isChecked)
         {
             if (moveType == MoveTypes::CAPTURE)
             {
-                targets &= state.checkers;
+                targets &= state.m_checkersBB;
             }
             else if (fromPiece != Pieces::KING)
             {
-                targets &= state.blockSquares;
+                targets &= state.m_blockersBB;
             }
         }
 
@@ -114,17 +114,17 @@ namespace engine::game
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
-        if (!state.hasCastlingRight<Castling>() || state.isChecked)
+        if (!state.hasCastlingRight<Castling>() || state.m_isChecked)
         {
             return;
         }
 
         // Check that square between rook and king are free
-        if ((state.generalOccupancy & CASTLING_BETWEEN_MASKS[Castling]).getData() != 0ULL)
+        if ((state.m_allOccBB & CASTLING_BETWEEN_MASKS[Castling]).getData() != 0ULL)
             return;
 
         // Check that no square on the king's path is under attack
-        if ((state.enemyTargetedSquares & CASTLING_KING_PATH_MASKS[Castling]).getData() != 0ULL)
+        if ((state.m_targetsBB & CASTLING_KING_PATH_MASKS[Castling]).getData() != 0ULL)
             return;
 
         Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveTypes::CASTLE, Pieces::KING, Castling};
@@ -137,29 +137,29 @@ namespace engine::game
     {
         int rankFrom = State::getRankIndex(fromSquare);
 
-        if (!((state.sideToMove == Colors::WHITE && rankFrom == 4) ||
-              (state.sideToMove == Colors::BLACK && rankFrom == 3)))
+        if (!((state.m_sideToMove == Colors::WHITE && rankFrom == 4) ||
+              (state.m_sideToMove == Colors::BLACK && rankFrom == 3)))
         {
             return;
         }
 
         int fileFrom = State::getFileIndex(fromSquare);
-        int fileEnPassant = State::getFileIndex(state.enPassantSquare);
+        int fileEnPassant = State::getFileIndex(state.m_epSquare);
         if (std::abs(fileFrom - fileEnPassant) != 1)
         {
             return;
         }
 
         // Check that enPassant doesn't leave our king in check
-        int capturedSquare = state.sideToMove == Colors::WHITE ? state.enPassantSquare - 8 : state.enPassantSquare + 8;
-        if (State::getRankIndex(state.kingSquares[state.sideToMove]) == State::getRankIndex(capturedSquare))
+        int capturedSquare = state.m_sideToMove == Colors::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8;
+        if (State::getRankIndex(state.m_kgSquares[state.m_sideToMove]) == State::getRankIndex(capturedSquare))
         {
-            Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+            Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
             // Get enemy Rooks and Queens that are on the same rank than our king
-            Bitboard attackers = state.allPieces[enemyColor][Pieces::ROOK] |
-                                 state.allPieces[enemyColor][Pieces::QUEEN] &
-                                     RANKS_MASKS[State::getRankIndex(state.kingSquares[state.sideToMove])];
+            Bitboard attackers = state.m_piecesBB[enemyColor][Pieces::ROOK] |
+                                 state.m_piecesBB[enemyColor][Pieces::QUEEN] &
+                                     RANKS_MASKS[State::getRankIndex(state.m_kgSquares[state.m_sideToMove])];
 
             while (attackers.isEmpty() == false)
             {
@@ -167,8 +167,8 @@ namespace engine::game
                 attackers.unset(attackSquare);
 
                 // Get blockers between the king and an attacker (excluding the captured enemy pawn)
-                Bitboard blockers = BETWEEN_MASKS[state.kingSquares[state.sideToMove]][attackSquare] &
-                                    state.generalOccupancy & ~Bitboard{1ULL << capturedSquare};
+                Bitboard blockers = BETWEEN_MASKS[state.m_kgSquares[state.m_sideToMove]][attackSquare] &
+                                    state.m_allOccBB & ~Bitboard{1ULL << capturedSquare};
 
                 // Captured enemy pawn is the only blocker preventing
                 // our king from check, En Passant is illegal
@@ -179,11 +179,11 @@ namespace engine::game
             }
         }
 
-        Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
+        Move enPassant{fromSquare, state.m_epSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
         this->add(std::move(enPassant));
 
         LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
-                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.enPassantSquare));
+                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.m_epSquare));
     }
 
     /**
@@ -191,9 +191,9 @@ namespace engine::game
      */
     void MoveList::generatePawnsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard pawns = state.allPieces[state.sideToMove][Pieces::PAWN];
+        Bitboard pawns = state.m_piecesBB[state.m_sideToMove][Pieces::PAWN];
 
         // While there is bits set to 1
         while (pawns.getData())
@@ -205,26 +205,26 @@ namespace engine::game
             pawns.unset(fromSquare);
 
             // Rechable empty squares
-            Bitboard pushTargets = PAWN_PUSHES_MASKS[state.sideToMove][fromSquare] & ~state.generalOccupancy;
+            Bitboard pushTargets = PAWN_PUSHES_MASKS[state.m_sideToMove][fromSquare] & ~state.m_allOccBB;
 
             // Rechable capture square
             Bitboard captureTargets =
-                PAWN_CAPTURES_MASKS[state.sideToMove][fromSquare] & state.coloredOccupancies[enemyColor];
+                PAWN_CAPTURES_MASKS[state.m_sideToMove][fromSquare] & state.m_teamsOccBB[enemyColor];
 
             this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::PAWN);
             this->processTargets(state, pushTargets, fromSquare, MoveTypes::QUIET, Pieces::PAWN);
 
             // Generate double pushes if the square between start and dest is empty
-            if ((PAWN_PUSHES_MASKS[state.sideToMove][fromSquare] & state.generalOccupancy) == 0)
+            if ((PAWN_PUSHES_MASKS[state.m_sideToMove][fromSquare] & state.m_allOccBB) == 0)
             {
                 Bitboard doublePushTargets =
-                    PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][fromSquare] & ~state.generalOccupancy;
+                    PAWN_DOUBLE_PUSHES_MASKS[state.m_sideToMove][fromSquare] & ~state.m_allOccBB;
 
                 this->processTargets(state, doublePushTargets, fromSquare, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
             }
 
             // Generate enPassant if enabled
-            if (state.enPassantSquare != -1) [[unlikely]]
+            if (state.m_epSquare != -1) [[unlikely]]
             {
                 this->getEnPassantMoves(state, fromSquare);
             }
@@ -233,9 +233,9 @@ namespace engine::game
 
     void MoveList::generateKnightsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard knights = state.allPieces[state.sideToMove][Pieces::KNIGHT];
+        Bitboard knights = state.m_piecesBB[state.m_sideToMove][Pieces::KNIGHT];
 
         // While there is bits set to 1
         while (knights.getData())
@@ -247,13 +247,13 @@ namespace engine::game
             knights.unset(fromSquare);
 
             // Get the targets
-            Bitboard targets = KNIGHT_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove];
+            Bitboard targets = KNIGHT_ATTACKS_MASKS[fromSquare] & ~state.m_teamsOccBB[state.m_sideToMove];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
+            Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
 
             // Rechable squares occupied by an enemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+            Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
             this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KNIGHT);
             this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KNIGHT);
@@ -262,9 +262,9 @@ namespace engine::game
 
     void MoveList::generateRooksMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard rooks = state.allPieces[state.sideToMove][Pieces::ROOK];
+        Bitboard rooks = state.m_piecesBB[state.m_sideToMove][Pieces::ROOK];
 
         // While there is bits set to 1
         while (rooks.getData())
@@ -275,19 +275,19 @@ namespace engine::game
             // Move to the next rook
             rooks.unset(fromSquare);
 
-            Bitboard relevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[fromSquare];
+            Bitboard relevantOcc = state.m_allOccBB & ROOK_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
             size_t magicIndex = (relevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
 
             // Get the targets
-            Bitboard targets = ROOK_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
+            Bitboard targets = ROOK_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.m_teamsOccBB[state.m_sideToMove];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
+            Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
 
             // Rechable squares occupied by an enemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+            Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
             this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::ROOK);
             this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::ROOK);
@@ -296,9 +296,9 @@ namespace engine::game
 
     void MoveList::generateBishopsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard bishops = state.allPieces[state.sideToMove][Pieces::BISHOP];
+        Bitboard bishops = state.m_piecesBB[state.m_sideToMove][Pieces::BISHOP];
 
         // While there is bits set to 1
         while (bishops.getData())
@@ -309,21 +309,20 @@ namespace engine::game
             // Move to the next bishop
             bishops.unset(fromSquare);
 
-            Bitboard relevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[fromSquare];
+            Bitboard relevantOcc = state.m_allOccBB & BISHOP_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
             size_t magicIndex =
                 (relevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
 
             // Get the targets
-            Bitboard targets =
-                BISHOP_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.coloredOccupancies[state.sideToMove];
+            Bitboard targets = BISHOP_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.m_teamsOccBB[state.m_sideToMove];
 
             // Rechable empty squares
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
+            Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
 
             // Rechable squares occupied by an enemy piece
-            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+            Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
             this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::BISHOP);
             this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::BISHOP);
@@ -332,9 +331,9 @@ namespace engine::game
 
     void MoveList::generateQueenMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard queen = state.allPieces[state.sideToMove][Pieces::QUEEN];
+        Bitboard queen = state.m_piecesBB[state.m_sideToMove][Pieces::QUEEN];
 
         // While there is bits set to 1
         // Remember that thank's to promotions, we can have several queens alive
@@ -347,12 +346,12 @@ namespace engine::game
             queen.unset(fromSquare);
 
             // Magic rook
-            Bitboard rookRelevantOcc = state.generalOccupancy & ROOK_RELEVANT_MASKS[fromSquare];
+            Bitboard rookRelevantOcc = state.m_allOccBB & ROOK_RELEVANT_MASKS[fromSquare];
             size_t rookMagicIndex =
                 (rookRelevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
 
             // Magic bishop
-            Bitboard bishopRelevantOcc = state.generalOccupancy & BISHOP_RELEVANT_MASKS[fromSquare];
+            Bitboard bishopRelevantOcc = state.m_allOccBB & BISHOP_RELEVANT_MASKS[fromSquare];
             size_t bishopMagicIndex =
                 (bishopRelevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
 
@@ -360,9 +359,9 @@ namespace engine::game
             Bitboard attacks =
                 ROOK_ATTACKS_TABLE[fromSquare][rookMagicIndex] | BISHOP_ATTACKS_TABLE[fromSquare][bishopMagicIndex];
 
-            Bitboard targets = attacks & ~state.coloredOccupancies[state.sideToMove];
-            Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
-            Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+            Bitboard targets = attacks & ~state.m_teamsOccBB[state.m_sideToMove];
+            Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
+            Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
             this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
             this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
@@ -371,21 +370,21 @@ namespace engine::game
 
     void MoveList::generateKingMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
 
-        Bitboard king = state.allPieces[state.sideToMove][Pieces::KING];
+        Bitboard king = state.m_piecesBB[state.m_sideToMove][Pieces::KING];
 
         // Extract king's index
         int fromSquare = king.lsbIndex();
 
         // Generate classic targets
         Bitboard targets =
-            KING_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove] & ~state.enemyTargetedSquares;
-        Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
-        Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
+            KING_ATTACKS_MASKS[fromSquare] & ~state.m_teamsOccBB[state.m_sideToMove] & ~state.m_targetsBB;
+        Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
+        Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
         // Generate Castling targets
-        if (state.sideToMove == Colors::WHITE)
+        if (state.m_sideToMove == Colors::WHITE)
         {
             getCastlingMoves<Castlings::WHITE_KING_SIDE>(state, fromSquare);
             getCastlingMoves<Castlings::WHITE_QUEEN_SIDE>(state, fromSquare);
@@ -411,9 +410,9 @@ namespace engine::game
         // Computes enemy targeted squares
         state.computeEnemyTargetedSquares();
 
-        LOG_DEBUG("Generating {} legal moves...", utils::toString(state.sideToMove));
+        LOG_DEBUG("Generating {} legal moves...", utils::toString(state.m_sideToMove));
 
-        if (state.isDoubleChecked == false)
+        if (state.m_isDoubleChecked == false)
         {
             this->generatePawnsMoves(state);
             this->generateKnightsMoves(state);
@@ -424,6 +423,6 @@ namespace engine::game
 
         this->generateKingMoves(state);
 
-        LOG_DEBUG("{} {} legal moves generated", this->_size, utils::toString(state.sideToMove));
+        LOG_DEBUG("{} {} legal moves generated", this->_size, utils::toString(state.m_sideToMove));
     }
 } // namespace engine::game
