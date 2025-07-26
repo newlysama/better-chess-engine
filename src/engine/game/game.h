@@ -33,6 +33,8 @@ namespace engine::game
 
         /**
          * @brief Constructor from FEN notation.
+         *
+         * @param [in] fenNotation : FEN string
          */
         Game(const std::string& fenNotation);
 

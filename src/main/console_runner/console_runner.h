@@ -29,6 +29,11 @@ namespace console_runner
          */
         ConsoleRunner() noexcept;
 
+        /**
+         * @brief Constructor using FEN notation string
+         *
+         * @param [in] fenNotation : the FEN string
+         */
         ConsoleRunner(std::string& fenNotation);
 
         /**

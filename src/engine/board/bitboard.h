@@ -44,7 +44,7 @@ namespace engine::board
         /**
          * @brief Copy constructor.
          *
-         * @param [in] : Bitboard instance to copy
+         * @param [in] Bitboard : instance to copy
          */
         constexpr Bitboard(const Bitboard&) noexcept = default;
 
@@ -162,6 +162,7 @@ namespace engine::board
         /**
          * @brief Checker wether a bit is set to 1 at a specific index.
          *
+         * @param [in] index : the bit's indice
          * @return bool : Wether the bit is set or not
          */
         inline constexpr bool isSet(int index) const noexcept
@@ -171,6 +172,8 @@ namespace engine::board
 
         /**
          * @brief Set a bit to to 1.
+         *
+         * @param [in] index : the bit's indice
          */
         inline constexpr void set(int index) noexcept
         {
@@ -179,6 +182,8 @@ namespace engine::board
 
         /**
          * @brief Set a bit to to 0.
+         *
+         * @param [in] index : the bit's indice
          */
         inline constexpr void unset(int index) noexcept
         {

@@ -79,7 +79,6 @@ namespace engine::game
          * @brief Call each generation method to generate all legal moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateAllMoves(board::State& state) noexcept;
 
@@ -87,9 +86,11 @@ namespace engine::game
         /**
          * @brief Generates legal moves from a given square with a specific moveType and targets bitstate.
          *
+         * @param [in] state      : Current state of the board
          * @param [in] targets    : Bitboard of possible destinations
          * @param [in] fromSquare : Starting square index
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
+         * @param [in] fromPiece  : Moving piece
          */
         void processTargets(const board::State& state, board::Bitboard& targets, const int fromSquare,
                             const core::MoveType moveType, const core::Piece fromPiece) noexcept;
@@ -115,7 +116,6 @@ namespace engine::game
          * @brief Generates legal Pawns moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generatePawnsMoves(const board::State& state) noexcept;
 
@@ -123,7 +123,6 @@ namespace engine::game
          * @brief Generates legal Knights moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateKnightsMoves(const board::State& state) noexcept;
 
@@ -131,7 +130,6 @@ namespace engine::game
          * @brief Generates legal Bishops moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateBishopsMoves(const board::State& state) noexcept;
 
@@ -139,7 +137,6 @@ namespace engine::game
          * @brief Generates legal Rooks moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateRooksMoves(const board::State& state) noexcept;
 
@@ -147,7 +144,6 @@ namespace engine::game
          * @brief Generates legal Queen moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateQueenMoves(const board::State& state) noexcept;
 
@@ -155,7 +151,6 @@ namespace engine::game
          * @brief Generates legal King moves.
          *
          * @param [in] state : The state to work with
-         * @param [in] color : Color to play
          */
         void generateKingMoves(const board::State& state) noexcept;
 
