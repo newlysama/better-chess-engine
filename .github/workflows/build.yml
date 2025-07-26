@@ -48,6 +48,7 @@ jobs:
         run: ninja -C build
 
       - name: Run Magic Generation
+      - run: |
           [[ "${{ matrix.generate_magics }}" == "true" ]]; then
             run ./build/src/main/chess
           fi
