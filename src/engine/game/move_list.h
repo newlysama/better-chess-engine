@@ -60,22 +60,6 @@ namespace engine::game
         bool contains(const game::Move& move) noexcept;
 
         /**
-         * @brief Make a move.
-         *
-         * @param [in] state : The state to make the move on
-         * @param [in] move  : The move to make
-         */
-        void makeMove(board::State& state, const game::Move& move) noexcept;
-
-        /**
-         * @brief Unmake a move.
-         *
-         * @param [in] state : The state to unmake the move on
-         * @param [in] move  : The move to unmake
-         */
-        void unmakeMove(board::State& state, const game::Move& move) noexcept;
-
-        /**
          * @brief Call each generation method to generate all legal moves.
          *
          * @param [in] state : The state to work with
@@ -155,7 +139,7 @@ namespace engine::game
         void generateKingMoves(const board::State& state) noexcept;
 
         game::Move _moves[256]; // Actual list of moves
-        int _size = 0;          // Current size of the list
+        std::size_t _size = 0;  // Current size of the list
     };
 } // namespace engine::game
 

@@ -229,7 +229,7 @@ namespace console_runner
                 move.value().setPromotionPiece(this->askPromotion());
             }
 
-            m_game.playMove(move.value());
+            m_game.makeMove<false>(move.value());
 
             // Print new state
             ConsoleUI::RenderState(m_game.m_state);
