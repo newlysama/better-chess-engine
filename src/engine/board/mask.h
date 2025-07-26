@@ -791,9 +791,15 @@ namespace engine::board
     }
     inline const core::BishopAttacksTable BISHOP_ATTACKS_TABLE = initBishopAttacksTable();
 
-    inline constexpr core::CastlingMasks CASTLING_MASKS = {
+    inline constexpr std::array<int, core::Castlings::CASTLINGS> CASTLING_TO_SQUARE = {6, 2, 62, 58};
+
+    inline constexpr core::CastlingMasks CASTLING_BETWEEN_MASKS = {
         Bitboard{(1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 1) | (1ULL << 2) | (1ULL << 3)},
         Bitboard{(1ULL << 61) | (1ULL << 62)}, Bitboard{(1ULL << 57) | (1ULL << 58) | (1ULL << 59)}};
+
+    inline constexpr core::CastlingMasks CASTLING_KING_PATH_MASKS = {
+        Bitboard{(1ULL << 4) | (1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 4) | (1ULL << 5) | (1ULL << 6)},
+        Bitboard{(1ULL << 60) | (1ULL << 61) | (1ULL << 62)}, Bitboard{(1ULL << 60) | (1ULL << 59) | (1ULL << 58)}};
 
 } // namespace engine::board
 
