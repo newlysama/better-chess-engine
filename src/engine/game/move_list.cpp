@@ -16,7 +16,7 @@
 #include "engine/board/mask.h"
 #include "logging/logging.h"
 
-#if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include "utils/enums_to_string.h"
 #include "utils/utils.h"
 #endif
@@ -34,7 +34,7 @@ namespace engine::game
     void MoveList::add(const Move& move) noexcept
     {
         // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
             assert(this->_size < 256);
         #endif
         // clang-format on
@@ -96,7 +96,7 @@ namespace engine::game
         }
 
         // clang-format off
-        #if !defined (BUILD_BENCHMARK) && !defined(BUILD_RELEASE)
+        #if !defined (BENCHMARK) && !defined(BUILD_RELEASE)
             if (targets.popCount() > 0)
             {
                 LOG_DEBUG("Generated {} {} {} legal moves",

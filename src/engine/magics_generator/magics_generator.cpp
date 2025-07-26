@@ -7,7 +7,7 @@
  * @brief Magic numbers generation implementation.
  */
 
-#include "engine/board/magics_generator.h"
+#include "engine/magics_generator/magics_generator.h"
 
 #include <array>
 #include <cstdint>
@@ -19,9 +19,10 @@
 #include "engine/board/mask.h"
 #include "logging/logging.h"
 
-namespace engine::board
+namespace engine::magics_generator
 {
     using namespace engine::core;
+    using namespace engine::board;
 
     Bitboard slidingAttackRook(const int square, const Bitboard occupancy) noexcept
     {
@@ -340,4 +341,4 @@ namespace engine::board
         std::cout << "};\n\n";
     }
 
-} // namespace engine::board
+} // namespace engine::magics_generator

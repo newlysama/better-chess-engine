@@ -13,7 +13,7 @@
 #include <bit>
 #include <cstdint>
 
-#if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include <print>
 
 #include "logging/logging.h"
@@ -223,7 +223,7 @@ namespace engine::game
         }
 
         // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
         inline void print() const noexcept
         {
             std::println("From    : {}", getFromSquare());

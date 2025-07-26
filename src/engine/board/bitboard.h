@@ -36,7 +36,7 @@ namespace engine::board
          *
          * @param [in] data : Value to initialize m_data member
          */
-        constexpr Bitboard(const uint64_t&& data = 0ULL) noexcept
+        constexpr Bitboard(const uint64_t& data = 0ULL) noexcept
             : m_data(data)
         {
         }
@@ -203,7 +203,7 @@ namespace engine::board
         inline constexpr int lsbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -219,7 +219,7 @@ namespace engine::board
         inline constexpr int msbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -233,7 +233,7 @@ namespace engine::board
         inline constexpr void popLsb() noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -247,7 +247,7 @@ namespace engine::board
         inline constexpr void popMsb() noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on

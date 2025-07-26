@@ -7,40 +7,84 @@
  * @brief Entry point of the program
  */
 
-#include "engine/game/game.h"
 #include "logging/logging.h"
-
-#if defined(GENERATE_MAGICS)
-#include "engine/board/magics_generator.h"
-#endif
+#include "main/options.h"
 
 #if defined(PLAY_CONSOLE)
 #include "main/console_runner/console_runner.h"
+
+#elif defined(PLAY_SERVER)
+// TODO: include your server header
+
+#elif defined(GENERATE_MAGICS)
+
+#include "engine/magics_generator/magics_generator.h"
+
 #endif
+
+/**
+ * @brief Run the program according to the defined options
+ *
+ * @param [in] options : processed user entered options
+ */
+
+static int run(const options::Options& opt)
+{
+#if defined(PLAY_CONSOLE)
+
+    auto fen = opt.perftFen;
+
+    console_runner::ConsoleRunner runner =
+        fen.has_value() ? console_runner::ConsoleRunner{fen.value()} : console_runner::ConsoleRunner{};
+
+    runner.runGame();
+
+    return 0;
+
+/*───────────────────────────────────────────────────────────────────────────*/
+#elif defined(PLAY_SERVER)
+
+    LOG_INFO("Starting server (not implemented yet)");
+    // TODO: server loop here
+    return 0;
+
+/*───────────────────────────────────────────────────────────────────────────*/
+#elif defined(GENERATE_MAGICS)
+
+    engine::magics_generator::initMagics();
+    return 0;
+
+/*───────────────────────────────────────────────────────────────────────────*/
+#elif defined(TEST)
+
+    LOG_INFO("Running tests (not implemented yet)");
+    // TODO: call your test framework
+    return 0;
+
+/*───────────────────────────────────────────────────────────────────────────*/
+#elif defined(BENCHMARK)
+
+    LOG_INFO("Running benchmarks (not implemented yet)");
+    // TODO: benchmark harness
+    return 0;
+#endif
+}
 
 int main(int argc, char* argv[])
 {
-    (void)argc;
-    (void)argv;
-
-    // Initialize logger
+    // Logger
     logging::init_logger();
 
-    // Init game
-    engine::game::Game game;
+    // Argument parsing
+    auto parsed = options::parse(argc, argv);
 
-#if defined(GENERATE_MAGICS)
-    engine::board::initMagics();
-#elif defined(PLAY_CONSOLE)
-    // BASE BOARD FEN : rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+    if (!parsed)
+    {
+        LOG_ERROR("Argument error: {}", parsed.error());
+        return EXIT_FAILURE;
+    }
 
-    std::string fenNotation = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    console_runner::ConsoleRunner runer{fenNotation};
-    runer.runGame();
-#else
-    LOG_INFO("DEFAULT BUILD");
-    return 0;
-#endif
-
-    return 0;
+    // Dispatch according to mode
+    const auto& options = parsed.value();
+    run(options);
 }
