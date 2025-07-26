@@ -11,6 +11,7 @@
 
 #include <exception>
 
+#include "engine/board/mask.h"
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
@@ -19,9 +20,8 @@ namespace engine::board
     using namespace engine::core;
 
     State::State() noexcept
-        : castlingRights((1 << Castlings::CASTLINGS) - 1)
-        , whitePinned{}
-        , blackPinned{}
+        : kingSquares{3, 60}
+        , pinnedPieces{}
         , allPieces{
             {// -- White pieces --
              {
@@ -232,30 +232,226 @@ namespace engine::board
                   utils::squareIndexToString(squareIndex));
     }
 
-    void State::getPinnedPieces(const core::Colors color) noexcept
-    {
-    }
-
-    void State::movePiece(const Colors color, const Pieces piece, const int fromSquare, const int toSquare) noexcept
+    void State::movePiece(const Pieces piece, const int fromSquare, const int toSquare) noexcept
     {
         // Keep track of the kings indices
-        if (fromSquare == this->whiteKingSquare)
+        if (piece == Pieces::KING)
         {
-            this->whiteKingSquare = toSquare;
-        }
-        else if (fromSquare == blackKingSquare)
-        {
-            this->blackKingSquare = toSquare;
+            this->kingSquares[this->sideToMove] = toSquare;
         }
 
-        this->unsetPiece(color, piece, fromSquare);
-        this->setPiece(color, piece, toSquare);
+        this->unsetPiece(this->sideToMove, piece, fromSquare);
+        this->setPiece(this->sideToMove, piece, toSquare);
 
         // If we move a rook or the king, check for castling rights removal
         this->checkCastlingRemoval(piece, fromSquare, toSquare);
 
-        LOG_INFO("Moved {} {} from {} to {}", utils::toString(color), utils::toString(piece),
+        LOG_INFO("Moved {} {} from {} to {}", utils::toString(this->sideToMove), utils::toString(piece),
                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(toSquare));
+    }
+
+    void State::computePinnedPieces() noexcept
+    {
+        // Clear the actuel pinned pieces bitboards
+        this->pinnedPieces[this->sideToMove].fill(Bitboard{0ULL});
+
+        const Colors enemyColor = this->sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+
+        // clang-format off
+        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+            int count = 0;
+        #endif
+        // clang-format on
+
+        for (int direction = 0; direction < Directions::DIRECTIONS; direction++)
+        {
+            // Get every piece on the ray, skip if ray is empty
+            Bitboard ray = RAY_MASKS[this->kingSquares[this->sideToMove]][direction] & this->generalOccupancy;
+            if (ray.isEmpty())
+            {
+                continue;
+            }
+
+            // Check if the direction makes at least 1 of the indices increase or not
+            bool isDirIncr = direction == Directions::NORTH || direction == Directions::EAST ||
+                             direction == Directions::NORTH_EAST || direction == Directions::NORTH_WEST;
+
+            // Check if the first piece on the ray is an ally, skip if not
+            int firstSquare = isDirIncr ? ray.lsbIndex() : ray.msbIndex();
+            if (this->coloredOccupancies[this->sideToMove].isSet(firstSquare) == false)
+            {
+                continue;
+            }
+
+            // Get every piece behind the first one, skip if there are none
+            Bitboard rayBehind = RAY_MASKS[firstSquare][direction] & this->generalOccupancy;
+            if (rayBehind.isEmpty())
+            {
+                continue;
+            }
+
+            // Check if first piece behind ally piece from
+            // first square is an enemy piece, skip if not
+            int enemySquare = isDirIncr ? rayBehind.lsbIndex() : rayBehind.msbIndex();
+            if (this->coloredOccupancies[enemyColor].isSet(enemySquare) == false)
+            {
+                continue;
+            }
+
+            bool isDirOrtho = direction == Directions::NORTH || direction == Directions::SOUTH ||
+                              direction == Directions::EAST || direction == Directions::WEST;
+
+            // clang-format off
+            // Check if enemy piece is a sliding piece that can move
+            // on the current ray given the current direction
+            Pieces enemyPiece = this->getPiece(enemyColor, enemySquare);
+            if (enemyPiece != Pieces::QUEEN)
+            {
+                if (isDirOrtho && enemyPiece != Pieces::ROOK)
+                {
+                    continue;
+                }
+
+                if (!isDirOrtho && enemyPiece != Pieces::BISHOP)
+                {
+                    continue;
+                }
+            }
+            // clang-format on
+
+            this->pinnedPieces[this->sideToMove][firstSquare] =
+                BETWEEN_MASKS[this->kingSquares[this->sideToMove]][enemySquare] | Bitboard{1ULL << enemySquare};
+
+            // clang-format off
+            #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+                count++;
+            #endif
+            // clang-format on
+        }
+
+        LOG_DEBUG("Computed {} {} pinned pieces", count, utils::toString(this->sideToMove));
+    }
+
+    void State::computeEnemyTargetedSquares() noexcept
+    {
+        const Colors enemyColor = this->sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+
+        // Restore checkers and blockSquares Bitboard
+        this->checkers = Bitboard{0ULL};
+        this->blockSquares = Bitboard{0ULL};
+
+        // Work on an occupancy where our King is removed,
+        // so that he doesn't block any target square
+        Bitboard occWithoutKing = this->generalOccupancy;
+        occWithoutKing.unset(this->kingSquares[this->sideToMove]);
+
+        // Reset the current Bitboard
+        this->enemyTargetedSquares = Bitboard{0ULL};
+
+        // Lambda that adds a checker and updates blockSquares if
+        // attacker is a sliding piece
+        auto addChecker = [&](const int attackerSquare, const bool isSlider) {
+            this->checkers.set(attackerSquare);
+
+            if (isSlider && checkers.popCount() == 1)
+            {
+                this->blockSquares = BETWEEN_MASKS[this->kingSquares[this->sideToMove]][attackerSquare];
+            }
+            else
+            {
+                this->blockSquares = Bitboard{0};
+            }
+        };
+
+        // Now computes every square under enemy pieces attack
+
+        // --- Pawns ---
+        Bitboard enemyPawns = this->allPieces[enemyColor][Pieces::PAWN];
+        while (enemyPawns.isEmpty() == false)
+        {
+            const int square = enemyPawns.lsbIndex();
+
+            enemyPawns.unset(square);
+            this->enemyTargetedSquares |= PAWN_CAPTURES_MASKS[enemyColor][square];
+
+            // Check if our king is targeted
+            if (PAWN_CAPTURES_MASKS[enemyColor][square].isSet(this->kingSquares[this->sideToMove]))
+            {
+                addChecker(square, false);
+            }
+        }
+
+        // --- Knights ---
+        Bitboard enemyKnights = this->allPieces[enemyColor][Pieces::KNIGHT];
+        while (enemyKnights.isEmpty() == false)
+        {
+            const int square = enemyKnights.lsbIndex();
+            enemyKnights.unset(square);
+            this->enemyTargetedSquares |= KNIGHT_ATTACKS_MASKS[square];
+
+            // Check if our king is targeted
+            if (KNIGHT_ATTACKS_MASKS[square].isSet(this->kingSquares[this->sideToMove]))
+            {
+                addChecker(square, false);
+            }
+        }
+
+        // --- Rook ---
+        Bitboard rooks = this->allPieces[enemyColor][Pieces::ROOK] | this->allPieces[enemyColor][Pieces::QUEEN];
+        while (rooks.isEmpty() == false)
+        {
+            const int square = rooks.lsbIndex();
+            Bitboard relevantOcc = occWithoutKing & ROOK_RELEVANT_MASKS[square];
+
+            // Index the attack table using magic bitboards
+            size_t magicIndex = (relevantOcc.getData() * rookMagics[square].getData()) >> rookShifts[square];
+
+            rooks.unset(square);
+            this->enemyTargetedSquares |= ROOK_ATTACKS_TABLE[square][magicIndex];
+
+            // Check if our king is targeted
+            if (ROOK_ATTACKS_TABLE[square][magicIndex].isSet(this->kingSquares[this->sideToMove]))
+            {
+                addChecker(square, true);
+            }
+        }
+
+        // --- Bishop ---
+        Bitboard bishops = this->allPieces[enemyColor][Pieces::BISHOP] | this->allPieces[enemyColor][Pieces::QUEEN];
+        while (bishops.isEmpty() == false)
+        {
+            const int square = bishops.lsbIndex();
+            Bitboard relevantOcc = occWithoutKing & BISHOP_RELEVANT_MASKS[square];
+
+            // Index the attack table using magic bitboards
+            size_t magicIndex = (relevantOcc.getData() * bishopMagics[square].getData()) >> bishopShifts[square];
+
+            bishops.unset(square);
+            this->enemyTargetedSquares |= BISHOP_ATTACKS_TABLE[square][magicIndex];
+
+            // Check if our king is targeted
+            if (BISHOP_ATTACKS_TABLE[square][magicIndex].isSet(this->kingSquares[this->sideToMove]))
+            {
+                addChecker(square, true);
+            }
+        }
+
+        const int enemyKingSq = this->kingSquares[enemyColor];
+        this->enemyTargetedSquares |= KING_ATTACKS_MASKS[enemyKingSq];
+
+        // Check if our king is targeted
+        if (KING_ATTACKS_MASKS[enemyKingSq].isSet(this->kingSquares[this->sideToMove]))
+        {
+            addChecker(enemyKingSq, false);
+        }
+
+        // Update check states
+        uint8_t numCheckers = this->checkers.popCount();
+        this->isChecked = (numCheckers >= 1);
+        this->isDoubleChecked = (numCheckers >= 2);
+
+        LOG_DEBUG("Computed {} targeted squares from {} team", this->enemyTargetedSquares.popCount(),
+                  utils::toString(enemyColor));
     }
 
 } // namespace engine::board

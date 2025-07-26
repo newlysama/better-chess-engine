@@ -154,13 +154,6 @@ namespace engine::board
         void unsetPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
 
         /**
-         * @brief Fill color's corresponding pinned pieces mask.
-         *
-         * @param color : color to look for
-         */
-        void getPinnedPieces(const core::Colors color) noexcept;
-
-        /**
          * @brief Move a given piece.
          *
          * @param [in] color      : Team to move the piece from
@@ -168,23 +161,42 @@ namespace engine::board
          * @param [in] fromSquare : Square to move the piece from
          * @param [in] toSquare   : Square to move the piece to
          */
-        void movePiece(const core::Colors color, const core::Pieces piece, const int fromSquare,
-                       const int toSquare) noexcept;
+        void movePiece(const core::Pieces piece, const int fromSquare, const int toSquare) noexcept;
+
+        /**
+         * @brief Computes all current side to move bitboards of
+         * pinned pieces allowed destinations.
+         */
+        void computePinnedPieces() noexcept;
+
+        /**
+         * @brief Computes the squares targeted by enemy moves, and
+         * updates the infos relative to king's check and double check states.
+         */
+        void computeEnemyTargetedSquares() noexcept;
+
+        /*****************************************
+         *               ATTRIBUTES              *
+         *****************************************/
 
         uint16_t halfMoveClock = 0;                    // Half move counter
         uint16_t fullMoveClock = 1;                    // Full move counter
         core::Colors sideToMove = core::Colors::WHITE; // Whose turn is it ? :)
-        core::CastlingRights castlingRights;           // Informations about enabled castlings.
+
+        // Informations about enabled castlings
+        core::CastlingRights castlingRights = (1 << core::Castlings::CASTLINGS) - 1;
 
         int enPassantSquare = -1; // When En Passant is enabled, this var is set
 
-        // Default starting square for kings
-        int whiteKingSquare = 3;
-        int blackKingSquare = 60;
+        core::KingSquares kingSquares; // Default starting square for kings
+        bool isChecked = false;        // Check state for the current king
+        bool isDoubleChecked = false;  // Double check state for the current king
+        bool isCheckMate = false;      // GAME OVER BABY
 
-        // Maintain bitboards for each pinned piece
-        core::BitboardTable whitePinned;
-        core::BitboardTable blackPinned;
+        core::PinnedPieces pinnedPieces;        // Bitboards of available destinations for each pinned piece
+        Bitboard enemyTargetedSquares;          // Squares targeted by enemy moves
+        Bitboard checkers = Bitboard{0ULL};     // Bitboard of pieces that put the current king in check
+        Bitboard blockSquares = Bitboard{0ULL}; // Bitboard of squares that block a king's check from sliding pieces
 
         core::PiecesBitboards allPieces;             // Occupancy for each team and each piece
         Bitboard generalOccupancy;                   // Occupancy for all pieces
@@ -281,14 +293,7 @@ namespace engine::board
                         // Set the king's square
                         if (pair.second == core::Pieces::KING)
                         {
-                            if (pair.first == core::Colors::WHITE)
-                            {
-                                this->whiteKingSquare = square;
-                            }
-                            else
-                            {
-                                this->blackKingSquare = square;
-                            }
+                            this->kingSquares[pair.first] = square;
                         }
 
                         file++;
