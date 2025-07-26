@@ -3,11 +3,10 @@ name: better-chess-ci
 on:
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -18,25 +17,20 @@ jobs:
         exclude:
           - console: true
             generate_magics: true
+          - mode: release
+            generate_magics: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Install build tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y ccache meson ninja-build clang build-essential libspdlog-dev libopenmpt-dev
-          echo "CC='ccache clang'"    >> $GITHUB_ENV
-          echo "CXX='ccache clang++'" >> $GITHUB_ENV
+          sudo apt-get install -y meson ninja-build clang-19 lld-19 g++-14 build-essential libspdlog-dev libomp-19-dev
 
-      # Caching
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/ccache
-            ~/.cache/meson
-          key: ${{ runner.os }}-${{ matrix.mode }}-${{ matrix.console }}-${{ matrix.generate_magics }}-v1
+          echo "CC='clang-19'"    >> $GITHUB_ENV
+          echo "CXX='clang++-19'" >> $GITHUB_ENV
 
-      - name: Configure
+      - name: Meson Setup
         run: |
           opts="-Dmode=${{ matrix.mode }}"
           if [[ "${{ matrix.console }}" == "true" ]]; then
@@ -47,5 +41,11 @@ jobs:
           fi
           meson setup build $opts
 
-      - name: Build
+      - name: Ninja Build
         run: ninja -C build
+
+      - name: Run Magic Generation
+        run: |
+          if [[ "${{ matrix.generate_magics }}" == "true" ]]; then
+            ./build/src/main/chess
+          fi
