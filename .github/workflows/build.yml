@@ -3,6 +3,7 @@ name: better-chess-ci
 on:
   pull_request:
     branches: [ main ]
+
   workflow_dispatch:
 
 jobs:
@@ -24,17 +25,9 @@ jobs:
       - name: Install build tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y ccache meson ninja-build clang build-essential libspdlog-dev libopenmpt-dev
-          echo "CC='ccache clang'"    >> $GITHUB_ENV
-          echo "CXX='ccache clang++'" >> $GITHUB_ENV
-
-      # Caching
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/ccache
-            ~/.cache/meson
-          key: ${{ runner.os }}-${{ matrix.mode }}-${{ matrix.console }}-${{ matrix.generate_magics }}-v1
+          sudo apt-get install -y meson ninja-build clang build-essential libspdlog-dev libopenmpt-dev
+          echo "CC='clang'"    >> $GITHUB_ENV
+          echo "CXX='clang++'" >> $GITHUB_ENV
 
       - name: Configure
         run: |
