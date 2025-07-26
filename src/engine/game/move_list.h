@@ -92,7 +92,7 @@ namespace engine::game
          * @param [in] moveType   : Type of move (Capture, Quiet, etc...)
          */
         void processTargets(const board::State& state, board::Bitboard& targets, const int fromSquare,
-                            const core::MoveTypes moveType, const core::Pieces fromPiece) noexcept;
+                            const core::MoveType moveType, const core::Piece fromPiece) noexcept;
 
         /**
          * @brief If castling enabled, add the corresponding move to the movelist.
@@ -100,7 +100,7 @@ namespace engine::game
          * @param [in] state      : Current state of the board
          * @param [in] fromSquare : Current king square
          */
-        template <core::Castlings C>
+        template <core::Castling C>
         void getCastlingMoves(const board::State& state, int fromSquare) noexcept;
 
         /**

@@ -45,7 +45,7 @@ namespace ui::console
          * @param [in] piece : piece to get
          * @return std::string : the colored piece string
          */
-        static std::string getColoredPiece(engine::core::Colors color, engine::core::Pieces piece) noexcept;
+        static std::string getColoredPiece(engine::core::Color color, engine::core::Piece piece) noexcept;
 
         /**
          * @brief Look through m_piecesBB bitboard to get the piece on a specific square.
@@ -82,7 +82,7 @@ namespace ui::console
         static constexpr std::string_view RED = "\033[31m";
         static constexpr std::string_view GREEN = "\033[32m";
 
-        static constexpr std::string_view FILES = "A     B     C     D     E     F     G     H";
+        static constexpr std::string_view N_FILES = "A     B     C     D     E     F     G     H";
 
         static constexpr std::string_view TOP_LINE = "┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐";
 
@@ -92,7 +92,7 @@ namespace ui::console
 
         static constexpr std::string_view BORDER = "│";
 
-        static constexpr std::array<std::string_view, engine::core::Pieces::PIECES> pieceSymbol = {
+        static constexpr std::array<std::string_view, engine::core::Piece::N_PIECES> pieceSymbol = {
             "", "", "󰡜", "󰡛", "󰡚", "󰡗"};
 
         static constexpr std::string_view RANK_INDENT = "            ";

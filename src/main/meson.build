@@ -1,4 +1,4 @@
-#- Source Files -#
+#- Source File -#
 app_src = files('main.cpp')
 
 #- Include Dirs -#

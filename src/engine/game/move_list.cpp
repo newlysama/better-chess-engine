@@ -70,12 +70,12 @@ namespace engine::game
         return false;
     }
 
-    void MoveList::processTargets(const State& state, Bitboard& targets, const int fromSquare, const MoveTypes moveType,
-                                  const Pieces fromPiece) noexcept
+    void MoveList::processTargets(const State& state, Bitboard& targets, const int fromSquare, const MoveType moveType,
+                                  const Piece fromPiece) noexcept
     {
         // Filter pinned pieces moves
         Bitboard pinnedTargets = state.m_pinnedBB[state.m_sideToMove][fromSquare];
-        if (pinnedTargets.isEmpty() == false && fromPiece != Pieces::KING)
+        if (pinnedTargets.isEmpty() == false && fromPiece != Piece::KING)
         {
             targets &= pinnedTargets;
         }
@@ -85,11 +85,11 @@ namespace engine::game
         // square that block checking sliding pieces (if any)
         if (state.m_isChecked)
         {
-            if (moveType == MoveTypes::CAPTURE)
+            if (moveType == MoveType::CAPTURE)
             {
                 targets &= state.m_checkersBB;
             }
-            else if (fromPiece != Pieces::KING)
+            else if (fromPiece != Piece::KING)
             {
                 targets &= state.m_blockersBB;
             }
@@ -110,7 +110,7 @@ namespace engine::game
         }
     }
 
-    template <Castlings Castling>
+    template <Castling Castling>
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
@@ -127,7 +127,7 @@ namespace engine::game
         if ((state.m_targetsBB & CASTLING_KING_PATH_MASKS[Castling]).getData() != 0ULL)
             return;
 
-        Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveTypes::CASTLE, Pieces::KING, Castling};
+        Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveType::CASTLE, Piece::KING, Castling};
         this->add(std::move(castle));
 
         LOG_DEBUG("Generated {} legal move", utils::toString(Castling));
@@ -137,8 +137,8 @@ namespace engine::game
     {
         int rankFrom = State::getRankIndex(fromSquare);
 
-        if (!((state.m_sideToMove == Colors::WHITE && rankFrom == 4) ||
-              (state.m_sideToMove == Colors::BLACK && rankFrom == 3)))
+        if (!((state.m_sideToMove == Color::WHITE && rankFrom == 4) ||
+              (state.m_sideToMove == Color::BLACK && rankFrom == 3)))
         {
             return;
         }
@@ -151,14 +151,14 @@ namespace engine::game
         }
 
         // Check that enPassant doesn't leave our king in check
-        int capturedSquare = state.m_sideToMove == Colors::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8;
+        int capturedSquare = state.m_sideToMove == Color::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8;
         if (State::getRankIndex(state.m_kgSquares[state.m_sideToMove]) == State::getRankIndex(capturedSquare))
         {
-            Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+            Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
             // Get enemy Rooks and Queens that are on the same rank than our king
-            Bitboard attackers = state.m_piecesBB[enemyColor][Pieces::ROOK] |
-                                 state.m_piecesBB[enemyColor][Pieces::QUEEN] &
+            Bitboard attackers = state.m_piecesBB[enemyColor][Piece::ROOK] |
+                                 state.m_piecesBB[enemyColor][Piece::QUEEN] &
                                      RANKS_MASKS[State::getRankIndex(state.m_kgSquares[state.m_sideToMove])];
 
             while (attackers.isEmpty() == false)
@@ -179,7 +179,7 @@ namespace engine::game
             }
         }
 
-        Move enPassant{fromSquare, state.m_epSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
+        Move enPassant{fromSquare, state.m_epSquare, MoveType::EN_PASSANT, Piece::PAWN};
         this->add(std::move(enPassant));
 
         LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
@@ -191,9 +191,9 @@ namespace engine::game
      */
     void MoveList::generatePawnsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard pawns = state.m_piecesBB[state.m_sideToMove][Pieces::PAWN];
+        Bitboard pawns = state.m_piecesBB[state.m_sideToMove][Piece::PAWN];
 
         // While there is bits set to 1
         while (pawns.getData())
@@ -211,8 +211,8 @@ namespace engine::game
             Bitboard captureTargets =
                 PAWN_CAPTURES_MASKS[state.m_sideToMove][fromSquare] & state.m_teamsOccBB[enemyColor];
 
-            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::PAWN);
-            this->processTargets(state, pushTargets, fromSquare, MoveTypes::QUIET, Pieces::PAWN);
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::PAWN);
+            this->processTargets(state, pushTargets, fromSquare, MoveType::QUIET, Piece::PAWN);
 
             // Generate double pushes if the square between start and dest is empty
             if ((PAWN_PUSHES_MASKS[state.m_sideToMove][fromSquare] & state.m_allOccBB) == 0)
@@ -220,7 +220,7 @@ namespace engine::game
                 Bitboard doublePushTargets =
                     PAWN_DOUBLE_PUSHES_MASKS[state.m_sideToMove][fromSquare] & ~state.m_allOccBB;
 
-                this->processTargets(state, doublePushTargets, fromSquare, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
+                this->processTargets(state, doublePushTargets, fromSquare, MoveType::DOUBLE_PUSH, Piece::PAWN);
             }
 
             // Generate enPassant if enabled
@@ -233,9 +233,9 @@ namespace engine::game
 
     void MoveList::generateKnightsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard knights = state.m_piecesBB[state.m_sideToMove][Pieces::KNIGHT];
+        Bitboard knights = state.m_piecesBB[state.m_sideToMove][Piece::KNIGHT];
 
         // While there is bits set to 1
         while (knights.getData())
@@ -255,16 +255,16 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
-            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KNIGHT);
-            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KNIGHT);
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KNIGHT);
+            this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::KNIGHT);
         }
     }
 
     void MoveList::generateRooksMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard rooks = state.m_piecesBB[state.m_sideToMove][Pieces::ROOK];
+        Bitboard rooks = state.m_piecesBB[state.m_sideToMove][Piece::ROOK];
 
         // While there is bits set to 1
         while (rooks.getData())
@@ -289,16 +289,16 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
-            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::ROOK);
-            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::ROOK);
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::ROOK);
+            this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::ROOK);
         }
     }
 
     void MoveList::generateBishopsMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard bishops = state.m_piecesBB[state.m_sideToMove][Pieces::BISHOP];
+        Bitboard bishops = state.m_piecesBB[state.m_sideToMove][Piece::BISHOP];
 
         // While there is bits set to 1
         while (bishops.getData())
@@ -324,16 +324,16 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
-            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::BISHOP);
-            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::BISHOP);
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::BISHOP);
+            this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::BISHOP);
         }
     }
 
     void MoveList::generateQueenMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard queen = state.m_piecesBB[state.m_sideToMove][Pieces::QUEEN];
+        Bitboard queen = state.m_piecesBB[state.m_sideToMove][Piece::QUEEN];
 
         // While there is bits set to 1
         // Remember that thank's to promotions, we can have several queens alive
@@ -363,16 +363,16 @@ namespace engine::game
             Bitboard quietTargets = targets & ~state.m_teamsOccBB[enemyColor];
             Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
-            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
-            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::QUEEN);
+            this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::QUEEN);
         }
     }
 
     void MoveList::generateKingMoves(const State& state) noexcept
     {
-        Colors enemyColor = state.m_sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        Bitboard king = state.m_piecesBB[state.m_sideToMove][Pieces::KING];
+        Bitboard king = state.m_piecesBB[state.m_sideToMove][Piece::KING];
 
         // Extract king's index
         int fromSquare = king.lsbIndex();
@@ -384,19 +384,19 @@ namespace engine::game
         Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
         // Generate Castling targets
-        if (state.m_sideToMove == Colors::WHITE)
+        if (state.m_sideToMove == Color::WHITE)
         {
-            getCastlingMoves<Castlings::WHITE_KING_SIDE>(state, fromSquare);
-            getCastlingMoves<Castlings::WHITE_QUEEN_SIDE>(state, fromSquare);
+            getCastlingMoves<Castling::WHITE_KING_SIDE>(state, fromSquare);
+            getCastlingMoves<Castling::WHITE_QUEEN_SIDE>(state, fromSquare);
         }
         else
         {
-            getCastlingMoves<Castlings::BLACK_KING_SIDE>(state, fromSquare);
-            getCastlingMoves<Castlings::BLACK_QUEEN_SIDE>(state, fromSquare);
+            getCastlingMoves<Castling::BLACK_KING_SIDE>(state, fromSquare);
+            getCastlingMoves<Castling::BLACK_QUEEN_SIDE>(state, fromSquare);
         }
 
-        this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KING);
-        this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KING);
+        this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KING);
+        this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::KING);
     }
 
     void MoveList::generateAllMoves(State& state) noexcept

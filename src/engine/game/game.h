@@ -58,7 +58,7 @@ namespace engine::game
          * @param [in] move       : capture move
          * @param [in] enemyColor : enemy color
          */
-        void makeCapture(const game::Move& move, const core::Colors enemyColor) noexcept;
+        void makeCapture(const game::Move& move, const core::Color enemyColor) noexcept;
 
         /**
          * @brief Special function make castling move.
@@ -73,7 +73,7 @@ namespace engine::game
          * @param [in] move       : the enPassant move
          * @param [in] enemyColor : color of the captured piece
          */
-        void makeEnPassant(const game::Move& move, const core::Colors enemyColor) noexcept;
+        void makeEnPassant(const game::Move& move, const core::Color enemyColor) noexcept;
 
         /**
          * @brief Asks user for promotion option and perform it.
@@ -88,7 +88,7 @@ namespace engine::game
          * @param [in] move       : the played move
          * @param [in] enemyColor : next team to play
          */
-        void update(const game::Move& move, const core::Colors enemyColor) noexcept;
+        void update(const game::Move& move, const core::Color enemyColor) noexcept;
     };
 
 } // namespace engine::game

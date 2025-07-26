@@ -78,10 +78,10 @@ namespace console_runner
         }
     }
 
-    Pieces ConsoleRunner::askPromotion() const noexcept
+    Piece ConsoleRunner::askPromotion() const noexcept
     {
         std::string promotion;
-        Pieces piece;
+        Piece piece;
 
         std::print("Select a promotion type (lowercase piece name): ");
 
@@ -90,7 +90,7 @@ namespace console_runner
             std::cin >> promotion;
             piece = utils::fromString(promotion);
 
-            if (piece == Pieces::UNKNOWN_PIECE || piece == Pieces::KING || piece == Pieces::PAWN) [[unlikely]]
+            if (piece == Piece::UNKNOWN_PIECE || piece == Piece::KING || piece == Piece::PAWN) [[unlikely]]
             {
                 LOG_INFO("User entered non existing piece: {}", promotion);
                 std::print("Please enter a valid piece (queen, rook, bishop or knight): ");
@@ -236,7 +236,7 @@ namespace console_runner
 
             if (this->game.state.m_isCheckMate)
             {
-                Colors winner = Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+                Color winner = Color::WHITE ? Color::BLACK : Color::WHITE;
                 LOG_INFO("{} team won the game.", utils::toString(winner));
                 std::println("{} team won the game !", utils::toString(winner));
 

@@ -1,4 +1,4 @@
-#- Source Files -#
+#- Source File -#
 logging_src = files('logging.cpp')
 
 #- Include Dirs -#

@@ -22,13 +22,13 @@ namespace engine::core
      * @typedef PieceBoards
      * @brief   2x6 array holding each piece's bitboards from each team.
      */
-    typedef std::array<std::array<board::Bitboard, Pieces::PIECES>, Colors::COLORS> PiecesBitboards;
+    typedef std::array<std::array<board::Bitboard, Piece::N_PIECES>, Color::N_COLORS> PiecesBitboards;
 
     /**
      * @typedef ColoredOccupancies
      * @brief   1x2 array holding each team's occupancy.
      */
-    typedef std::array<board::Bitboard, Colors::COLORS> ColoredOccupancies;
+    typedef std::array<board::Bitboard, Color::N_COLORS> ColoredOccupancies;
 
     /**
      * @typedef CastlingRights
@@ -49,13 +49,13 @@ namespace engine::core
      * @typedef BorderFilesMasks
      * @brief   1x8 array holding each file's mask.
      */
-    typedef std::array<board::Bitboard, Files::FILES> FilesMasks;
+    typedef std::array<board::Bitboard, File::N_FILES> FilesMasks;
 
     /**
      * @typedef RanksMasks
      * @brief   1x8 array holding each rank's mask.
      */
-    typedef std::array<board::Bitboard, Ranks::RANKS> RanksMasks;
+    typedef std::array<board::Bitboard, Rank::N_RANKS> RanksMasks;
 
     /**
      * @typedef DiagonalMasks
@@ -67,7 +67,7 @@ namespace engine::core
      * @typedef RayMasks
      * @brief   64x8 array holding each ray mask for each direction from each square.
      */
-    typedef std::array<std::array<board::Bitboard, Directions::DIRECTIONS>, 64> RayMasks;
+    typedef std::array<std::array<board::Bitboard, Direction::N_DIRECTIONS>, 64> RayMasks;
 
     /**
      * @typedef BitboardTable
@@ -79,7 +79,7 @@ namespace engine::core
      * @typedef CastlingMasks
      * @brief   1x4 array holding each castling right's mask (e.g., White King-side, White Queen-side, ...).
      */
-    typedef std::array<board::Bitboard, Castlings::CASTLINGS> CastlingMasks;
+    typedef std::array<board::Bitboard, Castling::N_CASTLINGS> CastlingMasks;
 
     /**
      * @typedef BetweenMasks
@@ -91,14 +91,14 @@ namespace engine::core
      * @typedef KingSquares
      * @brief   1x2 array holding each king's square index.
      */
-    typedef std::array<int, core::Colors::COLORS> KingSquares;
+    typedef std::array<int, core::Color::N_COLORS> KingSquares;
 
     /**
      * @typedef PinnedPieces
      * @brief   2x64 array holding each team's pinned pieces bitboards
      *          of allowed destination squares.
      */
-    typedef std::array<core::BitboardTable, core::Colors::COLORS> PinnedPieces;
+    typedef std::array<core::BitboardTable, core::Color::N_COLORS> PinnedPieces;
 
     /*----------------------------------*
      *      SLIDING ATTACK TABLES       *

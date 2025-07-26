@@ -41,40 +41,40 @@ namespace utils
      * @brief Given a char used in FEN notation to represent a piece, return a pair Color - Piece.
      *
      * @param [in] c : char to check
-     * @return std::pair<Colors, Pieces> : the according pair
+     * @return std::pair<Color, Piece> : the according pair
      */
-    inline std::pair<engine::core::Colors, engine::core::Pieces> fenCharToPiece(const char c) noexcept
+    inline std::pair<engine::core::Color, engine::core::Piece> fenCharToPiece(const char c) noexcept
     {
         using namespace engine::core;
 
         switch (c)
         {
         case 'p':
-            return {Colors::BLACK, Pieces::PAWN};
+            return {Color::BLACK, Piece::PAWN};
         case 'n':
-            return {Colors::BLACK, Pieces::KNIGHT};
+            return {Color::BLACK, Piece::KNIGHT};
         case 'r':
-            return {Colors::BLACK, Pieces::ROOK};
+            return {Color::BLACK, Piece::ROOK};
         case 'b':
-            return {Colors::BLACK, Pieces::BISHOP};
+            return {Color::BLACK, Piece::BISHOP};
         case 'q':
-            return {Colors::BLACK, Pieces::QUEEN};
+            return {Color::BLACK, Piece::QUEEN};
         case 'k':
-            return {Colors::BLACK, Pieces::KING};
+            return {Color::BLACK, Piece::KING};
         case 'P':
-            return {Colors::WHITE, Pieces::PAWN};
+            return {Color::WHITE, Piece::PAWN};
         case 'N':
-            return {Colors::WHITE, Pieces::KNIGHT};
+            return {Color::WHITE, Piece::KNIGHT};
         case 'R':
-            return {Colors::WHITE, Pieces::ROOK};
+            return {Color::WHITE, Piece::ROOK};
         case 'B':
-            return {Colors::WHITE, Pieces::BISHOP};
+            return {Color::WHITE, Piece::BISHOP};
         case 'Q':
-            return {Colors::WHITE, Pieces::QUEEN};
+            return {Color::WHITE, Piece::QUEEN};
         case 'K':
-            return {Colors::WHITE, Pieces::KING};
+            return {Color::WHITE, Piece::KING};
         default:
-            return {Colors::UNKNOWN_COLOR, Pieces::UNKNOWN_PIECE};
+            return {Color::UNKNOWN_COLOR, Piece::UNKNOWN_PIECE};
         }
     }
 } // namespace utils

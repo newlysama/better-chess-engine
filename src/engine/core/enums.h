@@ -16,7 +16,7 @@ namespace engine::core
      * @enum  Piece
      * @brief Enum of pieces types.
      */
-    enum Pieces
+    enum Piece
     {
         PAWN = 0,
         KNIGHT = 1,
@@ -24,27 +24,27 @@ namespace engine::core
         ROOK = 3,
         QUEEN = 4,
         KING = 5,
-        PIECES = 6,
+        N_PIECES = 6,
         UNKNOWN_PIECE = 255
     };
 
     /**
-     * @enum  Colors
+     * @enum  Color
      * @brief Enum of teams.
      */
-    enum Colors
+    enum Color
     {
         WHITE = 0,
         BLACK = 1,
-        COLORS = 2,
+        N_COLORS = 2,
         UNKNOWN_COLOR = 255
     };
 
     /**
-     * @enum  Ranks
+     * @enum  Rank
      * @brief Enum of board's ranks.
      */
-    enum Ranks
+    enum Rank
     {
         RANK_1 = 0,
         RANK_2 = 1,
@@ -54,15 +54,15 @@ namespace engine::core
         RANK_6 = 5,
         RANK_7 = 6,
         RANK_8 = 7,
-        RANKS = 8,
+        N_RANKS = 8,
         UNKNOWN_RANK = 255
     };
 
     /**
-     * @enum  Files
+     * @enum  File
      * @brief Enum of board's files.
      */
-    enum Files
+    enum File
     {
         FILE_A = 0,
         FILE_B = 1,
@@ -72,15 +72,15 @@ namespace engine::core
         FILE_F = 5,
         FILE_G = 6,
         FILE_H = 7,
-        FILES = 8,
+        N_FILES = 8,
         UNKNOWN_FILE = 255
     };
 
     /**
-     * @enum  Directions
+     * @enum  Direction
      * @brief Enum of possible moves directions.
      */
-    enum Directions
+    enum Direction
     {
         NORTH = 0,
         SOUTH = 1,
@@ -90,16 +90,16 @@ namespace engine::core
         NORTH_WEST = 5,
         SOUTH_EAST = 6,
         SOUTH_WEST = 7,
-        DIRECTIONS = 8,
+        N_DIRECTIONS = 8,
         UNKNOWN_DIRECTION = 255
     };
 
     /**
-     * @enum SpecialDirections
+     * @enum SpecialDirection
      * @brief Enum of special directions for
      * pawns double push / knight moves.
      */
-    enum SpecialDirections
+    enum SpecialDirection
     {
         // Pawn specific dirs
         NORTH_NORTH = 0,
@@ -114,15 +114,15 @@ namespace engine::core
         WSW = 7,
         WNW = 8,
         NNW = 9,
-        SPECIAL_DIRS = 10,
+        N_SPECIAL_DIRS = 10,
         UNKNOWN_SPECIAL_DIR = 255
     };
 
     /**
-     * @enum MoveTypes
+     * @enum MoveType
      * @brief Enum of possible move types.
      */
-    enum MoveTypes
+    enum MoveType
     {
         QUIET = 0,
         CAPTURE = 1,
@@ -130,21 +130,21 @@ namespace engine::core
         CASTLE = 3,
         DOUBLE_PUSH = 4,
         EN_PASSANT = 5,
-        MOVE_TYPES = 6,
+        N_MOVE_TYPES = 6,
         UNKNOWN_MOVE_TYPE = 255
     };
 
     /**
-     * @enum Castlings
+     * @enum Castling
      * @brief Enum of castlings options.
      */
-    enum Castlings
+    enum Castling
     {
         WHITE_KING_SIDE = 0,
         WHITE_QUEEN_SIDE = 1,
         BLACK_KING_SIDE = 2,
         BLACK_QUEEN_SIDE = 3,
-        CASTLINGS = 4,
+        N_CASTLINGS = 4,
         UNKNOWN_CASTLING = 255
     };
 } // namespace engine::core

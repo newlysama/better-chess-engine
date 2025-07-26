@@ -16,215 +16,215 @@
 
 namespace utils
 {
-    inline constexpr std::string_view toString(engine::core::Pieces v) noexcept
+    inline constexpr std::string_view toString(engine::core::Piece v) noexcept
     {
         switch (v)
         {
-        case engine::core::Pieces::PAWN:
+        case engine::core::Piece::PAWN:
             return "PAWN";
-        case engine::core::Pieces::KNIGHT:
+        case engine::core::Piece::KNIGHT:
             return "KNIGHT";
-        case engine::core::Pieces::BISHOP:
+        case engine::core::Piece::BISHOP:
             return "BISHOP";
-        case engine::core::Pieces::ROOK:
+        case engine::core::Piece::ROOK:
             return "ROOK";
-        case engine::core::Pieces::QUEEN:
+        case engine::core::Piece::QUEEN:
             return "QUEEN";
-        case engine::core::Pieces::KING:
+        case engine::core::Piece::KING:
             return "KING";
-        case engine::core::Pieces::PIECES:
+        case engine::core::Piece::N_PIECES:
             return "6";
-        case engine::core::Pieces::UNKNOWN_PIECE:
+        case engine::core::Piece::UNKNOWN_PIECE:
             return "UNKNOWN_PIECE";
         }
         return "UNKNOWN_PIECE";
     }
 
-    inline constexpr engine::core::Pieces fromString(std::string_view s) noexcept
+    inline constexpr engine::core::Piece fromString(std::string_view s) noexcept
     {
         using namespace engine::core;
-        return (s == "pawn")   ? Pieces::PAWN
-             : (s == "knight") ? Pieces::KNIGHT
-             : (s == "bishop") ? Pieces::BISHOP
-             : (s == "rook")   ? Pieces::ROOK
-             : (s == "queen")  ? Pieces::QUEEN
-             : (s == "king")   ? Pieces::KING
-             : (s == "pieces") ? Pieces::PIECES
-                               : Pieces::UNKNOWN_PIECE;
+        return (s == "pawn")   ? Piece::PAWN
+             : (s == "knight") ? Piece::KNIGHT
+             : (s == "bishop") ? Piece::BISHOP
+             : (s == "rook")   ? Piece::ROOK
+             : (s == "queen")  ? Piece::QUEEN
+             : (s == "king")   ? Piece::KING
+             : (s == "pieces") ? Piece::N_PIECES
+                               : Piece::UNKNOWN_PIECE;
     }
 
-    inline constexpr std::string_view toString(engine::core::Colors v) noexcept
+    inline constexpr std::string_view toString(engine::core::Color v) noexcept
     {
         switch (v)
         {
-        case engine::core::Colors::WHITE:
+        case engine::core::Color::WHITE:
             return "WHITE";
-        case engine::core::Colors::BLACK:
+        case engine::core::Color::BLACK:
             return "BLACK";
-        case engine::core::Colors::COLORS:
+        case engine::core::Color::N_COLORS:
             return "2";
-        case engine::core::Colors::UNKNOWN_COLOR:
+        case engine::core::Color::UNKNOWN_COLOR:
             return "UNKNOWN_COLOR";
         }
         return "UNKNOWN_COLOR";
     }
 
-    inline constexpr std::string_view toString(engine::core::Ranks v) noexcept
+    inline constexpr std::string_view toString(engine::core::Rank v) noexcept
     {
         switch (v)
         {
-        case engine::core::Ranks::RANK_1:
+        case engine::core::Rank::RANK_1:
             return "RANK_1";
-        case engine::core::Ranks::RANK_2:
+        case engine::core::Rank::RANK_2:
             return "RANK_2";
-        case engine::core::Ranks::RANK_3:
+        case engine::core::Rank::RANK_3:
             return "RANK_3";
-        case engine::core::Ranks::RANK_4:
+        case engine::core::Rank::RANK_4:
             return "RANK_4";
-        case engine::core::Ranks::RANK_5:
+        case engine::core::Rank::RANK_5:
             return "RANK_5";
-        case engine::core::Ranks::RANK_6:
+        case engine::core::Rank::RANK_6:
             return "RANK_6";
-        case engine::core::Ranks::RANK_7:
+        case engine::core::Rank::RANK_7:
             return "RANK_7";
-        case engine::core::Ranks::RANK_8:
+        case engine::core::Rank::RANK_8:
             return "RANK_8";
-        case engine::core::Ranks::RANKS:
+        case engine::core::Rank::N_RANKS:
             return "8";
-        case engine::core::Ranks::UNKNOWN_RANK:
+        case engine::core::Rank::UNKNOWN_RANK:
             return "UNKNOWN_RANK";
         }
         return "UNKNOWN_RANK";
     }
 
-    inline constexpr std::string_view toString(engine::core::Files v) noexcept
+    inline constexpr std::string_view toString(engine::core::File v) noexcept
     {
         switch (v)
         {
-        case engine::core::Files::FILE_A:
+        case engine::core::File::FILE_A:
             return "FILE_A";
-        case engine::core::Files::FILE_B:
+        case engine::core::File::FILE_B:
             return "FILE_B";
-        case engine::core::Files::FILE_C:
+        case engine::core::File::FILE_C:
             return "FILE_C";
-        case engine::core::Files::FILE_D:
+        case engine::core::File::FILE_D:
             return "FILE_D";
-        case engine::core::Files::FILE_E:
+        case engine::core::File::FILE_E:
             return "FILE_E";
-        case engine::core::Files::FILE_F:
+        case engine::core::File::FILE_F:
             return "FILE_F";
-        case engine::core::Files::FILE_G:
+        case engine::core::File::FILE_G:
             return "FILE_G";
-        case engine::core::Files::FILE_H:
+        case engine::core::File::FILE_H:
             return "FILE_H";
-        case engine::core::Files::FILES:
+        case engine::core::File::N_FILES:
             return "8";
-        case engine::core::Files::UNKNOWN_FILE:
+        case engine::core::File::UNKNOWN_FILE:
             return "UNKNOWN_FILE";
         }
         return "UNKNOWN_FILE";
     }
 
-    inline constexpr std::string_view toString(engine::core::Directions v) noexcept
+    inline constexpr std::string_view toString(engine::core::Direction v) noexcept
     {
         switch (v)
         {
-        case engine::core::Directions::NORTH:
+        case engine::core::Direction::NORTH:
             return "NORTH";
-        case engine::core::Directions::SOUTH:
+        case engine::core::Direction::SOUTH:
             return "SOUTH";
-        case engine::core::Directions::EAST:
+        case engine::core::Direction::EAST:
             return "EAST";
-        case engine::core::Directions::WEST:
+        case engine::core::Direction::WEST:
             return "WEST";
-        case engine::core::Directions::NORTH_EAST:
+        case engine::core::Direction::NORTH_EAST:
             return "NORTH_EAST";
-        case engine::core::Directions::NORTH_WEST:
+        case engine::core::Direction::NORTH_WEST:
             return "NORTH_WEST";
-        case engine::core::Directions::SOUTH_EAST:
+        case engine::core::Direction::SOUTH_EAST:
             return "SOUTH_EAST";
-        case engine::core::Directions::SOUTH_WEST:
+        case engine::core::Direction::SOUTH_WEST:
             return "SOUTH_WEST";
-        case engine::core::Directions::DIRECTIONS:
+        case engine::core::Direction::N_DIRECTIONS:
             return "8";
-        case engine::core::Directions::UNKNOWN_DIRECTION:
+        case engine::core::Direction::UNKNOWN_DIRECTION:
             return "UNKNOWN_DIRECTION";
         }
         return "UNKNOWN_DIRECTION";
     }
 
-    inline constexpr std::string_view toString(engine::core::SpecialDirections v)
+    inline constexpr std::string_view toString(engine::core::SpecialDirection v)
     {
         switch (v)
         {
-        case engine::core::SpecialDirections::NORTH_NORTH:
+        case engine::core::SpecialDirection::NORTH_NORTH:
             return "NORTH_NORTH";
-        case engine::core::SpecialDirections::SOUTH_SOUTH:
+        case engine::core::SpecialDirection::SOUTH_SOUTH:
             return "SOUTH_SOUTH";
-        case engine::core::SpecialDirections::NNE:
+        case engine::core::SpecialDirection::NNE:
             return "NNE";
-        case engine::core::SpecialDirections::ENE:
+        case engine::core::SpecialDirection::ENE:
             return "ENE";
-        case engine::core::SpecialDirections::ESE:
+        case engine::core::SpecialDirection::ESE:
             return "ESE";
-        case engine::core::SpecialDirections::SSE:
+        case engine::core::SpecialDirection::SSE:
             return "SSE";
-        case engine::core::SpecialDirections::SSW:
+        case engine::core::SpecialDirection::SSW:
             return "SSW";
-        case engine::core::SpecialDirections::WSW:
+        case engine::core::SpecialDirection::WSW:
             return "WSW";
-        case engine::core::SpecialDirections::WNW:
+        case engine::core::SpecialDirection::WNW:
             return "WNW";
-        case engine::core::SpecialDirections::NNW:
+        case engine::core::SpecialDirection::NNW:
             return "NNW";
-        case engine::core::SpecialDirections::SPECIAL_DIRS:
+        case engine::core::SpecialDirection::N_SPECIAL_DIRS:
             return "10";
-        case engine::core::SpecialDirections::UNKNOWN_SPECIAL_DIR:
+        case engine::core::SpecialDirection::UNKNOWN_SPECIAL_DIR:
             return "UNKNOWN_SPECIAL_DIR";
         }
 
         return "UNKNOWN_SPECIAL_DIR";
     }
 
-    inline constexpr std::string_view toString(engine::core::MoveTypes v) noexcept
+    inline constexpr std::string_view toString(engine::core::MoveType v) noexcept
     {
         switch (v)
         {
-        case engine::core::MoveTypes::QUIET:
+        case engine::core::MoveType::QUIET:
             return "QUIET";
-        case engine::core::MoveTypes::CAPTURE:
+        case engine::core::MoveType::CAPTURE:
             return "CAPTURE";
-        case engine::core::MoveTypes::PROMOTION:
+        case engine::core::MoveType::PROMOTION:
             return "PROMOTION";
-        case engine::core::MoveTypes::CASTLE:
+        case engine::core::MoveType::CASTLE:
             return "CASTLE";
-        case engine::core::MoveTypes::DOUBLE_PUSH:
+        case engine::core::MoveType::DOUBLE_PUSH:
             return "DOUBLE_PUSH";
-        case engine::core::MoveTypes::EN_PASSANT:
+        case engine::core::MoveType::EN_PASSANT:
             return "EN_PASSANT";
-        case engine::core::MoveTypes::MOVE_TYPES:
+        case engine::core::MoveType::N_MOVE_TYPES:
             return "5";
-        case engine::core::MoveTypes::UNKNOWN_MOVE_TYPE:
+        case engine::core::MoveType::UNKNOWN_MOVE_TYPE:
             return "UNKNOWN_MOVE_TYPE";
         }
         return "UNKNOWN_MOVE_TYPE";
     }
 
-    inline constexpr std::string_view toString(engine::core::Castlings v) noexcept
+    inline constexpr std::string_view toString(engine::core::Castling v) noexcept
     {
         switch (v)
         {
-        case engine::core::Castlings::WHITE_KING_SIDE:
+        case engine::core::Castling::WHITE_KING_SIDE:
             return "WHITE_KING_SIDE";
-        case engine::core::Castlings::WHITE_QUEEN_SIDE:
+        case engine::core::Castling::WHITE_QUEEN_SIDE:
             return "WHITE_QUEEN_SIDE";
-        case engine::core::Castlings::BLACK_KING_SIDE:
+        case engine::core::Castling::BLACK_KING_SIDE:
             return "BLACK_KING_SIDE";
-        case engine::core::Castlings::BLACK_QUEEN_SIDE:
+        case engine::core::Castling::BLACK_QUEEN_SIDE:
             return "BLACK_QUEEN_SIDE";
-        case engine::core::Castlings::CASTLINGS:
+        case engine::core::Castling::N_CASTLINGS:
             return "4";
-        case engine::core::Castlings::UNKNOWN_CASTLING:
+        case engine::core::Castling::UNKNOWN_CASTLING:
             return "UNKNOWN_CASTLING";
         }
         return "UNKNOWN_CASTLING";

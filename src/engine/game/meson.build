@@ -1,4 +1,4 @@
-#- Source Files -#
+#- Source File -#
 game_src = files(
   'move_list.cpp',
   'game.cpp'

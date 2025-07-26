@@ -51,7 +51,7 @@ namespace engine::game
         /**
          * @brief Basic move constructor.
          */
-        Move(int from, int to, core::MoveTypes type, core::Pieces fromPiece) noexcept
+        Move(int from, int to, core::MoveType type, core::Piece fromPiece) noexcept
             : _data{0}
         {
             this->setFromSquare(from);
@@ -63,7 +63,7 @@ namespace engine::game
         /**
          * @brief Castling move constructor.
          */
-        Move(int from, int to, core::MoveTypes type, core::Pieces fromPiece, core::Castlings castle) noexcept
+        Move(int from, int to, core::MoveType type, core::Piece fromPiece, core::Castling castle) noexcept
             : Move(from, to, type, fromPiece)
         {
             setCastlingType(castle);
@@ -83,15 +83,15 @@ namespace engine::game
             return int((_data >> 6) & 0x3Fu);
         }
 
-        core::Castlings getCastlingType() const noexcept
+        core::Castling getCastlingType() const noexcept
         {
             // 4 bits of castlings, starting at bit 12
             unsigned index = extractFlag(12, 4);
-            return index < static_cast<unsigned>(core::Castlings::CASTLINGS) ? static_cast<core::Castlings>(index)
-                                                                             : core::Castlings::UNKNOWN_CASTLING;
+            return index < static_cast<unsigned>(core::Castling::N_CASTLINGS) ? static_cast<core::Castling>(index)
+                                                                              : core::Castling::UNKNOWN_CASTLING;
         }
 
-        core::Pieces getPromotionPiece() const noexcept
+        core::Piece getPromotionPiece() const noexcept
         {
             // 4 bits of promotion piece, starting at bit 16
             unsigned index = extractFlag(16, 4);
@@ -101,32 +101,32 @@ namespace engine::game
             switch (index)
             {
             case 0:
-                return core::Pieces::KNIGHT;
+                return core::Piece::KNIGHT;
             case 1:
-                return core::Pieces::BISHOP;
+                return core::Piece::BISHOP;
             case 2:
-                return core::Pieces::ROOK;
+                return core::Piece::ROOK;
             case 3:
-                return core::Pieces::QUEEN;
+                return core::Piece::QUEEN;
             default:
-                return core::Pieces::UNKNOWN_PIECE;
+                return core::Piece::UNKNOWN_PIECE;
             }
         }
 
-        core::MoveTypes getMoveType() const noexcept
+        core::MoveType getMoveType() const noexcept
         {
             // 6 bits of move type, starting at bit 20
             unsigned index = extractFlag(20, 6);
-            return index < static_cast<unsigned>(core::MoveTypes::MOVE_TYPES) ? static_cast<core::MoveTypes>(index)
-                                                                              : core::MoveTypes::UNKNOWN_MOVE_TYPE;
+            return index < static_cast<unsigned>(core::MoveType::N_MOVE_TYPES) ? static_cast<core::MoveType>(index)
+                                                                               : core::MoveType::UNKNOWN_MOVE_TYPE;
         }
 
-        core::Pieces getFromPiece() const noexcept
+        core::Piece getFromPiece() const noexcept
         {
             // 6 bits of from piece, starting at bit 26
             unsigned index = extractFlag(26, 6);
-            return index < static_cast<unsigned>(core::Pieces::PIECES) ? static_cast<core::Pieces>(index)
-                                                                       : core::Pieces::UNKNOWN_PIECE;
+            return index < static_cast<unsigned>(core::Piece::N_PIECES) ? static_cast<core::Piece>(index)
+                                                                        : core::Piece::UNKNOWN_PIECE;
         }
 
         /*----------------------------------------*
@@ -143,29 +143,29 @@ namespace engine::game
             _data = (_data & ~(0x3Fu << 6)) | ((uint32_t(square) & 0x3Fu) << 6);
         }
 
-        void setCastlingType(core::Castlings castle) noexcept
+        void setCastlingType(core::Castling castle) noexcept
         {
             _data &= ~(0xFu << 12); // clear existing bits if any
             _data |= (1u << (12 + static_cast<unsigned>(castle)));
         }
 
-        void setPromotionPiece(core::Pieces piece) noexcept
+        void setPromotionPiece(core::Piece piece) noexcept
         {
             // Since possible promotion pieces have values that does not match
             // the reserved bit indices in _data, we need to map them.
             unsigned p;
             switch (piece)
             {
-            case core::Pieces::KNIGHT:
+            case core::Piece::KNIGHT:
                 p = 0;
                 break;
-            case core::Pieces::BISHOP:
+            case core::Piece::BISHOP:
                 p = 1;
                 break;
-            case core::Pieces::ROOK:
+            case core::Piece::ROOK:
                 p = 2;
                 break;
-            case core::Pieces::QUEEN:
+            case core::Piece::QUEEN:
                 p = 3;
                 break;
             default:
@@ -176,13 +176,13 @@ namespace engine::game
             _data |= (1u << (16 + static_cast<unsigned>(p)));
         }
 
-        void setMoveType(core::MoveTypes type) noexcept
+        void setMoveType(core::MoveType type) noexcept
         {
             _data &= ~(0x3Fu << 20); // clear existing bits if any
             _data |= (1u << (20 + static_cast<unsigned>(type)));
         }
 
-        void setFromPiece(core::Pieces piece) noexcept
+        void setFromPiece(core::Piece piece) noexcept
         {
             _data &= ~(0x3Fu << 26); // clear existing bits if any
             _data |= (1u << (26 + static_cast<unsigned>(piece)));
@@ -218,7 +218,7 @@ namespace engine::game
         bool isPromotion() const noexcept
         {
             int toSquare = this->getToSquare();
-            return (this->getFromPiece() == core::Pieces::PAWN &&
+            return (this->getFromPiece() == core::Piece::PAWN &&
                     ((toSquare <= 63 && toSquare >= 56) || (toSquare >= 0 && toSquare <= 7)));
         }
 

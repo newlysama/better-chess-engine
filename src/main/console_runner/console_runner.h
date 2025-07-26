@@ -62,9 +62,9 @@ namespace console_runner
          * @brief Asks user for promotion.
          * Restart until user enters a valid promotion.
          *
-         * @return Pieces : the requested piece type.
+         * @return Piece : the requested piece type.
          */
-        engine::core::Pieces askPromotion() const noexcept;
+        engine::core::Piece askPromotion() const noexcept;
 
         /**
          * @brief Parses a user input and use it to build a move.

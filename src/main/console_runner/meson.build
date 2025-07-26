@@ -1,4 +1,4 @@
-#- Source Files -#
+#- Source File -#
 console_runner_src = files('console_runner.cpp')
 
 #- Include Dirs -#

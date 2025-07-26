@@ -83,7 +83,7 @@ namespace engine::board
          *
          * @return bool : Wether this type of castling is enabled.
          */
-        template <core::Castlings Type>
+        template <core::Castling Type>
         inline constexpr bool hasCastlingRight() const noexcept
         {
             return ((m_castlingRights >> static_cast<unsigned>(Type)) & 1U) != 0;
@@ -92,7 +92,7 @@ namespace engine::board
         /**
          * @brief Enable a type of castling.
          */
-        inline constexpr void setCastlingRight(core::Castlings castle) noexcept
+        inline constexpr void setCastlingRight(core::Castling castle) noexcept
         {
             m_castlingRights |= (uint8_t{1} << static_cast<unsigned>(castle));
         }
@@ -100,7 +100,7 @@ namespace engine::board
         /**
          * @brief Disable a type of castling.
          */
-        template <core::Castlings Type>
+        template <core::Castling Type>
         inline constexpr void clearCastlingRight() noexcept
         {
             m_castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
@@ -116,24 +116,24 @@ namespace engine::board
          * @param [in] fromSquare : Initial square
          * @param [in] toSquare   : Destination square
          */
-        void checkCastlingRemoval(const core::Pieces piece, const int fromSquare, const int toSquare) noexcept;
+        void checkCastlingRemoval(const core::Piece piece, const int fromSquare, const int toSquare) noexcept;
 
         /**
          * @brief Get a piece on a given square.
          *
          * @param [in] squareIndex : the square to check
-         * @return Pieces : the found Piece
+         * @return Piece : the found Piece
          */
-        core::Pieces getPiece(const int squareIndex) const noexcept;
+        core::Piece getPiece(const int squareIndex) const noexcept;
 
         /**
          * @brief Get a piece from a given team and square.
          *
          * @param [in] color       : the team to check
          * @param [in] squareIndex : the square to check
-         * @return Pieces : the found Piece
+         * @return Piece : the found Piece
          */
-        core::Pieces getPiece(const core::Colors color, const int squareIndex) const noexcept;
+        core::Piece getPiece(const core::Color color, const int squareIndex) const noexcept;
 
         /**
          * @brief Add a piece to a given team on a given square.
@@ -142,7 +142,7 @@ namespace engine::board
          * @param [in] piece       : Piece to add
          * @param [in] squareIndex : Square to add the piece on
          */
-        void setPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
+        void setPiece(const core::Color color, const core::Piece piece, const int squareIndex) noexcept;
 
         /**
          * @brief Remove a piece from a given team and square.
@@ -151,7 +151,7 @@ namespace engine::board
          * @param [in] piece       : Piece to remove
          * @param [in] squareIndex : Square to remove the piece from
          */
-        void unsetPiece(const core::Colors color, const core::Pieces piece, const int squareIndex) noexcept;
+        void unsetPiece(const core::Color color, const core::Piece piece, const int squareIndex) noexcept;
 
         /**
          * @brief Move a given piece.
@@ -161,7 +161,7 @@ namespace engine::board
          * @param [in] fromSquare : Square to move the piece from
          * @param [in] toSquare   : Square to move the piece to
          */
-        void movePiece(const core::Pieces piece, const int fromSquare, const int toSquare) noexcept;
+        void movePiece(const core::Piece piece, const int fromSquare, const int toSquare) noexcept;
 
         /**
          * @brief Computes all current side to move bitboards of
@@ -179,12 +179,12 @@ namespace engine::board
          *               ATTRIBUTES              *
          *****************************************/
 
-        uint16_t m_halfMoveClock = 0;                    // Half move counter
-        uint16_t m_fullMoveClock = 1;                    // Full move counter
-        core::Colors m_sideToMove = core::Colors::WHITE; // Whose turn is it ? :)
+        uint16_t m_halfMoveClock = 0;                  // Half move counter
+        uint16_t m_fullMoveClock = 1;                  // Full move counter
+        core::Color m_sideToMove = core::Color::WHITE; // Whose turn is it ? :)
 
         // Informations about enabled castlings
-        core::CastlingRights m_castlingRights = (1 << core::Castlings::CASTLINGS) - 1;
+        core::CastlingRights m_castlingRights = (1 << core::Castling::N_CASTLINGS) - 1;
 
         int m_epSquare = -1; // When En Passant is enabled, this var is set
 
@@ -279,8 +279,8 @@ namespace engine::board
                                                                square, file, rank));
                         }
 
-                        std::pair<core::Colors, core::Pieces> pair = utils::fenCharToPiece(c);
-                        if (pair.first == core::Colors::UNKNOWN_COLOR && pair.second == core::Pieces::UNKNOWN_PIECE)
+                        std::pair<core::Color, core::Piece> pair = utils::fenCharToPiece(c);
+                        if (pair.first == core::Color::UNKNOWN_COLOR && pair.second == core::Piece::UNKNOWN_PIECE)
                         {
                             return std::unexpected(std::format("FEN's occupancy part error: invalid piece {}",
                                                                parts.value()[rank][index]));
@@ -291,7 +291,7 @@ namespace engine::board
                         m_allOccBB.set(square);
 
                         // Set the king's square
-                        if (pair.second == core::Pieces::KING)
+                        if (pair.second == core::Piece::KING)
                         {
                             m_kgSquares[pair.first] = square;
                         }
@@ -322,7 +322,7 @@ namespace engine::board
                 return std::unexpected(std::format("FEN's side to move part error: {}", fen));
             }
 
-            m_sideToMove = fen == "b" ? core::Colors::BLACK : core::Colors::WHITE;
+            m_sideToMove = fen == "b" ? core::Color::BLACK : core::Color::WHITE;
             return std::expected<void, std::string>{};
         }
 
@@ -342,14 +342,14 @@ namespace engine::board
             // clang-format off
             for (const unsigned char c : fen)
             {
-                std::pair<core::Colors, core::Pieces> pair = utils::fenCharToPiece(c);
-                core::Castlings castle = pair.first == core::Colors::WHITE && pair.second == core::Pieces::KING ? core::Castlings::WHITE_KING_SIDE
-                                       : pair.first == core::Colors::WHITE && pair.second == core::Pieces::QUEEN ? core::Castlings::WHITE_QUEEN_SIDE
-                                       : pair.first == core::Colors::BLACK && pair.second == core::Pieces::KING ? core::Castlings::BLACK_KING_SIDE
-                                       : pair.first == core::Colors::BLACK && pair.second == core::Pieces::QUEEN ? core::Castlings::BLACK_QUEEN_SIDE
-                                       : core::Castlings::UNKNOWN_CASTLING;
+                std::pair<core::Color, core::Piece> pair = utils::fenCharToPiece(c);
+                core::Castling castle = pair.first == core::Color::WHITE && pair.second == core::Piece::KING ? core::Castling::WHITE_KING_SIDE
+                                       : pair.first == core::Color::WHITE && pair.second == core::Piece::QUEEN ? core::Castling::WHITE_QUEEN_SIDE
+                                       : pair.first == core::Color::BLACK && pair.second == core::Piece::KING ? core::Castling::BLACK_KING_SIDE
+                                       : pair.first == core::Color::BLACK && pair.second == core::Piece::QUEEN ? core::Castling::BLACK_QUEEN_SIDE
+                                       : core::Castling::UNKNOWN_CASTLING;
 
-                if (castle == core::Castlings::UNKNOWN_CASTLING)
+                if (castle == core::Castling::UNKNOWN_CASTLING)
                 {
                     return std::unexpected(std::format("FEN's castling rights error: invalid piece {}", fen));
                 }

@@ -48,17 +48,17 @@ namespace ui::console
         headerFile.close();
     }
 
-    std::string ConsoleUI::getColoredPiece(Colors color, Pieces piece) noexcept
+    std::string ConsoleUI::getColoredPiece(Color color, Piece piece) noexcept
     {
         std::string coloredPiece;
 
-        if (color == Colors::WHITE)
+        if (color == Color::WHITE)
         {
             coloredPiece = std::format("{}{}{}", ConsoleUI::GREEN, ConsoleUI::pieceSymbol[piece], ConsoleUI::RESET);
 
             return coloredPiece;
         }
-        else if (color == Colors::BLACK)
+        else if (color == Color::BLACK)
         {
             coloredPiece = std::format("{}{}{}", ConsoleUI::RED, ConsoleUI::pieceSymbol[piece], ConsoleUI::RESET);
 
@@ -71,14 +71,14 @@ namespace ui::console
 
     std::string ConsoleUI::getSquare(State& state, int square) noexcept
     {
-        for (int color = 0; color < Colors::COLORS; color++)
+        for (int color = 0; color < Color::N_COLORS; color++)
         {
-            for (int piece = 0; piece < Pieces::PIECES; piece++)
+            for (int piece = 0; piece < Piece::N_PIECES; piece++)
             {
                 Bitboard bb = state.m_piecesBB[color][piece];
                 if (bb.isSet(square))
                 {
-                    return ConsoleUI::getColoredPiece(static_cast<Colors>(color), static_cast<Pieces>(piece));
+                    return ConsoleUI::getColoredPiece(static_cast<Color>(color), static_cast<Piece>(piece));
                 }
             }
         }
@@ -131,7 +131,7 @@ namespace ui::console
         ConsoleUI::printHeader();
 
         // Print files specifiers
-        std::println("{}{}", ConsoleUI::FILE_IDENT, ConsoleUI::FILES);
+        std::println("{}{}", ConsoleUI::FILE_IDENT, ConsoleUI::N_FILES);
 
         // Print top line
         std::println("{}{}", ConsoleUI::BOARD_INDENT, ConsoleUI::TOP_LINE);
@@ -144,7 +144,7 @@ namespace ui::console
 
         // Print the bottom line and files specifiers
         std::println("{}{}", ConsoleUI::BOARD_INDENT, ConsoleUI::BOT_LINE);
-        std::println("{}{}", ConsoleUI::FILE_IDENT, ConsoleUI::FILES);
+        std::println("{}{}", ConsoleUI::FILE_IDENT, ConsoleUI::N_FILES);
 
         std::println();
 
