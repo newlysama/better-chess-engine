@@ -26,7 +26,7 @@ jobs:
       - name: Install build tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y meson ninja-build clang build-essential libspdlog-dev libopenmpt-dev
+          sudo apt-get install -y meson ninja-build clang build-essential libspdlog-dev libomp-dev
           echo "CC='clang'"    >> $GITHUB_ENV
           echo "CXX='clang++'" >> $GITHUB_ENV
 
