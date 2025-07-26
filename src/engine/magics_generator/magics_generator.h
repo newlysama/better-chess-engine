@@ -14,7 +14,7 @@
 
 #include "engine/board/bitboard.h"
 
-namespace engine::board
+namespace engine::magics_generator
 {
     /**
      * @brief Computes bitboards of attackable squares by a
@@ -24,7 +24,7 @@ namespace engine::board
      * @param [in] occupancy : the given occupancy
      * @return Bitboard : Exact attacks bitboard for that square and occupancy
      */
-    inline Bitboard slidingAttackRook(const int square, const Bitboard occupancy) noexcept;
+    inline board::Bitboard slidingAttackRook(const int square, const board::Bitboard occupancy) noexcept;
 
     /**
      * @brief Computes bitboards of attackable squares by a
@@ -34,7 +34,7 @@ namespace engine::board
      * @param [in] occupancy : the given occupancy
      * @return Bitboard : Exact attacks bitboard for that square and occupancy
      */
-    inline Bitboard slidingAttackBishop(const int square, const Bitboard occupancy) noexcept;
+    inline board::Bitboard slidingAttackBishop(const int square, const board::Bitboard occupancy) noexcept;
 
     /**
      * @brief Look for a valid magic bitboard for a rook on the given square.
@@ -45,7 +45,7 @@ namespace engine::board
      * @param [in] square : the square we looking from
      * @return Bitboard : the valid magic bitboard
      */
-    inline Bitboard findMagicRook(const int square) noexcept;
+    inline board::Bitboard findMagicRook(const int square) noexcept;
 
     /**
      * @brief Look for a valid magic bitboard for a bishop on the given square.
@@ -56,7 +56,7 @@ namespace engine::board
      * @param [in] square : the square we looking from
      * @return Bitboard : the valid magic bitboard
      */
-    inline Bitboard findMagicBishop(const int square) noexcept;
+    inline board::Bitboard findMagicBishop(const int square) noexcept;
 
     /**
      * @brief Computed the necessary shift for a rook on square.
@@ -90,6 +90,6 @@ namespace engine::board
      */
     void initMagics() noexcept;
 
-} // namespace engine::board
+} // namespace engine::magics_generator
 
 #endif // MAGICS_GENERATOR_H_

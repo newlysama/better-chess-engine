@@ -122,19 +122,6 @@ endif
 #             DEPS             #
 #------------------------------#
 
-# spdlog (subprojects/spdlog.wrap → export spdlog_dep)
-spdlog_dep = dependency(
-  'spdlog',
-  required: true
-)
-
-if generate_magics == true
-  openmp_dep = dependency(
-    'openmp',
-    required: true
-  )
-endif
-
 # GoogleTest (subprojects/gtest.wrap → export gtest_dep)
 if mode == 'test'
   gtest_dep = dependency(
@@ -162,15 +149,4 @@ inc_src = include_directories('src')
 #           SUB DIRS           #
 #------------------------------#
 
-subdir('src/logging')
-subdir('src/engine/board')
-subdir('src/engine/game')
-
-if console == true
-  subdir('src/ui/console')
-  subdir('src/main/console_runner')
-endif
-
-if mode not in ['test', 'benchmark']
-  subdir('src/main')
-endif
+subdir('src/')

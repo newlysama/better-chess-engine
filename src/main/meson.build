@@ -1,12 +1,14 @@
+#----- src/main/meson.build -----#
+
 #- Source File -#
 app_src = files('main.cpp')
 
-#- Include Dirs -#
-incs = [inc_src]
+#- Depedencies -#
+deps = [logging_dep, engine_dep]
 
-deps = [logging_dep, game_dep]
-
+# If we compile with -Dconsole=true, compile the console_runner
 if console == true
+  subdir('console_runner/')
   deps += console_runner_dep
 endif
 
@@ -14,6 +16,6 @@ endif
 executable(
   'chess',
   app_src,
-  include_directories: incs,
+  include_directories: [inc_src],
   dependencies: deps
 )

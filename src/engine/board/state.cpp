@@ -258,7 +258,7 @@ namespace engine::board
         const Color enemyColor = m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
         // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
             int count = 0;
         #endif
         // clang-format on
@@ -321,7 +321,7 @@ namespace engine::board
                 BETWEEN_MASKS[m_kgSquares[m_sideToMove]][enemySquare] | Bitboard{1ULL << enemySquare};
 
             // clang-format off
-            #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
+            #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
                 count++;
             #endif
             // clang-format on

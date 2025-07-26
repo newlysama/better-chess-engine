@@ -203,7 +203,7 @@ namespace engine::board
         inline constexpr int lsbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -219,7 +219,7 @@ namespace engine::board
         inline constexpr int msbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -233,7 +233,7 @@ namespace engine::board
         inline constexpr void popLsb() noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -247,7 +247,7 @@ namespace engine::board
         inline constexpr void popMsb() noexcept
         {
             // clang-format off
-            #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
