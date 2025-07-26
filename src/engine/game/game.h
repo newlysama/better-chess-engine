@@ -42,6 +42,17 @@ namespace engine::game
         ~Game() noexcept = default;
 
         /**
+         * @brief Play a move.
+         *
+         * @param [in] move  : The move to play
+         */
+        void playMove(const game::Move& move) noexcept;
+
+        board::State state;      // Game's state
+        game::MoveList moveList; // Legal move lists of the current halfMoveClock
+
+      private:
+        /**
          * @brief Make a catpure.
          *
          * @param [in] move       : capture move
@@ -78,16 +89,6 @@ namespace engine::game
          * @param [in] enemyColor : next team to play
          */
         void update(const game::Move& move, const core::Colors enemyColor) noexcept;
-
-        /**
-         * @brief Play a move.
-         *
-         * @param [in] move  : The move to play
-         */
-        void playMove(const game::Move& move) noexcept;
-
-        board::State state;      // Game's state
-        game::MoveList moveList; // Legal move lists of the current halfMoveClock
     };
 
 } // namespace engine::game
