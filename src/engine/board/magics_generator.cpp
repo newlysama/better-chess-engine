@@ -182,7 +182,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackRook(square, Bitboard{occupancy}).getData();
+                uint64_t attack = slidingAttackRook(square, Bitboard{occupancy}).m_data;
 
                 if (used[key] == 0ULL)
                 {
@@ -247,7 +247,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackBishop(square, Bitboard{occupancy}).getData();
+                uint64_t attack = slidingAttackBishop(square, Bitboard{occupancy}).m_data;
 
                 if (used[key] == 0ULL)
                 {
@@ -289,8 +289,8 @@ namespace engine::board
             auto rmagic = findMagicRook(square);
             auto bmagic = findMagicBishop(square);
 
-            rMagicVals[square] = rmagic.getData();
-            bMagicVals[square] = bmagic.getData();
+            rMagicVals[square] = rmagic.m_data;
+            bMagicVals[square] = bmagic.m_data;
 
             LOG_INFO("Computing shifts for square {}", square);
             rShiftVals[square] = findShiftRook(square);

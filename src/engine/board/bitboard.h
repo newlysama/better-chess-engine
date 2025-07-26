@@ -34,10 +34,10 @@ namespace engine::board
         /**
          * @brief Constructor.
          *
-         * @param [in] data : Value to initialize _data member
+         * @param [in] data : Value to initialize m_data member
          */
-        constexpr Bitboard(const uint64_t& data = 0ULL) noexcept
-            : _data(data)
+        constexpr Bitboard(const uint64_t&& data = 0ULL) noexcept
+            : m_data(data)
         {
         }
 
@@ -56,47 +56,47 @@ namespace engine::board
         /*----------------------------------------*
          *         COMPARAISON OPERATORS          *
          *----------------------------------------*/
-        inline constexpr bool operator==(const Bitboard& bitboard_) const noexcept
+        inline constexpr bool operator==(const Bitboard& bb) const noexcept
         {
-            return this->_data == bitboard_._data;
+            return m_data == bb.m_data;
         }
 
-        inline constexpr bool operator!=(const Bitboard& bitboard_) const noexcept
+        inline constexpr bool operator!=(const Bitboard& bb) const noexcept
         {
-            return this->_data != bitboard_._data;
+            return m_data != bb.m_data;
         }
 
         /*----------------------------------------*
          *           BITWISE OPERATORS            *
          *----------------------------------------*/
-        inline constexpr Bitboard operator&(const Bitboard& bitboard_) const noexcept
+        inline constexpr Bitboard operator&(const Bitboard& bb) const noexcept
         {
-            return Bitboard{this->_data & bitboard_._data};
+            return Bitboard{m_data & bb.m_data};
         }
 
-        inline constexpr Bitboard operator|(const Bitboard& bitboard_) const noexcept
+        inline constexpr Bitboard operator|(const Bitboard& bb) const noexcept
         {
-            return Bitboard{this->_data | bitboard_._data};
+            return Bitboard{m_data | bb.m_data};
         }
 
         inline constexpr Bitboard operator~() const noexcept
         {
-            return Bitboard{~this->_data};
+            return Bitboard{~m_data};
         }
 
-        inline constexpr Bitboard operator^(const Bitboard& bitboard_) const noexcept
+        inline constexpr Bitboard operator^(const Bitboard& bb) const noexcept
         {
-            return Bitboard{this->_data ^ bitboard_._data};
+            return Bitboard{m_data ^ bb.m_data};
         }
 
         inline constexpr Bitboard operator<<(const int shift) const noexcept
         {
-            return Bitboard{this->_data << shift};
+            return Bitboard{m_data << shift};
         }
 
         inline constexpr Bitboard operator>>(const int shift) const noexcept
         {
-            return Bitboard{this->_data >> shift};
+            return Bitboard{m_data >> shift};
         }
 
         /*----------------------------------------*
@@ -104,49 +104,39 @@ namespace engine::board
          *----------------------------------------*/
         inline constexpr Bitboard& operator=(const Bitboard&) noexcept = default;
 
-        inline constexpr Bitboard& operator&=(const Bitboard& bitboard_) noexcept
+        inline constexpr Bitboard& operator&=(const Bitboard& bb) noexcept
         {
-            this->_data &= bitboard_._data;
+            m_data &= bb.m_data;
             return *this;
         }
 
-        inline constexpr Bitboard& operator|=(const Bitboard& bitboard_) noexcept
+        inline constexpr Bitboard& operator|=(const Bitboard& bb) noexcept
         {
-            this->_data |= bitboard_._data;
+            m_data |= bb.m_data;
             return *this;
         }
 
-        inline constexpr Bitboard& operator^=(const Bitboard& bitboard_) noexcept
+        inline constexpr Bitboard& operator^=(const Bitboard& bb) noexcept
         {
-            this->_data ^= bitboard_._data;
+            m_data ^= bb.m_data;
             return *this;
         }
 
         inline constexpr Bitboard& operator<<=(const int shift) noexcept
         {
-            this->_data <<= shift;
+            m_data <<= shift;
             return *this;
         }
 
         inline constexpr Bitboard& operator>>=(const int shift) noexcept
         {
-            this->_data >>= shift;
+            m_data >>= shift;
             return *this;
         }
 
         /*----------------------------------------*
          *           UTILITY FUNCTIONS            *
          *----------------------------------------*/
-
-        /**
-         * @brief  Getter for _data member.
-         *
-         * @return uint64_t : the actual bitboard
-         */
-        inline constexpr uint64_t getData() const noexcept
-        {
-            return this->_data;
-        }
 
         /**
          * @brief Get a bit's value at a specific index.
@@ -156,7 +146,7 @@ namespace engine::board
          */
         inline constexpr int at(int index) const noexcept
         {
-            return int((this->_data >> index) & 1ULL);
+            return int((m_data >> index) & 1ULL);
         }
 
         /**
@@ -166,7 +156,7 @@ namespace engine::board
          */
         inline constexpr int popCount() const noexcept
         {
-            return std::popcount(this->_data);
+            return std::popcount(m_data);
         }
 
         /**
@@ -176,7 +166,7 @@ namespace engine::board
          */
         inline constexpr bool isSet(int index) const noexcept
         {
-            return (((this->_data >> index) & 1ULL) == 1ULL);
+            return (((m_data >> index) & 1ULL) == 1ULL);
         }
 
         /**
@@ -184,7 +174,7 @@ namespace engine::board
          */
         inline constexpr void set(int index) noexcept
         {
-            this->_data |= (1ULL << index);
+            m_data |= (1ULL << index);
         }
 
         /**
@@ -192,7 +182,7 @@ namespace engine::board
          */
         inline constexpr void unset(int index) noexcept
         {
-            this->_data &= ~(1ULL << index);
+            m_data &= ~(1ULL << index);
         }
 
         /**
@@ -202,7 +192,7 @@ namespace engine::board
          */
         inline constexpr bool isEmpty() const noexcept
         {
-            return this->_data == 0;
+            return m_data == 0;
         }
 
         /**
@@ -214,11 +204,11 @@ namespace engine::board
         {
             // clang-format off
             #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
-                assert(this->_data != 0);
+                assert(m_data != 0);
             #endif
             // clang-format on
 
-            return std::countr_zero(this->_data);
+            return std::countr_zero(m_data);
         }
 
         /**
@@ -230,11 +220,11 @@ namespace engine::board
         {
             // clang-format off
             #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
-                assert(this->_data != 0);
+                assert(m_data != 0);
             #endif
             // clang-format on
 
-            return 63 - std::countl_zero(this->_data);
+            return 63 - std::countl_zero(m_data);
         }
 
         /**
@@ -244,11 +234,11 @@ namespace engine::board
         {
             // clang-format off
             #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
-                assert(this->_data != 0);
+                assert(m_data != 0);
             #endif
             // clang-format on
 
-            this->_data &= ~(1ULL << this->lsbIndex());
+            m_data &= ~(1ULL << this->lsbIndex());
         }
 
         /**
@@ -258,15 +248,14 @@ namespace engine::board
         {
             // clang-format off
             #if !defined(BUILD_BENCHMARK) || !defined(BUILD_RELEASE)
-                assert(this->_data != 0);
+                assert(m_data != 0);
             #endif
             // clang-format on
 
-            this->_data &= ~(1ULL << this->msbIndex());
+            m_data &= ~(1ULL << this->msbIndex());
         }
 
-      private:
-        uint64_t _data; // Actual bitboard
+        uint64_t m_data; // Actual bitboard
     };
 } // namespace engine::board
 

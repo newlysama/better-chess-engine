@@ -98,7 +98,7 @@ namespace engine::game
         LOG_DEBUG("Generated {} {} {} legal moves", targets.popCount(), utils::toString(fromPiece),
                   utils::toString(moveType));
 
-        while (targets.getData())
+        while (targets.m_data)
         {
             int toSquare = targets.lsbIndex();
 
@@ -120,11 +120,11 @@ namespace engine::game
         }
 
         // Check that square between rook and king are free
-        if ((state.m_allOccBB & CASTLING_BETWEEN_MASKS[Castling]).getData() != 0ULL)
+        if ((state.m_allOccBB & CASTLING_BETWEEN_MASKS[Castling]).m_data != 0ULL)
             return;
 
         // Check that no square on the king's path is under attack
-        if ((state.m_targetsBB & CASTLING_KING_PATH_MASKS[Castling]).getData() != 0ULL)
+        if ((state.m_targetsBB & CASTLING_KING_PATH_MASKS[Castling]).m_data != 0ULL)
             return;
 
         Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveType::CASTLE, Piece::KING, Castling};
@@ -196,7 +196,7 @@ namespace engine::game
         Bitboard pawns = state.m_piecesBB[state.m_sideToMove][Piece::PAWN];
 
         // While there is bits set to 1
-        while (pawns.getData())
+        while (pawns.m_data)
         {
             // Extract bit index to the next '1'
             int fromSquare = pawns.lsbIndex();
@@ -238,7 +238,7 @@ namespace engine::game
         Bitboard knights = state.m_piecesBB[state.m_sideToMove][Piece::KNIGHT];
 
         // While there is bits set to 1
-        while (knights.getData())
+        while (knights.m_data)
         {
             // Extract bit index to the next '1'
             int fromSquare = knights.lsbIndex();
@@ -267,7 +267,7 @@ namespace engine::game
         Bitboard rooks = state.m_piecesBB[state.m_sideToMove][Piece::ROOK];
 
         // While there is bits set to 1
-        while (rooks.getData())
+        while (rooks.m_data)
         {
             // Extract bit index to the next '1'
             int fromSquare = rooks.lsbIndex();
@@ -278,7 +278,7 @@ namespace engine::game
             Bitboard relevantOcc = state.m_allOccBB & ROOK_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex = (relevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
+            size_t magicIndex = (relevantOcc.m_data * rookMagics[fromSquare].m_data) >> rookShifts[fromSquare];
 
             // Get the targets
             Bitboard targets = ROOK_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.m_teamsOccBB[state.m_sideToMove];
@@ -301,7 +301,7 @@ namespace engine::game
         Bitboard bishops = state.m_piecesBB[state.m_sideToMove][Piece::BISHOP];
 
         // While there is bits set to 1
-        while (bishops.getData())
+        while (bishops.m_data)
         {
             // Extract bit index to the next '1'
             int fromSquare = bishops.lsbIndex();
@@ -312,8 +312,7 @@ namespace engine::game
             Bitboard relevantOcc = state.m_allOccBB & BISHOP_RELEVANT_MASKS[fromSquare];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex =
-                (relevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
+            size_t magicIndex = (relevantOcc.m_data * bishopMagics[fromSquare].m_data) >> bishopShifts[fromSquare];
 
             // Get the targets
             Bitboard targets = BISHOP_ATTACKS_TABLE[fromSquare][magicIndex] & ~state.m_teamsOccBB[state.m_sideToMove];
@@ -337,7 +336,7 @@ namespace engine::game
 
         // While there is bits set to 1
         // Remember that thank's to promotions, we can have several queens alive
-        while (queen.getData())
+        while (queen.m_data)
         {
             // Extract queen's index
             int fromSquare = queen.lsbIndex();
@@ -347,13 +346,12 @@ namespace engine::game
 
             // Magic rook
             Bitboard rookRelevantOcc = state.m_allOccBB & ROOK_RELEVANT_MASKS[fromSquare];
-            size_t rookMagicIndex =
-                (rookRelevantOcc.getData() * rookMagics[fromSquare].getData()) >> rookShifts[fromSquare];
+            size_t rookMagicIndex = (rookRelevantOcc.m_data * rookMagics[fromSquare].m_data) >> rookShifts[fromSquare];
 
             // Magic bishop
             Bitboard bishopRelevantOcc = state.m_allOccBB & BISHOP_RELEVANT_MASKS[fromSquare];
             size_t bishopMagicIndex =
-                (bishopRelevantOcc.getData() * bishopMagics[fromSquare].getData()) >> bishopShifts[fromSquare];
+                (bishopRelevantOcc.m_data * bishopMagics[fromSquare].m_data) >> bishopShifts[fromSquare];
 
             // Combine rooks and bishops attack tables
             Bitboard attacks =

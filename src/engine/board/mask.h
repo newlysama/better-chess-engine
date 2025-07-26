@@ -698,7 +698,7 @@ namespace engine::board
                 }
 
                 // Get magic index
-                uint64_t magicIndex = (occupancyBB.getData() * rookMagics[square].getData()) >> rookShifts[square];
+                uint64_t magicIndex = (occupancyBB.m_data * rookMagics[square].m_data) >> rookShifts[square];
 
                 table[square][magicIndex] = attacks;
             }
@@ -776,7 +776,7 @@ namespace engine::board
                 }
 
                 // Get magic index
-                uint64_t magicIndex = (occupancyBB.getData() * bishopMagics[square].getData()) >> bishopShifts[square];
+                uint64_t magicIndex = (occupancyBB.m_data * bishopMagics[square].m_data) >> bishopShifts[square];
 
                 table[square][magicIndex] = attacks;
             }

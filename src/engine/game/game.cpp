@@ -25,13 +25,13 @@ namespace engine::game
     using namespace engine::board;
 
     Game::Game() noexcept
-        : state(State{})
-        , moveList(MoveList{})
+        : m_state(State{})
+        , m_moveList(MoveList{})
     {
     }
 
     Game::Game(const std::string& fenNotation)
-        : moveList(MoveList{})
+        : m_moveList(MoveList{})
     {
         std::array<std::string, 6> parts;
         std::string token;
@@ -47,7 +47,7 @@ namespace engine::game
             parts[i] = token;
         }
 
-        state = State{parts};
+        m_state = State{parts};
     }
 
     void Game::makeCapture(const game::Move& move, const Color enemyColor) noexcept
@@ -56,38 +56,38 @@ namespace engine::game
         // state.checkCastlingRemoval() in state.movePiece() won't detect
         // if we take an enemy rook or not and therefore will not be able
         // to remove the enemy castling right correctly
-        this->state.checkCastlingRemoval(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        m_state.checkCastlingRemoval(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
-        Piece toRemove = this->state.getPiece(enemyColor, move.getToSquare());
-        this->state.unsetPiece(enemyColor, toRemove, move.getToSquare());
-        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        Piece toRemove = m_state.getPiece(enemyColor, move.getToSquare());
+        m_state.unsetPiece(enemyColor, toRemove, move.getToSquare());
+        m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         LOG_INFO("{} {} captured by {} {}", utils::toString(enemyColor), utils::toString(toRemove),
-                 utils::toString(state.m_sideToMove), utils::toString(move.getFromPiece()));
+                 utils::toString(m_state.m_sideToMove), utils::toString(move.getFromPiece()));
     }
 
     void Game::makeCastling(const Move& move) noexcept
     {
         // Move the king
-        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         // Move the rook
         switch (move.getCastlingType())
         {
         case Castling::WHITE_KING_SIDE:
-            this->state.movePiece(Piece::ROOK, 7, 5);
+            m_state.movePiece(Piece::ROOK, 7, 5);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::WHITE_QUEEN_SIDE:
-            this->state.movePiece(Piece::ROOK, 0, 3);
+            m_state.movePiece(Piece::ROOK, 0, 3);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::BLACK_KING_SIDE:
-            this->state.movePiece(Piece::ROOK, 63, 61);
+            m_state.movePiece(Piece::ROOK, 63, 61);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::BLACK_QUEEN_SIDE:
-            this->state.movePiece(Piece::ROOK, 56, 59);
+            m_state.movePiece(Piece::ROOK, 56, 59);
             LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         default:
@@ -99,11 +99,11 @@ namespace engine::game
     void Game::makeEnPassant(const Move& move, const Color enemyColor) noexcept
     {
         // Move the pawn performing enPassant
-        this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         // Determine enPassant captured piece's square
         int captureSquare;
-        if (this->state.m_sideToMove == Color::WHITE)
+        if (m_state.m_sideToMove == Color::WHITE)
         {
             captureSquare = move.getToSquare() - 8;
         }
@@ -112,7 +112,7 @@ namespace engine::game
             captureSquare = move.getToSquare() + 8;
         }
 
-        this->state.unsetPiece(enemyColor, Piece::PAWN, captureSquare);
+        m_state.unsetPiece(enemyColor, Piece::PAWN, captureSquare);
 
         LOG_INFO("Performed En Passant");
     }
@@ -121,15 +121,15 @@ namespace engine::game
     {
         if (move.getToSquare() >= 56) // Rank 8 = White promotion
         {
-            this->state.unsetPiece(Color::WHITE, Piece::PAWN, move.getToSquare());
-            this->state.setPiece(Color::WHITE, move.getPromotionPiece(), move.getToSquare());
+            m_state.unsetPiece(Color::WHITE, Piece::PAWN, move.getToSquare());
+            m_state.setPiece(Color::WHITE, move.getPromotionPiece(), move.getToSquare());
 
             LOG_INFO("Performed White Promotion");
         }
         else // Black promotion
         {
-            this->state.unsetPiece(Color::BLACK, Piece::PAWN, move.getToSquare());
-            this->state.setPiece(Color::BLACK, move.getPromotionPiece(), move.getToSquare());
+            m_state.unsetPiece(Color::BLACK, Piece::PAWN, move.getToSquare());
+            m_state.setPiece(Color::BLACK, move.getPromotionPiece(), move.getToSquare());
 
             LOG_INFO("Performed Black Promotion");
         }
@@ -140,49 +140,48 @@ namespace engine::game
         if (move.getMoveType() == MoveType::CAPTURE || move.getMoveType() == MoveType::EN_PASSANT ||
             move.getMoveType() == MoveType::PROMOTION || move.getFromPiece() == Piece::PAWN)
         {
-            this->state.m_halfMoveClock = 0;
+            m_state.m_halfMoveClock = 0;
         }
         else
         {
-            this->state.m_halfMoveClock++;
+            m_state.m_halfMoveClock++;
         }
 
         // If black just played, increase full move clock
-        if (this->state.m_sideToMove == Color::BLACK)
+        if (m_state.m_sideToMove == Color::BLACK)
         {
-            this->state.m_fullMoveClock++;
+            m_state.m_fullMoveClock++;
         }
 
         // If pawn double push was played, set enPassant square
         if (move.getMoveType() == MoveType::DOUBLE_PUSH)
         {
-            this->state.m_epSquare = (move.getFromSquare() + move.getToSquare()) >> 1;
+            m_state.m_epSquare = (move.getFromSquare() + move.getToSquare()) >> 1;
         }
         // If enPassant square was set and we didn't double push, set it back to -1
-        else if (this->state.m_epSquare != -1)
+        else if (m_state.m_epSquare != -1)
         {
-            this->state.m_epSquare = -1;
+            m_state.m_epSquare = -1;
         }
 
-        this->state.m_sideToMove = enemyColor;
+        m_state.m_sideToMove = enemyColor;
 
         LOG_DEBUG("===== BOARD STATE UPDATED =====");
-        LOG_DEBUG("New side to move: {}", utils::toString(this->state.m_sideToMove));
-        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", this->state.m_halfMoveClock,
-                  this->state.m_fullMoveClock);
+        LOG_DEBUG("New side to move: {}", utils::toString(m_state.m_sideToMove));
+        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", m_state.m_halfMoveClock, m_state.m_fullMoveClock);
         LOG_DEBUG("White King Side Castling Right: {} - White Queen Side Castling Right: {}",
-                  this->state.hasCastlingRight<WHITE_KING_SIDE>(), this->state.hasCastlingRight<WHITE_QUEEN_SIDE>());
+                  m_state.hasCastlingRight<WHITE_KING_SIDE>(), m_state.hasCastlingRight<WHITE_QUEEN_SIDE>());
         LOG_DEBUG("Black King Side Castling Right: {} - Black Queen Side Castling Right: {}",
-                  this->state.hasCastlingRight<BLACK_KING_SIDE>(), this->state.hasCastlingRight<BLACK_QUEEN_SIDE>());
-        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(this->state.m_epSquare));
+                  m_state.hasCastlingRight<BLACK_KING_SIDE>(), m_state.hasCastlingRight<BLACK_QUEEN_SIDE>());
+        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(m_state.m_epSquare));
         LOG_DEBUG("===============================");
 
-        this->moveList.generateAllMoves(this->state);
+        m_moveList.generateAllMoves(m_state);
 
         // GAME OVER BABY
-        if (this->moveList.size() == 0)
+        if (m_moveList.size() == 0)
         {
-            this->state.m_isCheckMate = true;
+            m_state.m_isCheckMate = true;
         }
     }
 
@@ -192,7 +191,7 @@ namespace engine::game
                   utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
                   utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
-        Color enemyColor = this->state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
         // If move is a capture, move the from piece and remove the target piece
         if (move.getMoveType() == MoveType::CAPTURE)
@@ -212,7 +211,7 @@ namespace engine::game
         // If no special move, just move the piece
         else
         {
-            this->state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+            m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
         }
 
         // If promotion piece is set, make promotion

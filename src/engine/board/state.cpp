@@ -404,7 +404,7 @@ namespace engine::board
             Bitboard relevantOcc = occWithoutKing & ROOK_RELEVANT_MASKS[square];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex = (relevantOcc.getData() * rookMagics[square].getData()) >> rookShifts[square];
+            size_t magicIndex = (relevantOcc.m_data * rookMagics[square].m_data) >> rookShifts[square];
 
             rooks.unset(square);
             m_targetsBB |= ROOK_ATTACKS_TABLE[square][magicIndex];
@@ -424,7 +424,7 @@ namespace engine::board
             Bitboard relevantOcc = occWithoutKing & BISHOP_RELEVANT_MASKS[square];
 
             // Index the attack table using magic bitboards
-            size_t magicIndex = (relevantOcc.getData() * bishopMagics[square].getData()) >> bishopShifts[square];
+            size_t magicIndex = (relevantOcc.m_data * bishopMagics[square].m_data) >> bishopShifts[square];
 
             bishops.unset(square);
             m_targetsBB |= BISHOP_ATTACKS_TABLE[square][magicIndex];

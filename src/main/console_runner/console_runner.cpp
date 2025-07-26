@@ -41,7 +41,7 @@ namespace console_runner
     {
         std::string input;
 
-        if (this->game.state.m_halfMoveClock >= 100)
+        if (this->game.m_state.m_halfMoveClock >= 100)
         {
             std::print("Select a move to play (format ex: a1a2 OR 'draw'): ");
         }
@@ -60,7 +60,7 @@ namespace console_runner
     std::string ConsoleRunner::askDraw() const noexcept
     {
         std::string input;
-        std::print("{} player asked for a draw, accept ? (yes/no): ", utils::toString(this->game.state.m_sideToMove));
+        std::print("{} player asked for a draw, accept ? (yes/no): ", utils::toString(this->game.m_state.m_sideToMove));
 
         while (true)
         {
@@ -138,9 +138,9 @@ namespace console_runner
         }
 
         // If the requested move exists, return it.
-        for (std::size_t i = 0; i < this->game.moveList.size(); i++)
+        for (std::size_t i = 0; i < this->game.m_moveList.size(); i++)
         {
-            Move current = this->game.moveList[i];
+            Move current = this->game.m_moveList[i];
 
             if (current.getFromSquare() == fromSquare && current.getToSquare() == toSquare)
             {
@@ -153,9 +153,9 @@ namespace console_runner
 
     bool ConsoleRunner::handleDrawRequest() noexcept
     {
-        LOG_INFO("Player {} is calling a draw", utils::toString(this->game.state.m_sideToMove));
+        LOG_INFO("Player {} is calling a draw", utils::toString(this->game.m_state.m_sideToMove));
 
-        if (this->game.state.m_halfMoveClock >= 100)
+        if (this->game.m_state.m_halfMoveClock >= 100)
         {
             while (true)
             {
@@ -180,7 +180,7 @@ namespace console_runner
         }
         else
         {
-            LOG_INFO("Draw request is not valid, current Half Move Clock is {}", this->game.state.m_halfMoveClock);
+            LOG_INFO("Draw request is not valid, current Half Move Clock is {}", this->game.m_state.m_halfMoveClock);
             std::println("Cannot draw until Half Move Clock reaches 100.");
 
             return false;
@@ -189,13 +189,13 @@ namespace console_runner
 
     void ConsoleRunner::runGame() noexcept
     {
-        this->game.moveList.generateAllMoves(this->game.state);
+        this->game.m_moveList.generateAllMoves(this->game.m_state);
 
         // Load UI header
         ConsoleUI::loadHeader();
 
         // Print initial state
-        ConsoleUI::RenderState(this->game.state);
+        ConsoleUI::RenderState(this->game.m_state);
 
         while (true)
         {
@@ -232,9 +232,9 @@ namespace console_runner
             this->game.playMove(move.value());
 
             // Print new state
-            ConsoleUI::RenderState(this->game.state);
+            ConsoleUI::RenderState(this->game.m_state);
 
-            if (this->game.state.m_isCheckMate)
+            if (this->game.m_state.m_isCheckMate)
             {
                 Color winner = Color::WHITE ? Color::BLACK : Color::WHITE;
                 LOG_INFO("{} team won the game.", utils::toString(winner));
