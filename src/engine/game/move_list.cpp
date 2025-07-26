@@ -70,77 +70,65 @@ namespace engine::game
         return false;
     }
 
-    void MoveList::processTargets(Bitboard& targets, int fromSquare, MoveTypes moveType, Pieces fromPiece) noexcept
+    void MoveList::processTargets(const State& state, Bitboard& targets, const int fromSquare, const MoveTypes moveType,
+                                  const Pieces fromPiece) noexcept
     {
-        // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-            uint8_t count = 0;
-        #endif
+        // Filter pinned pieces moves
+        Bitboard pinnedTargets = state.pinnedPieces[state.sideToMove][fromSquare];
+        if (pinnedTargets.isEmpty() == false && fromPiece != Pieces::KING)
+        {
+            targets &= pinnedTargets;
+        }
+
+        // If the king is in simple check, we can only
+        // capture checking pieces, and only move to
+        // square that block checking sliding pieces (if any)
+        if (state.isChecked)
+        {
+            if (moveType == MoveTypes::CAPTURE)
+            {
+                targets &= state.checkers;
+            }
+            else if (fromPiece != Pieces::KING)
+            {
+                targets &= state.blockSquares;
+            }
+        }
+
+        LOG_DEBUG("Generated {} {} {} legal moves", targets.popCount(), utils::toString(fromPiece),
+                  utils::toString(moveType));
 
         while (targets.getData())
         {
             int toSquare = targets.lsbIndex();
 
             Move move{fromSquare, toSquare, moveType, fromPiece};
-
-            this->add(move);
+            this->add(std::move(move));
 
             // Move to the next target
             targets.unset(toSquare);
-
-            #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-                count++;
-            #endif
         }
-
-        #if !defined(BUILD_RELEASE) && !defined(BUILD_BENCHMARK)
-            if (count > 0)
-            {
-                LOG_DEBUG("Generated {} {} {} legal moves", count, utils::toString(fromPiece), utils::toString(moveType));
-            }
-        #endif
-        // clang-format on
     }
 
     template <Castlings Castling>
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
-        if (!state.hasCastlingRight<Castling>())
+        if (!state.hasCastlingRight<Castling>() || state.isChecked)
         {
             return;
-        }
-
-        // Chose the right castling mask
-        // between the rook and the king
-        // (squares that have to be empty)
-        Bitboard between = CASTLING_MASKS[Castling];
-        int toSquare = 0;
-
-        switch (Castling)
-        {
-        case WHITE_KING_SIDE:
-            toSquare = 6;
-            break;
-        case WHITE_QUEEN_SIDE:
-            toSquare = 2;
-            break;
-        case BLACK_KING_SIDE:
-            toSquare = 62;
-            break;
-        case BLACK_QUEEN_SIDE:
-            toSquare = 58;
-            break;
-        default:
-            break;
         }
 
         // Check that square between rook and king are free
-        if ((state.generalOccupancy & between).getData() != 0ULL)
+        if ((state.generalOccupancy & CASTLING_BETWEEN_MASKS[Castling]).getData() != 0ULL)
             return;
 
-        Move castle{fromSquare, toSquare, MoveTypes::CASTLE, Pieces::KING, Castling};
-        this->add(castle);
+        // Check that no square on the king's path is under attack
+        if ((state.enemyTargetedSquares & CASTLING_KING_PATH_MASKS[Castling]).getData() != 0ULL)
+            return;
+
+        Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveTypes::CASTLE, Pieces::KING, Castling};
+        this->add(std::move(castle));
 
         LOG_DEBUG("Generated {} legal move", utils::toString(Castling));
     }
@@ -149,21 +137,53 @@ namespace engine::game
     {
         int rankFrom = State::getRankIndex(fromSquare);
 
-        if ((state.sideToMove == Colors::WHITE && rankFrom == 4) ||
-            (state.sideToMove == Colors::BLACK && rankFrom == 3))
+        if (!((state.sideToMove == Colors::WHITE && rankFrom == 4) ||
+              (state.sideToMove == Colors::BLACK && rankFrom == 3)))
         {
-            int fileFrom = State::getFileIndex(fromSquare);
-            int fileEnPassant = State::getFileIndex(state.enPassantSquare);
+            return;
+        }
 
-            if (std::abs(fileFrom - fileEnPassant) == 1)
+        int fileFrom = State::getFileIndex(fromSquare);
+        int fileEnPassant = State::getFileIndex(state.enPassantSquare);
+        if (std::abs(fileFrom - fileEnPassant) != 1)
+        {
+            return;
+        }
+
+        // Check that enPassant doesn't leave our king in check
+        int capturedSquare = state.sideToMove == Colors::WHITE ? state.enPassantSquare - 8 : state.enPassantSquare + 8;
+        if (State::getRankIndex(state.kingSquares[state.sideToMove]) == State::getRankIndex(capturedSquare))
+        {
+            Colors enemyColor = state.sideToMove == Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+
+            // Get enemy Rooks and Queens that are on the same rank than our king
+            Bitboard attackers = state.allPieces[enemyColor][Pieces::ROOK] |
+                                 state.allPieces[enemyColor][Pieces::QUEEN] &
+                                     RANKS_MASKS[State::getRankIndex(state.kingSquares[state.sideToMove])];
+
+            while (attackers.isEmpty() == false)
             {
-                Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
-                this->add(enPassant);
+                int attackSquare = attackers.lsbIndex();
+                attackers.unset(attackSquare);
 
-                LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
-                          utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.enPassantSquare));
+                // Get blockers between the king and an attacker (excluding the captured enemy pawn)
+                Bitboard blockers = BETWEEN_MASKS[state.kingSquares[state.sideToMove]][attackSquare] &
+                                    state.generalOccupancy & ~Bitboard{1ULL << capturedSquare};
+
+                // Captured enemy pawn is the only blocker preventing
+                // our king from check, En Passant is illegal
+                if (blockers.isEmpty())
+                {
+                    return;
+                }
             }
         }
+
+        Move enPassant{fromSquare, state.enPassantSquare, MoveTypes::EN_PASSANT, Pieces::PAWN};
+        this->add(std::move(enPassant));
+
+        LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
+                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.enPassantSquare));
     }
 
     /**
@@ -191,8 +211,8 @@ namespace engine::game
             Bitboard captureTargets =
                 PAWN_CAPTURES_MASKS[state.sideToMove][fromSquare] & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::PAWN);
-            this->processTargets(pushTargets, fromSquare, MoveTypes::QUIET, Pieces::PAWN);
+            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::PAWN);
+            this->processTargets(state, pushTargets, fromSquare, MoveTypes::QUIET, Pieces::PAWN);
 
             // Generate double pushes if the square between start and dest is empty
             if ((PAWN_PUSHES_MASKS[state.sideToMove][fromSquare] & state.generalOccupancy) == 0)
@@ -200,7 +220,7 @@ namespace engine::game
                 Bitboard doublePushTargets =
                     PAWN_DOUBLE_PUSHES_MASKS[state.sideToMove][fromSquare] & ~state.generalOccupancy;
 
-                this->processTargets(doublePushTargets, fromSquare, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
+                this->processTargets(state, doublePushTargets, fromSquare, MoveTypes::DOUBLE_PUSH, Pieces::PAWN);
             }
 
             // Generate enPassant if enabled
@@ -235,8 +255,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KNIGHT);
-            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KNIGHT);
+            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KNIGHT);
+            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KNIGHT);
         }
     }
 
@@ -269,8 +289,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::ROOK);
-            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::ROOK);
+            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::ROOK);
+            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::ROOK);
         }
     }
 
@@ -305,8 +325,8 @@ namespace engine::game
             // Rechable squares occupied by an enemy piece
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::BISHOP);
-            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::BISHOP);
+            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::BISHOP);
+            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::BISHOP);
         }
     }
 
@@ -344,8 +364,8 @@ namespace engine::game
             Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
             Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
-            this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
-            this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
+            this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::QUEEN);
+            this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::QUEEN);
         }
     }
 
@@ -359,7 +379,8 @@ namespace engine::game
         int fromSquare = king.lsbIndex();
 
         // Generate classic targets
-        Bitboard targets = KING_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove];
+        Bitboard targets =
+            KING_ATTACKS_MASKS[fromSquare] & ~state.coloredOccupancies[state.sideToMove] & ~state.enemyTargetedSquares;
         Bitboard quietTargets = targets & ~state.coloredOccupancies[enemyColor];
         Bitboard captureTargets = targets & state.coloredOccupancies[enemyColor];
 
@@ -375,21 +396,32 @@ namespace engine::game
             getCastlingMoves<Castlings::BLACK_QUEEN_SIDE>(state, fromSquare);
         }
 
-        this->processTargets(captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KING);
-        this->processTargets(quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KING);
+        this->processTargets(state, captureTargets, fromSquare, MoveTypes::CAPTURE, Pieces::KING);
+        this->processTargets(state, quietTargets, fromSquare, MoveTypes::QUIET, Pieces::KING);
     }
 
-    void MoveList::generateAllMoves(const State& state) noexcept
+    void MoveList::generateAllMoves(State& state) noexcept
     {
+        // Clear the actual list
         this->clear();
+
+        // Computes pinned pieces
+        state.computePinnedPieces();
+
+        // Computes enemy targeted squares
+        state.computeEnemyTargetedSquares();
 
         LOG_DEBUG("Generating {} legal moves...", utils::toString(state.sideToMove));
 
-        this->generatePawnsMoves(state);
-        this->generateKnightsMoves(state);
-        this->generateRooksMoves(state);
-        this->generateBishopsMoves(state);
-        this->generateQueenMoves(state);
+        if (state.isDoubleChecked == false)
+        {
+            this->generatePawnsMoves(state);
+            this->generateKnightsMoves(state);
+            this->generateRooksMoves(state);
+            this->generateBishopsMoves(state);
+            this->generateQueenMoves(state);
+        }
+
         this->generateKingMoves(state);
 
         LOG_DEBUG("{} {} legal moves generated", this->_size, utils::toString(state.sideToMove));
