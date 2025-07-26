@@ -301,7 +301,6 @@ namespace engine::board
             bool isDirOrtho = direction == Direction::NORTH || direction == Direction::SOUTH ||
                               direction == Direction::EAST || direction == Direction::WEST;
 
-            // clang-format off
             // Check if enemy piece is a sliding piece that can move
             // on the current ray given the current direction
             Piece enemyPiece = this->getPiece(enemyColor, enemySquare);
@@ -317,7 +316,6 @@ namespace engine::board
                     continue;
                 }
             }
-            // clang-format on
 
             m_pinnedBB[m_sideToMove][firstSquare] =
                 BETWEEN_MASKS[m_kgSquares[m_sideToMove]][enemySquare] | Bitboard{1ULL << enemySquare};
