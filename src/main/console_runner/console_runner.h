@@ -38,6 +38,8 @@ namespace console_runner
 
         /**
          * @brief Main loop function to run the game.
+         *
+         * @return The winner team
          */
         void runGame() noexcept;
 

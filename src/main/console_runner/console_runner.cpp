@@ -233,6 +233,15 @@ namespace console_runner
 
             // Print new state
             ConsoleUI::RenderState(this->game.state);
+
+            if (this->game.state.isCheckMate)
+            {
+                Colors winner = Colors::WHITE ? Colors::BLACK : Colors::WHITE;
+                LOG_INFO("{} team won the game.", utils::toString(winner));
+                std::println("{} team won the game !", utils::toString(winner));
+
+                return;
+            }
         }
     }
 } // namespace console_runner
