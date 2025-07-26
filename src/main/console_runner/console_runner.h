@@ -82,7 +82,7 @@ namespace console_runner
         bool handleDrawRequest() noexcept;
 
         // Game engine instance
-        engine::game::Game game;
+        engine::game::Game m_game;
     };
 
 } // namespace console_runner
