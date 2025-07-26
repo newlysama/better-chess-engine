@@ -77,7 +77,7 @@ namespace engine::core
 
     /**
      * @typedef CastlingMasks
-     * @brief   Castling masks: one mask per castling right (e.g., White King-side, White Queen-side, ...).
+     * @brief   1x4 array holding each castling right's mask (e.g., White King-side, White Queen-side, ...).
      */
     typedef std::array<board::Bitboard, Castlings::CASTLINGS> CastlingMasks;
 
@@ -86,6 +86,19 @@ namespace engine::core
      * @brief   Masks of squares strictly between any two squares (for line checks, pinned pieces, ...).
      */
     typedef std::array<std::array<board::Bitboard, 64>, 64> BetweenMasks;
+
+    /**
+     * @typedef KingSquares
+     * @brief   1x2 array holding each king's square index.
+     */
+    typedef std::array<int, core::Colors::COLORS> KingSquares;
+
+    /**
+     * @typedef PinnedPieces
+     * @brief   2x64 array holding each team's pinned pieces bitboards
+     *          of allowed destination squares.
+     */
+    typedef std::array<core::BitboardTable, core::Colors::COLORS> PinnedPieces;
 
     /*----------------------------------*
      *      SLIDING ATTACK TABLES       *
