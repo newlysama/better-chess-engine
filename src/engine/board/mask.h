@@ -55,35 +55,35 @@ namespace engine::board
      * @return the shifted bitboard
      */
     template <core::Direction D>
-    constexpr Bitboard shiftDir(Bitboard b)
+    constexpr Bitboard shiftDir(Bitboard bb)
     {
         // clang-format off
         switch (D)
         {
         // ——— Sliding / King / Pawn ———
         case core::Direction::NORTH:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8]) << 8;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8]) << 8;
 
         case core::Direction::NORTH_EAST:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_H]) << 9;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_H]) << 9;
 
         case core::Direction::EAST:
-            return (b & ~FILES_MASKS[core::File::FILE_H]) << 1;
+            return (bb & ~FILES_MASKS[core::File::FILE_H]) << 1;
 
         case core::Direction::SOUTH_EAST:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_H]) >> 7;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_H]) >> 7;
 
         case core::Direction::SOUTH:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1]) >> 8;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1]) >> 8;
 
         case core::Direction::SOUTH_WEST:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_A]) >> 9;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_A]) >> 9;
 
         case core::Direction::WEST:
-            return (b & ~FILES_MASKS[core::File::FILE_A]) >> 1;
+            return (bb & ~FILES_MASKS[core::File::FILE_A]) >> 1;
 
         case core::Direction::NORTH_WEST:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_A]) << 7;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_A]) << 7;
         }
         // clang-format on
 
@@ -93,61 +93,61 @@ namespace engine::board
     /**
      * @brief Special shiftDir to handle Pawn double pushes and Knight directions
      *
-     * @param [in] b : Bitboard to shift
+     * @param [in] bb : Bitboard to shift
      * @return : the shifted Bitboard
      */
     template <core::SpecialDirection D>
-    constexpr Bitboard shiftDir(Bitboard b) noexcept
+    constexpr Bitboard shiftDir(Bitboard bb) noexcept
     {
         // clang-format off
         switch (D)
         {
         //  ——— Pawns double push ———
         case core::SpecialDirection::NORTH_NORTH:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]) << 16;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]) << 16;
 
         case core::SpecialDirection::SOUTH_SOUTH:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2]) >> 16;
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2]) >> 16;
 
         // ——— Knights ———
         // two North + one East
         case core::SpecialDirection::NNE:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]&
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]&
                     ~FILES_MASKS[core::File::FILE_H]) << 17;
 
         // one North + two East
         case core::SpecialDirection::ENE:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_H] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_H] &
                     ~FILES_MASKS[core::File::FILE_G]) << 10;
 
         // one South + two East
         case core::SpecialDirection::ESE:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_H] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_H] &
                     ~FILES_MASKS[core::File::FILE_G]) >> 6;
 
         // two South + one East
         case core::SpecialDirection::SSE:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2] &
                     ~FILES_MASKS[core::File::FILE_H]) >> 15;
 
         // two South + one West
         case core::SpecialDirection::SSW:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2] &
                     ~FILES_MASKS[core::File::FILE_A]) >> 17;
 
         // one South + two West
         case core::SpecialDirection::WSW:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_A] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~FILES_MASKS[core::File::FILE_A] &
                     ~FILES_MASKS[core::File::FILE_B]) >> 10;
 
         // one North + two West
         case core::SpecialDirection::WNW:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_A] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_A] &
                     ~FILES_MASKS[core::File::FILE_B]) << 6;
 
         // two North + one West
         case core::SpecialDirection::NNW:
-            return (b & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7] &
+            return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7] &
                   ~FILES_MASKS[core::File::FILE_A]) << 15;
         }
         // clang-format on
@@ -218,87 +218,87 @@ namespace engine::board
             {
                 core::Direction dir = static_cast<core::Direction>(direction);
                 Bitboard ray{};
-                Bitboard b = squareBB;
+                Bitboard bb = squareBB;
 
                 switch (dir)
                 {
                 case core::Direction::NORTH:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::NORTH>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::NORTH>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::SOUTH:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::SOUTH>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::SOUTH>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::EAST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::EAST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::EAST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::WEST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::WEST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::WEST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::NORTH_EAST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::NORTH_EAST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::NORTH_EAST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::NORTH_WEST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::NORTH_WEST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::NORTH_WEST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::SOUTH_EAST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::SOUTH_EAST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::SOUTH_EAST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
                 case core::Direction::SOUTH_WEST:
                     while (true)
                     {
-                        b = shiftDir<core::Direction::SOUTH_WEST>(b);
-                        if (b == 0)
+                        bb = shiftDir<core::Direction::SOUTH_WEST>(bb);
+                        if (bb == 0)
                             break;
-                        ray |= b;
+                        ray |= bb;
                     }
                     break;
 
@@ -406,7 +406,7 @@ namespace engine::board
     inline consteval core::BitboardTable initPawnDoublePushesMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int square = 0; square < 64; ++square)
+        for (int square = 0; square < 64; square++)
         {
             Bitboard squareBB = Bitboard{1ULL << square};
             if constexpr (Color == core::Color::WHITE)
@@ -476,7 +476,7 @@ namespace engine::board
     inline consteval core::BitboardTable initKnightAttacksMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int square = 0; square < 64; ++square)
+        for (int square = 0; square < 64; square++)
         {
             Bitboard squareBB = Bitboard{1ULL << square};
             masks[square] =
