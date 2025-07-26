@@ -50,5 +50,5 @@ jobs:
       - name: Run Magic Generation
         run: |
           if [[ "${{ matrix.generate_magics }}" == "true" ]]; then
-            run ./build/src/main/chess
+            ./build/src/main/chess
           fi
