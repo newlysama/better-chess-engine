@@ -36,7 +36,7 @@ namespace engine::board
          *
          * @param [in] data : Value to initialize m_data member
          */
-        constexpr Bitboard(const uint64_t&& data = 0ULL) noexcept
+        constexpr Bitboard(const uint64_t& data = 0ULL) noexcept
             : m_data(data)
         {
         }
