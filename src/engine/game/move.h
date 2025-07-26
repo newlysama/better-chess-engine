@@ -54,10 +54,10 @@ namespace engine::game
         Move(int from, int to, core::MoveTypes type, core::Pieces fromPiece) noexcept
             : _data{0}
         {
-            setFromSquare(from);
-            setToSquare(to);
-            setMoveType(type);
-            setFromPiece(fromPiece);
+            this->setFromSquare(from);
+            this->setToSquare(to);
+            this->setMoveType(type);
+            this->setFromPiece(fromPiece);
         }
 
         /**
