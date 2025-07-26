@@ -179,57 +179,57 @@ namespace engine::board
         }
     }
 
-    Piece State::getPiece(int squareIndex) const noexcept
+    Piece State::getPiece(int square) const noexcept
     {
         for (Color color : {Color::WHITE, Color::BLACK})
         {
             for (Piece piece = Piece::PAWN; piece < Piece::N_PIECES; piece = static_cast<Piece>(piece + 1))
             {
-                if (m_piecesBB[color][piece].isSet(squareIndex))
+                if (m_piecesBB[color][piece].isSet(square))
                 {
                     return piece;
                 }
             }
         }
 
-        LOG_ERROR("Trying to access piece at square {}, but no piece was found", squareIndex);
+        LOG_ERROR("Trying to access piece at square {}, but no piece was found", square);
         return Piece::UNKNOWN_PIECE;
     }
 
-    Piece State::getPiece(const Color color, const int squareIndex) const noexcept
+    Piece State::getPiece(const Color color, const int square) const noexcept
     {
         for (Piece piece = Piece::PAWN; piece < Piece::N_PIECES; piece = static_cast<Piece>(piece + 1))
         {
-            if (m_piecesBB[color][piece].isSet(squareIndex))
+            if (m_piecesBB[color][piece].isSet(square))
             {
                 return piece;
             }
         }
 
         LOG_ERROR("Trying to access piece of team {} at square {}, but no piece was found", utils::toString(color),
-                  squareIndex);
+                  square);
 
         return Piece::UNKNOWN_PIECE;
     }
 
-    void State::setPiece(const Color color, const Piece piece, const int squareIndex) noexcept
+    void State::setPiece(const Color color, const Piece piece, const int square) noexcept
     {
-        m_piecesBB[color][piece].set(squareIndex);
-        m_allOccBB.set(squareIndex);
-        m_teamsOccBB[color].set(squareIndex);
+        m_piecesBB[color][piece].set(square);
+        m_allOccBB.set(square);
+        m_teamsOccBB[color].set(square);
 
         LOG_DEBUG("Added {} {} to {}", utils::toString(color), utils::toString(piece),
-                  utils::squareIndexToString(squareIndex));
+                  utils::squareIndexToString(square));
     }
 
-    void State::unsetPiece(const Color color, const Piece piece, const int squareIndex) noexcept
+    void State::unsetPiece(const Color color, const Piece piece, const int square) noexcept
     {
-        m_piecesBB[color][piece].unset(squareIndex);
-        m_allOccBB.unset(squareIndex);
-        m_teamsOccBB[color].unset(squareIndex);
+        m_piecesBB[color][piece].unset(square);
+        m_allOccBB.unset(square);
+        m_teamsOccBB[color].unset(square);
 
         LOG_DEBUG("Removed {} {} from {}", utils::toString(color), utils::toString(piece),
-                  utils::squareIndexToString(squareIndex));
+                  utils::squareIndexToString(square));
     }
 
     void State::movePiece(const Piece piece, const int fromSquare, const int toSquare) noexcept

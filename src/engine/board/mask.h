@@ -163,15 +163,15 @@ namespace engine::board
     {
         core::DiagonalMasks masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
             // file's index - rank's index + 7 -> range [0,14]
-            int file = squareIndex & 7;
-            int rank = squareIndex >> 3;
+            int file = square & 7;
+            int rank = square >> 3;
 
             int maskIndex = file - rank + 7;
 
-            masks[maskIndex] |= Bitboard{1ULL << squareIndex};
+            masks[maskIndex] |= Bitboard{1ULL << square};
         }
 
         return masks;
@@ -186,15 +186,15 @@ namespace engine::board
     {
         core::DiagonalMasks masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            int file = squareIndex & 7;
-            int rank = squareIndex >> 3;
+            int file = square & 7;
+            int rank = square >> 3;
 
             // file's index + rank's index -> range [0,14]
             int maskIndex = file + rank;
 
-            masks[maskIndex] |= Bitboard{1ULL << squareIndex};
+            masks[maskIndex] |= Bitboard{1ULL << square};
         }
 
         return masks;
@@ -381,17 +381,17 @@ namespace engine::board
     inline consteval core::BitboardTable initPawnAttacksMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (int square = 0; square < 64; ++square)
         {
-            Bitboard squareBB = Bitboard{1ULL << squareIndex};
+            Bitboard squareBB = Bitboard{1ULL << square};
             if constexpr (Color == core::Color::WHITE)
             {
-                masks[squareIndex] =
+                masks[square] =
                     shiftDir<core::Direction::NORTH_WEST>(squareBB) | shiftDir<core::Direction::NORTH_EAST>(squareBB);
             }
             else
             {
-                masks[squareIndex] =
+                masks[square] =
                     shiftDir<core::Direction::SOUTH_EAST>(squareBB) | shiftDir<core::Direction::SOUTH_WEST>(squareBB);
             }
         }
@@ -406,24 +406,24 @@ namespace engine::board
     inline consteval core::BitboardTable initPawnDoublePushesMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (int square = 0; square < 64; ++square)
         {
-            Bitboard squareBB = Bitboard{1ULL << squareIndex};
+            Bitboard squareBB = Bitboard{1ULL << square};
             if constexpr (Color == core::Color::WHITE)
             {
-                int rankIndex = squareIndex >> 3;
+                int rankIndex = square >> 3;
 
                 if (rankIndex == 1) // Second rank
                 {
-                    masks[squareIndex] |= shiftDir<core::SpecialDirection::NORTH_NORTH>(squareBB);
+                    masks[square] |= shiftDir<core::SpecialDirection::NORTH_NORTH>(squareBB);
                 }
             }
             else
             {
-                int rankIndex = squareIndex >> 3;
+                int rankIndex = square >> 3;
                 if (rankIndex == 6) // 7th rank
                 {
-                    masks[squareIndex] |= shiftDir<core::SpecialDirection::SOUTH_SOUTH>(squareBB);
+                    masks[square] |= shiftDir<core::SpecialDirection::SOUTH_SOUTH>(squareBB);
                 }
             }
         }
@@ -438,16 +438,16 @@ namespace engine::board
     inline consteval core::BitboardTable initPawnPushesMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (int square = 0; square < 64; ++square)
         {
-            Bitboard squareBB = Bitboard{1ULL << squareIndex};
+            Bitboard squareBB = Bitboard{1ULL << square};
             if constexpr (Color == core::Color::WHITE)
             {
-                masks[squareIndex] = shiftDir<core::Direction::NORTH>(squareBB);
+                masks[square] = shiftDir<core::Direction::NORTH>(squareBB);
             }
             else
             {
-                masks[squareIndex] = shiftDir<core::Direction::SOUTH>(squareBB);
+                masks[square] = shiftDir<core::Direction::SOUTH>(squareBB);
             }
         }
         return masks;
@@ -476,10 +476,10 @@ namespace engine::board
     inline consteval core::BitboardTable initKnightAttacksMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (int square = 0; square < 64; ++square)
         {
-            Bitboard squareBB = Bitboard{1ULL << squareIndex};
-            masks[squareIndex] =
+            Bitboard squareBB = Bitboard{1ULL << square};
+            masks[square] =
                 shiftDir<core::SpecialDirection::NNE>(squareBB) | shiftDir<core::SpecialDirection::ENE>(squareBB) |
                 shiftDir<core::SpecialDirection::ESE>(squareBB) | shiftDir<core::SpecialDirection::SSE>(squareBB) |
                 shiftDir<core::SpecialDirection::SSW>(squareBB) | shiftDir<core::SpecialDirection::WSW>(squareBB) |
@@ -497,15 +497,14 @@ namespace engine::board
     {
         core::BitboardTable masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            Bitboard mask = Bitboard{1ULL << squareIndex};
+            Bitboard mask = Bitboard{1ULL << square};
 
-            masks[squareIndex] =
-                shiftDir<core::Direction::NORTH>(mask) | shiftDir<core::Direction::SOUTH>(mask) |
-                shiftDir<core::Direction::EAST>(mask) | shiftDir<core::Direction::WEST>(mask) |
-                shiftDir<core::Direction::NORTH_EAST>(mask) | shiftDir<core::Direction::NORTH_WEST>(mask) |
-                shiftDir<core::Direction::SOUTH_EAST>(mask) | shiftDir<core::Direction::SOUTH_WEST>(mask);
+            masks[square] = shiftDir<core::Direction::NORTH>(mask) | shiftDir<core::Direction::SOUTH>(mask) |
+                            shiftDir<core::Direction::EAST>(mask) | shiftDir<core::Direction::WEST>(mask) |
+                            shiftDir<core::Direction::NORTH_EAST>(mask) | shiftDir<core::Direction::NORTH_WEST>(mask) |
+                            shiftDir<core::Direction::SOUTH_EAST>(mask) | shiftDir<core::Direction::SOUTH_WEST>(mask);
         }
 
         return masks;
@@ -520,17 +519,17 @@ namespace engine::board
     {
         core::BitboardTable masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            std::size_t file = squareIndex & 7;
-            std::size_t rank = squareIndex >> 3;
-            Bitboard mask = Bitboard{1ULL << squareIndex};
+            std::size_t file = square & 7;
+            std::size_t rank = square >> 3;
+            Bitboard mask = Bitboard{1ULL << square};
 
             // Same file and same rank without the square itself
             Bitboard byFile = FILES_MASKS[file] ^ mask;
             Bitboard byRank = RANKS_MASKS[rank] ^ mask;
 
-            masks[squareIndex] = byFile | byRank;
+            masks[square] = byFile | byRank;
         }
 
         return masks;
@@ -545,19 +544,19 @@ namespace engine::board
     {
         core::BitboardTable masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            std::size_t file = squareIndex & 7;
-            std::size_t rank = squareIndex >> 3;
+            std::size_t file = square & 7;
+            std::size_t rank = square >> 3;
 
             std::size_t diag = file - rank + 7;
             std::size_t antiDiag = file + rank;
 
-            Bitboard mask = Bitboard{1ULL << squareIndex};
+            Bitboard mask = Bitboard{1ULL << square};
             Bitboard diag1 = DIAGONALS_MASKS[diag] ^ mask;
             Bitboard diag2 = ANTI_DIAGONALS_MASKS[antiDiag] ^ mask;
 
-            masks[squareIndex] = diag1 | diag2;
+            masks[square] = diag1 | diag2;
         }
 
         return masks;
@@ -568,7 +567,7 @@ namespace engine::board
      * @brief Get the relevant occupancy masks for a rook.
      * @details
      * Excludes edges squares on ranks/files so that we only keep
-     * those who can block a ray from each squareIndex
+     * those who can block a ray from each square
      *
      * @return 1x64 array of relevant occupancy masks
      */
@@ -576,11 +575,11 @@ namespace engine::board
     {
         core::BitboardTable masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
             // Get file / rank indexes
-            int file = squareIndex & 7;
-            int rank = squareIndex >> 3;
+            int file = square & 7;
+            int rank = square >> 3;
 
             // Exclude ranks 1 and 8
             Bitboard byFile = FILES_MASKS[file] & NOT_RANK_EDGES_MASK;
@@ -588,8 +587,8 @@ namespace engine::board
             // Exclude files A and H
             Bitboard byRank = RANKS_MASKS[rank] & NOT_FILE_EDGES_MASK;
 
-            masks[squareIndex] = (byFile | byRank);
-            masks[squareIndex].unset(squareIndex);
+            masks[square] = (byFile | byRank);
+            masks[square].unset(square);
         }
 
         return masks;
@@ -598,7 +597,7 @@ namespace engine::board
 
     /**
      * @brief Get the relevant occupancy masks for a bishop.
-     * @details Excludes edges squares on diags/anti-diags that goes through each squareIndex
+     * @details Excludes edges squares on diags/anti-diags that goes through each square
      *
      * @return 1x64 array of relevant occupancy masks
      */
@@ -606,11 +605,11 @@ namespace engine::board
     {
         core::BitboardTable masks{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
             // Get file / rank indexes
-            int file = squareIndex & 7;
-            int rank = squareIndex >> 3;
+            int file = square & 7;
+            int rank = square >> 3;
 
             // diag = file - rank + 7  → index [0..14]
             int diag = file - rank + 7;
@@ -622,9 +621,9 @@ namespace engine::board
             Bitboard byDiag = DIAGONALS_MASKS[diag] & NOT_FILE_EDGES_MASK & NOT_RANK_EDGES_MASK;
             Bitboard byAntiDiag = ANTI_DIAGONALS_MASKS[antiDiag] & NOT_FILE_EDGES_MASK & NOT_RANK_EDGES_MASK;
 
-            // remove squareIndex
-            masks[squareIndex] = (byDiag | byAntiDiag);
-            masks[squareIndex].unset(squareIndex);
+            // remove square
+            masks[square] = (byDiag | byAntiDiag);
+            masks[square].unset(square);
         }
 
         return masks;
@@ -642,13 +641,13 @@ namespace engine::board
     {
         core::RookAttacksTable table{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            int bits = 64 - rookShifts[squareIndex];
+            int bits = 64 - rookShifts[square];
             uint64_t nEntries = 1ULL << bits;
 
             // Get relevant occupancy mask for this square
-            Bitboard relevantMask = ROOK_RELEVANT_MASKS[squareIndex];
+            Bitboard relevantMask = ROOK_RELEVANT_MASKS[square];
             int relevantBits = relevantMask.popCount();
 
             // Generate all possible occupancies
@@ -669,7 +668,7 @@ namespace engine::board
                 }
 
                 Bitboard attacks = 0ULL;
-                Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[squareIndex];
+                Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[square];
 
                 // directions rook : N, S, E, W
                 constexpr std::array<core::Direction, 4> dirs = {core::Direction::NORTH, core::Direction::SOUTH,
@@ -677,7 +676,7 @@ namespace engine::board
 
                 for (auto dir : dirs)
                 {
-                    Bitboard fullRay = RAY_MASKS[squareIndex][dir];
+                    Bitboard fullRay = RAY_MASKS[square][dir];
 
                     // Check for blockers
                     Bitboard blockers = fullRay & occupancyMasked;
@@ -687,9 +686,8 @@ namespace engine::board
                         int blockerSquare =
                             (dir == core::NORTH || dir == core::EAST) ? blockers.lsbIndex() : blockers.msbIndex();
 
-                        // Get all squares between squareIndex and the blocker
-                        Bitboard rayToBlock =
-                            BETWEEN_MASKS[squareIndex][blockerSquare] | Bitboard(1ULL << blockerSquare);
+                        // Get all squares between square and the blocker
+                        Bitboard rayToBlock = BETWEEN_MASKS[square][blockerSquare] | Bitboard(1ULL << blockerSquare);
                         attacks |= rayToBlock;
                     }
                     else
@@ -700,10 +698,9 @@ namespace engine::board
                 }
 
                 // Get magic index
-                uint64_t magicIndex =
-                    (occupancyBB.getData() * rookMagics[squareIndex].getData()) >> rookShifts[squareIndex];
+                uint64_t magicIndex = (occupancyBB.getData() * rookMagics[square].getData()) >> rookShifts[square];
 
-                table[squareIndex][magicIndex] = attacks;
+                table[square][magicIndex] = attacks;
             }
         }
 
@@ -722,13 +719,13 @@ namespace engine::board
     {
         core::BishopAttacksTable table{};
 
-        for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+        for (int square = 0; square < 64; square++)
         {
-            int bits = 64 - bishopShifts[squareIndex];
+            int bits = 64 - bishopShifts[square];
             uint64_t nEntries = 1ULL << bits;
 
             // Get relevant occupancy mask for this square
-            Bitboard relevantMask = BISHOP_RELEVANT_MASKS[squareIndex];
+            Bitboard relevantMask = BISHOP_RELEVANT_MASKS[square];
             int relevantBits = relevantMask.popCount();
 
             // Generate all possible occupancies
@@ -748,7 +745,7 @@ namespace engine::board
                     tempMask.unset(square); // Clear LSB
                 }
                 Bitboard attacks = 0;
-                Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[squareIndex];
+                Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[square];
 
                 // directions Bishop
                 constexpr std::array<core::Direction, 4> dirs = {
@@ -757,7 +754,7 @@ namespace engine::board
 
                 for (auto dir : dirs)
                 {
-                    Bitboard fullRay = RAY_MASKS[squareIndex][dir];
+                    Bitboard fullRay = RAY_MASKS[square][dir];
 
                     // Check for blockers
                     Bitboard blockers = fullRay & occupancyMasked;
@@ -767,9 +764,8 @@ namespace engine::board
                         int blockerSquare =
                             (dir == core::NORTH || dir == core::EAST) ? blockers.lsbIndex() : blockers.msbIndex();
 
-                        // Get all squares between squareIndex and the blocker
-                        Bitboard rayToBlock =
-                            BETWEEN_MASKS[squareIndex][blockerSquare] | Bitboard(1ULL << blockerSquare);
+                        // Get all squares between square and the blocker
+                        Bitboard rayToBlock = BETWEEN_MASKS[square][blockerSquare] | Bitboard(1ULL << blockerSquare);
                         attacks |= rayToBlock;
                     }
                     else
@@ -780,10 +776,9 @@ namespace engine::board
                 }
 
                 // Get magic index
-                uint64_t magicIndex =
-                    (occupancyBB.getData() * bishopMagics[squareIndex].getData()) >> bishopShifts[squareIndex];
+                uint64_t magicIndex = (occupancyBB.getData() * bishopMagics[square].getData()) >> bishopShifts[square];
 
-                table[squareIndex][magicIndex] = attacks;
+                table[square][magicIndex] = attacks;
             }
         }
 

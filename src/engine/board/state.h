@@ -59,23 +59,23 @@ namespace engine::board
         /**
          * @brief Get a rank's index, bases on a square's index
          *
-         * @param [in] squareIndex : square's index
+         * @param [in] square : square's index
          * @return int : the rank's index
          */
-        static inline constexpr int getRankIndex(const int squareIndex) noexcept
+        static inline constexpr int getRankIndex(const int square) noexcept
         {
-            return squareIndex >> 3;
+            return square >> 3;
         };
 
         /**
          * @brief Get a files's index, bases on a square's index.
          *
-         * @param [in] squareIndex : square's index
+         * @param [in] square : square's index
          * @return int : the file's index
          */
-        static inline constexpr int getFileIndex(const int squareIndex) noexcept
+        static inline constexpr int getFileIndex(const int square) noexcept
         {
-            return squareIndex & 7;
+            return square & 7;
         };
 
         /**
@@ -121,37 +121,37 @@ namespace engine::board
         /**
          * @brief Get a piece on a given square.
          *
-         * @param [in] squareIndex : the square to check
+         * @param [in] square : the square to check
          * @return Piece : the found Piece
          */
-        core::Piece getPiece(const int squareIndex) const noexcept;
+        core::Piece getPiece(const int square) const noexcept;
 
         /**
          * @brief Get a piece from a given team and square.
          *
          * @param [in] color       : the team to check
-         * @param [in] squareIndex : the square to check
+         * @param [in] square : the square to check
          * @return Piece : the found Piece
          */
-        core::Piece getPiece(const core::Color color, const int squareIndex) const noexcept;
+        core::Piece getPiece(const core::Color color, const int square) const noexcept;
 
         /**
          * @brief Add a piece to a given team on a given square.
          *
          * @param [in] color       : Team to add the piece to
          * @param [in] piece       : Piece to add
-         * @param [in] squareIndex : Square to add the piece on
+         * @param [in] square : Square to add the piece on
          */
-        void setPiece(const core::Color color, const core::Piece piece, const int squareIndex) noexcept;
+        void setPiece(const core::Color color, const core::Piece piece, const int square) noexcept;
 
         /**
          * @brief Remove a piece from a given team and square.
          *
          * @param [in] color       : Team to remove the piece from
          * @param [in] piece       : Piece to remove
-         * @param [in] squareIndex : Square to remove the piece from
+         * @param [in] square : Square to remove the piece from
          */
-        void unsetPiece(const core::Color color, const core::Piece piece, const int squareIndex) noexcept;
+        void unsetPiece(const core::Color color, const core::Piece piece, const int square) noexcept;
 
         /**
          * @brief Move a given piece.

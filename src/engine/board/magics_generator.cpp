@@ -23,13 +23,13 @@ namespace engine::board
 {
     using namespace engine::core;
 
-    Bitboard slidingAttackRook(const int squareIndex, const Bitboard occupancy) noexcept
+    Bitboard slidingAttackRook(const int square, const Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[squareIndex];
+        Bitboard occupancyMasked = occupancy & ROOK_RELEVANT_MASKS[square];
 
         // North
-        Bitboard ray = shiftDir<Direction::NORTH>(Bitboard{1ULL << squareIndex});
+        Bitboard ray = shiftDir<Direction::NORTH>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -40,7 +40,7 @@ namespace engine::board
         }
 
         // South
-        ray = shiftDir<Direction::SOUTH>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::SOUTH>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -51,7 +51,7 @@ namespace engine::board
         }
 
         // East
-        ray = shiftDir<Direction::EAST>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::EAST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -62,7 +62,7 @@ namespace engine::board
         }
 
         // West
-        ray = shiftDir<Direction::WEST>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::WEST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -75,13 +75,13 @@ namespace engine::board
         return attacks;
     }
 
-    Bitboard slidingAttackBishop(const int squareIndex, const Bitboard occupancy) noexcept
+    Bitboard slidingAttackBishop(const int square, const Bitboard occupancy) noexcept
     {
         Bitboard attacks(0ULL);
-        Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[squareIndex];
+        Bitboard occupancyMasked = occupancy & BISHOP_RELEVANT_MASKS[square];
 
         // NE
-        Bitboard ray = shiftDir<Direction::NORTH_EAST>(Bitboard{1ULL << squareIndex});
+        Bitboard ray = shiftDir<Direction::NORTH_EAST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -92,7 +92,7 @@ namespace engine::board
         }
 
         // NW
-        ray = shiftDir<Direction::NORTH_WEST>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::NORTH_WEST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -103,7 +103,7 @@ namespace engine::board
         }
 
         // SE
-        ray = shiftDir<Direction::SOUTH_EAST>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::SOUTH_EAST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -114,7 +114,7 @@ namespace engine::board
         }
 
         // SW
-        ray = shiftDir<Direction::SOUTH_WEST>(Bitboard{1ULL << squareIndex});
+        ray = shiftDir<Direction::SOUTH_WEST>(Bitboard{1ULL << square});
         while (!ray.isEmpty())
         {
             attacks |= ray;
@@ -127,20 +127,20 @@ namespace engine::board
         return attacks;
     }
 
-    uint8_t findShiftRook(const int squareIndex) noexcept
+    uint8_t findShiftRook(const int square) noexcept
     {
-        return 64 - ROOK_RELEVANT_MASKS[squareIndex].popCount();
+        return 64 - ROOK_RELEVANT_MASKS[square].popCount();
     }
 
-    uint8_t findShiftBishop(int squareIndex) noexcept
+    uint8_t findShiftBishop(int square) noexcept
     {
-        return 64 - BISHOP_RELEVANT_MASKS[squareIndex].popCount();
+        return 64 - BISHOP_RELEVANT_MASKS[square].popCount();
     }
 
-    Bitboard findMagicRook(int squareIndex) noexcept
+    Bitboard findMagicRook(int square) noexcept
     {
-        const Bitboard mask = ROOK_RELEVANT_MASKS[squareIndex];
-        const uint8_t shift = findShiftRook(squareIndex);
+        const Bitboard mask = ROOK_RELEVANT_MASKS[square];
+        const uint8_t shift = findShiftRook(square);
 
         const uint8_t bits = mask.popCount();
         const uint64_t subsetCount = 1ULL << bits;
@@ -182,7 +182,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackRook(squareIndex, Bitboard{occupancy}).getData();
+                uint64_t attack = slidingAttackRook(square, Bitboard{occupancy}).getData();
 
                 if (used[key] == 0ULL)
                 {
@@ -202,10 +202,10 @@ namespace engine::board
         }
     }
 
-    Bitboard findMagicBishop(const int squareIndex) noexcept
+    Bitboard findMagicBishop(const int square) noexcept
     {
-        const Bitboard mask = BISHOP_RELEVANT_MASKS[squareIndex];
-        const uint8_t shift = findShiftBishop(squareIndex);
+        const Bitboard mask = BISHOP_RELEVANT_MASKS[square];
+        const uint8_t shift = findShiftBishop(square);
 
         const uint8_t bits = mask.popCount();
         const uint64_t subsetCount = 1ULL << bits;
@@ -247,7 +247,7 @@ namespace engine::board
             {
                 uint64_t occupancy = occupancies[idx];
                 uint64_t key = (occupancy * magic) >> shift;
-                uint64_t attack = slidingAttackBishop(squareIndex, Bitboard{occupancy}).getData();
+                uint64_t attack = slidingAttackBishop(square, Bitboard{occupancy}).getData();
 
                 if (used[key] == 0ULL)
                 {
@@ -283,18 +283,18 @@ namespace engine::board
         omp_set_num_threads(nproc);
 
 #pragma omp parallel for
-        for (int squareIndex = 0; squareIndex < 64; ++squareIndex)
+        for (int square = 0; square < 64; ++square)
         {
-            LOG_INFO("Computing magics for square {}", squareIndex);
-            auto rmagic = findMagicRook(squareIndex);
-            auto bmagic = findMagicBishop(squareIndex);
+            LOG_INFO("Computing magics for square {}", square);
+            auto rmagic = findMagicRook(square);
+            auto bmagic = findMagicBishop(square);
 
-            rMagicVals[squareIndex] = rmagic.getData();
-            bMagicVals[squareIndex] = bmagic.getData();
+            rMagicVals[square] = rmagic.getData();
+            bMagicVals[square] = bmagic.getData();
 
-            LOG_INFO("Computing shifts for square {}", squareIndex);
-            rShiftVals[squareIndex] = findShiftRook(squareIndex);
-            bShiftVals[squareIndex] = findShiftBishop(squareIndex);
+            LOG_INFO("Computing shifts for square {}", square);
+            rShiftVals[square] = findShiftRook(square);
+            bShiftVals[square] = findShiftBishop(square);
         }
 
         // Print C++ constexpr initializers

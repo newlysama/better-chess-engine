@@ -21,13 +21,13 @@ namespace utils
     /**
      * @brief Retreives the rank/file string notation given a square index.
      *
-     * @param [in] squareIndex : the index of the square within a Bitboard
-     * @return std::string_view : rank/file string notation or "Unkown" if squareIndex is not valid
+     * @param [in] square : the index of the square within a Bitboard
+     * @return std::string_view : rank/file string notation or "Unkown" if square is not valid
      */
-    inline std::string_view squareIndexToString(const int squareIndex)
+    inline std::string_view squareIndexToString(const int square)
     {
         auto iter = std::find_if(std::begin(engine::core::SQUARE_INDEX), std::end(engine::core::SQUARE_INDEX),
-                                 [&squareIndex](auto&& pair) { return pair.second == squareIndex; });
+                                 [&square](auto&& pair) { return pair.second == square; });
 
         if (iter == std::end(engine::core::SQUARE_INDEX)) [[unlikely]]
         {
