@@ -33,7 +33,7 @@ jobs:
           echo "CC='clang-19'"    >> $GITHUB_ENV
           echo "CXX='clang++-19'" >> $GITHUB_ENV
 
-      - name: Configure
+      - name: Meson Setup
         run: |
           opts="-Dmode=${{ matrix.mode }}"
           if [[ "${{ matrix.console }}" == "true" ]]; then
@@ -44,5 +44,9 @@ jobs:
           fi
           meson setup build $opts
 
-      - name: Build
+      - name: Ninja Build
         run: ninja -C build
+
+      - name: Run Magic Generation
+        if: ${{ matrix.generate_magics == 'true' }}
+        run: ./build/src/main/chess
