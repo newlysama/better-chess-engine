@@ -49,7 +49,7 @@ namespace engine::board
          *
          * @param [in] rankInex  : rank's index
          * @param [in] fileIndex : file's index
-         * @return int : the square's index
+         * @return the square's index
          */
         static inline constexpr int getSquareIndex(const int rankIndex, const int fileIndex) noexcept
         {
@@ -60,7 +60,7 @@ namespace engine::board
          * @brief Get a rank's index, bases on a square's index
          *
          * @param [in] square : square's index
-         * @return int : the rank's index
+         * @return the rank's index
          */
         static inline constexpr int getRankIndex(const int square) noexcept
         {
@@ -71,7 +71,7 @@ namespace engine::board
          * @brief Get a files's index, bases on a square's index.
          *
          * @param [in] square : square's index
-         * @return int : the file's index
+         * @return the file's index
          */
         static inline constexpr int getFileIndex(const int square) noexcept
         {
@@ -81,7 +81,7 @@ namespace engine::board
         /**
          * @brief Check if a type of castling is enabled by checking its corresponding bit.
          *
-         * @return bool : Wether this type of castling is enabled.
+         * @return Wether this type of castling is enabled.
          */
         template <core::Castling Type>
         inline constexpr bool hasCastlingRight() const noexcept
@@ -111,7 +111,6 @@ namespace engine::board
          * - Moving a rook / king from it's initial position
          * - Capturing an enemy rook (making him lose 1 castling right)
          *
-         * @param [in] color      : Performing the move
          * @param [in] piece      : Piece being moved
          * @param [in] fromSquare : Initial square
          * @param [in] toSquare   : Destination square
@@ -122,24 +121,24 @@ namespace engine::board
          * @brief Get a piece on a given square.
          *
          * @param [in] square : the square to check
-         * @return Piece : the found Piece
+         * @return the found Piece
          */
         core::Piece getPiece(const int square) const noexcept;
 
         /**
          * @brief Get a piece from a given team and square.
          *
-         * @param [in] color       : the team to check
+         * @param [in] color  : the team to check
          * @param [in] square : the square to check
-         * @return Piece : the found Piece
+         * @return the found Piece
          */
         core::Piece getPiece(const core::Color color, const int square) const noexcept;
 
         /**
          * @brief Add a piece to a given team on a given square.
          *
-         * @param [in] color       : Team to add the piece to
-         * @param [in] piece       : Piece to add
+         * @param [in] color  : Team to add the piece to
+         * @param [in] piece  : Piece to add
          * @param [in] square : Square to add the piece on
          */
         void setPiece(const core::Color color, const core::Piece piece, const int square) noexcept;
@@ -147,8 +146,8 @@ namespace engine::board
         /**
          * @brief Remove a piece from a given team and square.
          *
-         * @param [in] color       : Team to remove the piece from
-         * @param [in] piece       : Piece to remove
+         * @param [in] color  : Team to remove the piece from
+         * @param [in] piece  : Piece to remove
          * @param [in] square : Square to remove the piece from
          */
         void unsetPiece(const core::Color color, const core::Piece piece, const int square) noexcept;

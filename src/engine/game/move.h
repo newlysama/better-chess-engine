@@ -50,6 +50,11 @@ namespace engine::game
 
         /**
          * @brief Basic move constructor.
+         *
+         * @param [in] from       : initial square
+         * @param [in] to         : destination square
+         * @param [in] type       : type of move
+         * @param [in] fromPieces : moving piece
          */
         Move(int from, int to, core::MoveType type, core::Piece fromPiece) noexcept
             : _data{0}
@@ -62,6 +67,12 @@ namespace engine::game
 
         /**
          * @brief Castling move constructor.
+         *
+         * @param [in] from       : initial square
+         * @param [in] to         : destination square
+         * @param [in] type       : type of move
+         * @param [in] fromPieces : moving piece
+         * @param [in] castke     : type of castling
          */
         Move(int from, int to, core::MoveType type, core::Piece fromPiece, core::Castling castle) noexcept
             : Move(from, to, type, fromPiece)

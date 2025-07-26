@@ -11,7 +11,6 @@
 
 #include <exception>
 
-#include "logging/logging.h"
 #include "utils/enums_to_string.h"
 
 #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
@@ -27,11 +26,13 @@ namespace engine::game
     Game::Game() noexcept
         : m_state(State{})
         , m_moveList(MoveList{})
+        , m_unmakeStack{}
     {
     }
 
     Game::Game(const std::string& fenNotation)
         : m_moveList(MoveList{})
+        , m_unmakeStack{}
     {
         std::array<std::string, 6> parts;
         std::string token;
@@ -50,7 +51,7 @@ namespace engine::game
         m_state = State{parts};
     }
 
-    void Game::makeCapture(const game::Move& move, const Color enemyColor) noexcept
+    void Game::makeCapture(const Move& move, const Color& enemyColor, const Piece& enemyPiece) noexcept
     {
         // Since state.unsetPiece() will delete target piece from general occupancy,
         // state.checkCastlingRemoval() in state.movePiece() won't detect
@@ -58,12 +59,17 @@ namespace engine::game
         // to remove the enemy castling right correctly
         m_state.checkCastlingRemoval(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
-        Piece toRemove = m_state.getPiece(enemyColor, move.getToSquare());
-        m_state.unsetPiece(enemyColor, toRemove, move.getToSquare());
+        m_state.unsetPiece(enemyColor, enemyPiece, move.getToSquare());
         m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
-        LOG_INFO("{} {} captured by {} {}", utils::toString(enemyColor), utils::toString(toRemove),
+        LOG_INFO("{} {} captured by {} {}", utils::toString(enemyColor), utils::toString(enemyPiece),
                  utils::toString(m_state.m_sideToMove), utils::toString(move.getFromPiece()));
+    }
+
+    void Game::unmakeCapture(const Move& move, const UnmakeInfo& unmakeInfo) noexcept
+    {
+        m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
+        m_state.setPiece(unmakeInfo.capColor, unmakeInfo.capPiece, unmakeInfo.capSquare);
     }
 
     void Game::makeCastling(const Move& move) noexcept
@@ -96,25 +102,47 @@ namespace engine::game
         }
     }
 
-    void Game::makeEnPassant(const Move& move, const Color enemyColor) noexcept
+    void Game::unmakeCastling(const Move& move) noexcept
+    {
+        // Move the king
+        m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
+
+        // Move the rook
+        switch (move.getCastlingType())
+        {
+        case Castling::WHITE_KING_SIDE:
+            m_state.movePiece(Piece::ROOK, 5, 7);
+            break;
+        case Castling::WHITE_QUEEN_SIDE:
+            m_state.movePiece(Piece::ROOK, 3, 0);
+            break;
+        case Castling::BLACK_KING_SIDE:
+            m_state.movePiece(Piece::ROOK, 61, 63);
+            break;
+        case Castling::BLACK_QUEEN_SIDE:
+            m_state.movePiece(Piece::ROOK, 59, 56);
+            break;
+        default:
+            LOG_ERROR("Move castling type is invalid: {}", utils::toString(move.getCastlingType()));
+            break;
+        }
+    }
+
+    void Game::makeEnPassant(const Move& move, const Color& enemyColor, const int& capturedSquare) noexcept
     {
         // Move the pawn performing enPassant
         m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
 
         // Determine enPassant captured piece's square
-        int captureSquare;
-        if (m_state.m_sideToMove == Color::WHITE)
-        {
-            captureSquare = move.getToSquare() - 8;
-        }
-        else
-        {
-            captureSquare = move.getToSquare() + 8;
-        }
-
-        m_state.unsetPiece(enemyColor, Piece::PAWN, captureSquare);
+        m_state.unsetPiece(enemyColor, Piece::PAWN, capturedSquare);
 
         LOG_INFO("Performed En Passant");
+    }
+
+    void Game::unmakeEnPassant(const Move& move, const UnmakeInfo& unmakeInfo) noexcept
+    {
+        m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
+        m_state.setPiece(unmakeInfo.capColor, Piece::PAWN, unmakeInfo.capSquare);
     }
 
     void Game::makePromotion(const game::Move& move) noexcept
@@ -135,10 +163,18 @@ namespace engine::game
         }
     }
 
-    void Game::update(const Move& move, const Color enemyColor) noexcept
+    void Game::unmakePromotion(const game::Move& move) noexcept
     {
-        if (move.getMoveType() == MoveType::CAPTURE || move.getMoveType() == MoveType::EN_PASSANT ||
-            move.getMoveType() == MoveType::PROMOTION || move.getFromPiece() == Piece::PAWN)
+        m_state.unsetPiece(m_state.m_sideToMove, move.getPromotionPiece(), move.getToSquare());
+        m_state.setPiece(m_state.m_sideToMove, Piece::PAWN, move.getFromSquare());
+    }
+
+    void Game::update(const Move& move, const Color& enemyColor) noexcept
+    {
+        MoveType moveType = move.getMoveType();
+
+        if (moveType == MoveType::CAPTURE || moveType == MoveType::EN_PASSANT || moveType == MoveType::PROMOTION ||
+            move.getFromPiece() == Piece::PAWN)
         {
             m_state.m_halfMoveClock = 0;
         }
@@ -154,7 +190,7 @@ namespace engine::game
         }
 
         // If pawn double push was played, set enPassant square
-        if (move.getMoveType() == MoveType::DOUBLE_PUSH)
+        if (moveType == MoveType::DOUBLE_PUSH)
         {
             m_state.m_epSquare = (move.getFromSquare() + move.getToSquare()) >> 1;
         }
@@ -185,41 +221,41 @@ namespace engine::game
         }
     }
 
-    void Game::playMove(const Move& move) noexcept
+    void Game::unmakeMove(const game::Move& move) noexcept
     {
-        LOG_DEBUG("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
-                  utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
-                  utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
+        using namespace engine::core;
 
-        Color enemyColor = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        m_state.m_sideToMove = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        // If move is a capture, move the from piece and remove the target piece
-        if (move.getMoveType() == MoveType::CAPTURE)
-        {
-            this->makeCapture(move, enemyColor);
-        }
-        // If move is a castling, move to according rook
-        else if (move.getMoveType() == MoveType::CASTLE) [[unlikely]]
-        {
-            this->makeCastling(move);
-        }
-        // If move is an enPassant, remove the target piece
-        else if (move.getMoveType() == MoveType::EN_PASSANT) [[unlikely]]
-        {
-            this->makeEnPassant(move, enemyColor);
-        }
-        // If no special move, just move the piece
-        else
-        {
-            m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
-        }
+        UnmakeInfo unmakeInfo = std::move(m_unmakeStack[--m_stackSize]);
+        MoveType moveType = move.getMoveType();
 
-        // If promotion piece is set, make promotion
+        // Check promotion first because the original
+        // fromPiece of the move has been replaced
         if (move.isPromotion()) [[unlikely]]
         {
-            this->makePromotion(move);
+            this->unmakePromotion(move);
+        }
+        if (moveType == MoveType::CAPTURE)
+        {
+            this->unmakeCapture(move, std::move(unmakeInfo));
+        }
+        else if (moveType == MoveType::CASTLE) [[unlikely]]
+        {
+            this->unmakeCastling(move);
+        }
+        else if (moveType == MoveType::EN_PASSANT) [[unlikely]]
+        {
+            this->unmakeEnPassant(move, std::move(unmakeInfo));
+        }
+        else
+        {
+            m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
         }
 
-        this->update(move, enemyColor);
+        m_state.m_castlingRights = unmakeInfo.prevCastlingRights;
+        m_state.m_halfMoveClock = unmakeInfo.prevHalfMoveClock;
+        m_state.m_fullMoveClock = unmakeInfo.prevFullMoveClock;
+        m_state.m_epSquare = unmakeInfo.prevEpSquare;
     }
 } // namespace engine::game
