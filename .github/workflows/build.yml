@@ -48,5 +48,6 @@ jobs:
         run: ninja -C build
 
       - name: Run Magic Generation
-        if: ${{ matrix.generate_magics == 'true' }}
-        run: ./build/src/main/chess
+          [[ "${{ matrix.generate_magics }}" == "true" ]]; then
+            run ./build/src/main/chess
+          fi
