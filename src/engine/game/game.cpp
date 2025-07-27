@@ -227,7 +227,9 @@ namespace engine::game
 
         m_state.m_sideToMove = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
-        UnmakeInfo unmakeInfo = std::move(m_unmakeStack[--m_stackSize]);
+        m_stackSize--;
+
+        UnmakeInfo unmakeInfo = std::move(m_unmakeStack[m_stackSize]);
         MoveType moveType = move.getMoveType();
 
         // Check promotion first because the original
@@ -257,5 +259,7 @@ namespace engine::game
         m_state.m_halfMoveClock = unmakeInfo.prevHalfMoveClock;
         m_state.m_fullMoveClock = unmakeInfo.prevFullMoveClock;
         m_state.m_epSquare = unmakeInfo.prevEpSquare;
+
+        m_moveList = m_moveListStack[m_stackSize];
     }
 } // namespace engine::game
