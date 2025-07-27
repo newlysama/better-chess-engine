@@ -43,11 +43,11 @@ namespace console_runner
 
         if (m_game.m_state.m_halfMoveClock >= 100)
         {
-            std::print("Select a move to play (format ex: a1a2 OR 'draw'): ");
+            std::print("Move to play (ex: \"A2B3\") | Undo last move (\"U\") | Draw (\"draw\"): ");
         }
         else
         {
-            std::print("Select a move to play (format ex: a1a2): ");
+            std::print("Move to play (ex: \"A2B3\") | Undo last move (\"U\"): ");
         }
 
         std::cin >> input;
@@ -196,10 +196,30 @@ namespace console_runner
 
         // Print initial state
         ConsoleUI::RenderState(m_game.m_state);
+        Move lastMove;
 
         while (true)
         {
             std::string userInput = this->askInput();
+
+            if (userInput == "U" || userInput == "u")
+            {
+                if (lastMove.isSet() == false)
+                {
+                    std::println("Cannot undo more than 1 move OR if no move have been played");
+                    continue;
+                }
+                else
+                {
+                    m_game.unmakeMove(lastMove);
+                    lastMove.setData(uint32_t{0});
+
+                    ConsoleUI::RenderState(m_game.m_state);
+                    std::println("Last move have been reversed");
+
+                    continue;
+                }
+            }
 
             if (userInput == "draw")
             {
@@ -229,7 +249,8 @@ namespace console_runner
                 move.value().setPromotionPiece(this->askPromotion());
             }
 
-            m_game.makeMove<false>(move.value());
+            m_game.makeMove<true>(move.value());
+            lastMove = move.value();
 
             // Print new state
             ConsoleUI::RenderState(m_game.m_state);

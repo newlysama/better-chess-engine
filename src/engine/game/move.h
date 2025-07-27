@@ -46,7 +46,10 @@ namespace engine::game
         /**
          * @brief Default constructor.
          */
-        Move() noexcept = default;
+        Move() noexcept
+            : m_data{0}
+        {
+        }
 
         /**
          * @brief Basic move constructor.
@@ -57,7 +60,7 @@ namespace engine::game
          * @param [in] fromPieces : moving piece
          */
         Move(int from, int to, core::MoveType type, core::Piece fromPiece) noexcept
-            : _data{0}
+            : m_data{0}
         {
             this->setFromSquare(from);
             this->setToSquare(to);
@@ -80,18 +83,38 @@ namespace engine::game
             setCastlingType(castle);
         }
 
+        /**
+         * @brief Check if a move has value or not.
+         *
+         * @return True if set, false otherwise
+         */
+        inline bool isSet() noexcept
+        {
+            return m_data != 0;
+        }
+
+        /**
+         * @brief Set a value to m_data attribute.
+         *
+         * @param [in] newData : new value to set
+         */
+        inline void setData(uint32_t&& newData) noexcept
+        {
+            m_data = std::move(newData);
+        }
+
         /*----------------------------------------*
          *                GETTERS                 *
          *----------------------------------------*/
 
         int getFromSquare() const noexcept
         {
-            return int(_data & 0x3Fu);
+            return int(m_data & 0x3Fu);
         }
 
         int getToSquare() const noexcept
         {
-            return int((_data >> 6) & 0x3Fu);
+            return int((m_data >> 6) & 0x3Fu);
         }
 
         core::Castling getCastlingType() const noexcept
@@ -108,7 +131,7 @@ namespace engine::game
             unsigned index = extractFlag(16, 4);
 
             // Since possible promotion pieces have values that does not match
-            // the reserved bit indices in _data, we need to map them.
+            // the reserved bit indices in m_data, we need to map them.
             switch (index)
             {
             case 0:
@@ -146,24 +169,24 @@ namespace engine::game
 
         void setFromSquare(int square) noexcept
         {
-            _data = (_data & ~0x3Fu) | (uint32_t(square) & 0x3Fu);
+            m_data = (m_data & ~0x3Fu) | (uint32_t(square) & 0x3Fu);
         }
 
         void setToSquare(int square) noexcept
         {
-            _data = (_data & ~(0x3Fu << 6)) | ((uint32_t(square) & 0x3Fu) << 6);
+            m_data = (m_data & ~(0x3Fu << 6)) | ((uint32_t(square) & 0x3Fu) << 6);
         }
 
         void setCastlingType(core::Castling castle) noexcept
         {
-            _data &= ~(0xFu << 12); // clear existing bits if any
-            _data |= (1u << (12 + static_cast<unsigned>(castle)));
+            m_data &= ~(0xFu << 12); // clear existing bits if any
+            m_data |= (1u << (12 + static_cast<unsigned>(castle)));
         }
 
         void setPromotionPiece(core::Piece piece) noexcept
         {
             // Since possible promotion pieces have values that does not match
-            // the reserved bit indices in _data, we need to map them.
+            // the reserved bit indices in m_data, we need to map them.
             unsigned p;
             switch (piece)
             {
@@ -183,20 +206,20 @@ namespace engine::game
                 p = 4;
             }
 
-            _data &= ~(0xFu << 16); // clear existing bits if any
-            _data |= (1u << (16 + static_cast<unsigned>(p)));
+            m_data &= ~(0xFu << 16); // clear existing bits if any
+            m_data |= (1u << (16 + static_cast<unsigned>(p)));
         }
 
         void setMoveType(core::MoveType type) noexcept
         {
-            _data &= ~(0x3Fu << 20); // clear existing bits if any
-            _data |= (1u << (20 + static_cast<unsigned>(type)));
+            m_data &= ~(0x3Fu << 20); // clear existing bits if any
+            m_data |= (1u << (20 + static_cast<unsigned>(type)));
         }
 
         void setFromPiece(core::Piece piece) noexcept
         {
-            _data &= ~(0x3Fu << 26); // clear existing bits if any
-            _data |= (1u << (26 + static_cast<unsigned>(piece)));
+            m_data &= ~(0x3Fu << 26); // clear existing bits if any
+            m_data |= (1u << (26 + static_cast<unsigned>(piece)));
         }
 
         /*----------------------------------------*
@@ -205,12 +228,12 @@ namespace engine::game
 
         bool operator==(const Move& other) const noexcept
         {
-            return _data == other._data;
+            return m_data == other.m_data;
         }
 
         bool operator!=(const Move& other) const noexcept
         {
-            return _data != other._data;
+            return m_data != other.m_data;
         }
 
         /**
@@ -219,7 +242,7 @@ namespace engine::game
          */
         bool isCastling() const noexcept
         {
-            return (_data & (0xFu << 12)) != 0;
+            return (m_data & (0xFu << 12)) != 0;
         }
 
         /**
@@ -270,8 +293,8 @@ namespace engine::game
             // Create mask where each bit within [shift; shfit + width] is set to 1
             uint32_t mask = ((1u << width) - 1u) << shift;
 
-            // Apply the mask on _data to reveal the one bit set to 1
-            uint32_t revealed = _data & mask;
+            // Apply the mask on m_data to reveal the one bit set to 1
+            uint32_t revealed = m_data & mask;
 
             if (revealed == 0) // out-of-range
             {
@@ -281,7 +304,7 @@ namespace engine::game
             return unsigned(std::countr_zero(revealed)) - unsigned(shift);
         }
 
-        uint32_t _data;
+        uint32_t m_data;
     };
 } // namespace engine::game
 

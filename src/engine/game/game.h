@@ -150,6 +150,7 @@ namespace engine::game
         board::State m_state;                      // Game's state
         game::MoveList m_moveList;                 // Legal move lists of the current m_halfMoveClock
         std::array<UnmakeInfo, 256> m_unmakeStack; // History of previous states to undo move efficiently
+        std::array<MoveList, 256> m_moveListStack; // History of the previous move lists
         std::size_t m_stackSize = 0;               // Current size of m_unmakeStack
 
       private:
