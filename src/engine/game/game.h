@@ -31,6 +31,12 @@ namespace engine::game
         core::Piece capPiece = core::Piece::UNKNOWN_PIECE;
         core::Color capColor = core::Color::UNKNOWN_COLOR;
         int capSquare = -1;
+
+        // State bitboards
+        core::PinnedPieces prevPinnedBB{};
+        board::Bitboard prevTargetsBB = board::Bitboard{0ULL};
+        board::Bitboard prevCheckersBB = board::Bitboard{0ULL};
+        board::Bitboard prevBlockersBB = board::Bitboard{0ULL};
     };
 
     /**
@@ -81,6 +87,11 @@ namespace engine::game
                 unmakeInfo.prevEpSquare = m_state.m_epSquare;
                 unmakeInfo.prevHalfMoveClock = m_state.m_halfMoveClock;
                 unmakeInfo.prevFullMoveClock = m_state.m_fullMoveClock;
+
+                unmakeInfo.prevPinnedBB = m_state.m_pinnedBB;
+                unmakeInfo.prevTargetsBB = m_state.m_targetsBB;
+                unmakeInfo.prevBlockersBB = m_state.m_blockersBB;
+                unmakeInfo.prevCheckersBB = m_state.m_checkersBB;
             }
 
             Color enemyColor = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
