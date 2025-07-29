@@ -27,7 +27,7 @@ namespace engine::game
     using namespace engine::board;
 
     MoveList::MoveList() noexcept
-        : _moves{}
+        : _m_moves{}
     {
     }
 
@@ -35,39 +35,52 @@ namespace engine::game
     {
         // clang-format off
         #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
-            assert(this->_size < 256);
+            assert(_m_size < 256);
         #endif
         // clang-format on
 
-        this->_moves[this->_size++] = move;
+        _m_moves[_m_size++] = move;
     }
 
     void MoveList::clear() noexcept
     {
-        this->_size = 0;
+        _m_size = 0;
     }
 
     std::size_t MoveList::size() const noexcept
     {
-        return this->_size;
+        return _m_size;
     }
 
     Move& MoveList::operator[](std::size_t index) noexcept
     {
-        return this->_moves[index];
+        return _m_moves[index];
     }
 
-    bool MoveList::contains(const Move& move) noexcept
+    bool MoveList::contains(const Move& other) const noexcept
     {
-        for (std::size_t i = 0; i < this->_size; i++)
+        for (const Move& move : _m_moves)
         {
-            if (move == this->_moves[i])
+            if (other == move)
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    game::Move MoveList::find(const int fromSquare, const int toSquare) const noexcept
+    {
+        for (const Move& move : _m_moves)
+        {
+            if (move.getFromSquare() == fromSquare && move.getToSquare() == toSquare)
+            {
+                return move;
+            }
+        }
+
+        return Move{};
     }
 
     void MoveList::processTargets(const State& state, Bitboard& targets, const int fromSquare, const MoveType moveType,
@@ -431,6 +444,12 @@ namespace engine::game
 
         this->generateKingMoves(state);
 
-        LOG_DEBUG("{} {} legal moves generated", this->_size, utils::toString(state.m_sideToMove));
+        // GAME OVER BABY
+        if (_m_size == 0)
+        {
+            state.m_isCheckMate = true;
+        }
+
+        LOG_DEBUG("{} {} legal moves generated", _m_size, utils::toString(state.m_sideToMove));
     }
 } // namespace engine::game
