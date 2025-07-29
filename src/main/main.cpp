@@ -53,20 +53,6 @@ static int run(const options::Options& opt)
 
     engine::magics_generator::initMagics();
     return 0;
-
-/*───────────────────────────────────────────────────────────────────────────*/
-#elif defined(TEST)
-
-    LOG_INFO("Running tests (not implemented yet)");
-    // TODO: call your test framework
-    return 0;
-
-/*───────────────────────────────────────────────────────────────────────────*/
-#elif defined(BENCHMARK)
-
-    LOG_INFO("Running benchmarks (not implemented yet)");
-    // TODO: benchmark harness
-    return 0;
 #endif
 }
 
