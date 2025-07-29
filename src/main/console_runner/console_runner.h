@@ -82,7 +82,7 @@ namespace console_runner
         /**
          * @brief Handles a draw request from a user.
          *
-         * @return bool : wether the draw is valid and accepted by both users
+         * @return bool : whether the draw is valid and accepted by both users
          */
         bool handleDrawRequest() noexcept;
 

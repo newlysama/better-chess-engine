@@ -142,7 +142,7 @@ namespace engine::board
          * @brief Get a bit's value at a specific index.
          *
          * @param [in] index : index to look at
-         * @return in : the bit's value
+         * @return The bit's value
          */
         inline constexpr int at(int index) const noexcept
         {
@@ -152,7 +152,7 @@ namespace engine::board
         /**
          * @brief  Get the number of bits set to 1.
          *
-         * @return int : the number of bits set to 1
+         * @return The number of bits set to 1
          */
         inline constexpr int popCount() const noexcept
         {
@@ -160,10 +160,10 @@ namespace engine::board
         }
 
         /**
-         * @brief Checker wether a bit is set to 1 at a specific index.
+         * @brief Checker whether a bit is set to 1 at a specific index.
          *
-         * @param [in] index : the bit's indice
-         * @return bool : Wether the bit is set or not
+         * @param [in] index : the bit's index
+         * @return Whether the bit is set or not
          */
         inline constexpr bool isSet(int index) const noexcept
         {
@@ -173,7 +173,7 @@ namespace engine::board
         /**
          * @brief Set a bit to to 1.
          *
-         * @param [in] index : the bit's indice
+         * @param [in] index : the bit's index
          */
         inline constexpr void set(int index) noexcept
         {
@@ -183,7 +183,7 @@ namespace engine::board
         /**
          * @brief Set a bit to to 0.
          *
-         * @param [in] index : the bit's indice
+         * @param [in] index : the bit's index
          */
         inline constexpr void unset(int index) noexcept
         {
@@ -193,7 +193,7 @@ namespace engine::board
         /**
          * @brief  Check if the bitboard is empty.
          *
-         * @return bool : wether the bitboard is empty or not
+         * @return Whether the bitboard is empty or not
          */
         inline constexpr bool isEmpty() const noexcept
         {
@@ -203,12 +203,12 @@ namespace engine::board
         /**
          * @brief  Get LSB's index.
          *
-         * @return int : LSB's index
+         * @return LSB's index
          */
         inline constexpr int lsbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -219,12 +219,12 @@ namespace engine::board
         /**
          * @brief  Get MSB's index.
          *
-         * @return int : MSB's index
+         * @return MSB's index
          */
         inline constexpr int msbIndex() const noexcept
         {
             // clang-format off
-            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -238,7 +238,7 @@ namespace engine::board
         inline constexpr void popLsb() noexcept
         {
             // clang-format off
-            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on
@@ -252,7 +252,7 @@ namespace engine::board
         inline constexpr void popMsb() noexcept
         {
             // clang-format off
-            #if !defined(BENCHMARK) || !defined(BUILD_RELEASE)
+            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
                 assert(m_data != 0);
             #endif
             // clang-format on

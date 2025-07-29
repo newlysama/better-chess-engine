@@ -93,7 +93,7 @@ namespace engine::game
          * @brief Check if a given move is present in the list.
          *
          * @param [in] other : the move to look for
-         * @return bool : wether the move is present or not
+         * @return bool : whether the move is present or not
          */
         bool contains(const game::Move& other) const noexcept;
 

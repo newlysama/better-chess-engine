@@ -81,7 +81,7 @@ namespace engine::board
         /**
          * @brief Check if a type of castling is enabled by checking its corresponding bit.
          *
-         * @return Wether this type of castling is enabled.
+         * @return Whether this type of castling is enabled.
          */
         template <core::Castling Type>
         inline constexpr bool hasCastlingRight() const noexcept

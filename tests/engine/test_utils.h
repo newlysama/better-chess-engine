@@ -28,7 +28,7 @@ namespace test
      * @param [in] a : first state
      * @param [in] b : second state
      *
-     * @return Wether the two states are equal
+     * @return Whether the two states are equal
      */
     inline void compareStates(const engine::board::State& a, const engine::board::State& b)
     {
