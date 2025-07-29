@@ -333,6 +333,12 @@ namespace engine::board
          */
         inline std::expected<void, std::string> setCastlingRightsFromFen(const std::string_view fen) noexcept
         {
+            // Start by clearing all castling rights
+            this->clearCastlingRight<core::Castling::WHITE_KING_SIDE>();
+            this->clearCastlingRight<core::Castling::WHITE_QUEEN_SIDE>();
+            this->clearCastlingRight<core::Castling::BLACK_KING_SIDE>();
+            this->clearCastlingRight<core::Castling::BLACK_QUEEN_SIDE>();
+
             if (fen == "-")
             {
                 return std::expected<void, std::string>{};
