@@ -73,6 +73,8 @@ elif mode == 'test'
 
   add_project_link_arguments(
     '-pthread',
+    '-lgtest',
+    '-lgtest_main',
     language: 'cpp'
   )
 
@@ -122,14 +124,6 @@ endif
 #             DEPS             #
 #------------------------------#
 
-# GoogleTest (subprojects/gtest.wrap → export gtest_dep)
-if mode == 'test'
-  gtest_dep = dependency(
-    'gtest',
-    required: mode == 'test'
-  )
-endif
-
 # Google Benchmark (subprojects/google-benchmark.wrap → export benchmark_dep)
 if mode == 'benchmark'
   benchmark_dep = dependency(
@@ -140,4 +134,10 @@ endif
 
 
 inc_src = include_directories('src')
+
+
 subdir('src/')
+
+if mode == 'test'
+  subdir('tests')
+endif
