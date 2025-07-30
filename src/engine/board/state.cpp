@@ -234,7 +234,7 @@ namespace engine::board
 
     void State::movePiece(const Piece piece, const int fromSquare, const int toSquare) noexcept
     {
-        // Keep track of the kings indices
+        // Keep track of the kings indexes
         if (piece == Piece::KING)
         {
             m_kgSquares[m_sideToMove] = toSquare;
@@ -272,7 +272,7 @@ namespace engine::board
                 continue;
             }
 
-            // Check if the direction makes at least 1 of the indices increase or not
+            // Check if the direction makes at least 1 of the indexes increase or not
             bool isDirIncr = direction == Direction::NORTH || direction == Direction::EAST ||
                              direction == Direction::NORTH_EAST || direction == Direction::NORTH_WEST;
 

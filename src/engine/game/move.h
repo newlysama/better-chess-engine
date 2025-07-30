@@ -34,7 +34,7 @@ namespace engine::game
      *      Bits 0 -> 5   : Initial square
      *      Bits 6 -> 11  : Destination square
      *
-     * ==> Theese ones are juste flags, never combined (1 bit = 1 piece or 1 type)
+     * ==> these ones are juste flags, never combined (1 bit = 1 piece or 1 type)
      *      Bits 12 -> 15 : Types of castling (if any)
      *      Bits 16 -> 19 : Promotion piece (if any) (0: Knhight - 1: Bishop - 2: Rook - 3: Queen)
      *      Bits 20 -> 25 : Type of move
@@ -131,7 +131,7 @@ namespace engine::game
             unsigned index = extractFlag(16, 4);
 
             // Since possible promotion pieces have values that does not match
-            // the reserved bit indices in m_data, we need to map them.
+            // the reserved bit indexes in m_data, we need to map them.
             switch (index)
             {
             case 0:
@@ -186,7 +186,7 @@ namespace engine::game
         void setPromotionPiece(core::Piece piece) noexcept
         {
             // Since possible promotion pieces have values that does not match
-            // the reserved bit indices in m_data, we need to map them.
+            // the reserved bit indexes in m_data, we need to map them.
             unsigned p;
             switch (piece)
             {
