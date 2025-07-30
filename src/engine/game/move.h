@@ -75,7 +75,7 @@ namespace engine::game
          * @param [in] to         : destination square
          * @param [in] type       : type of move
          * @param [in] fromPieces : moving piece
-         * @param [in] castke     : type of castling
+         * @param [in] castle     : type of castling
          */
         Move(int from, int to, core::MoveType type, core::Piece fromPiece, core::Castling castle) noexcept
             : Move(from, to, type, fromPiece)
