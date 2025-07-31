@@ -19,6 +19,9 @@ jobs:
             generate_magics: true
           - mode: release
             generate_magics: true
+          - mode: test
+            generate_magics: true
+            console: true
     steps:
       - uses: actions/checkout@v4
 
