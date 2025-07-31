@@ -32,6 +32,11 @@ namespace engine::game
         core::Color capColor = core::Color::UNKNOWN_COLOR;
         int capSquare = -1;
 
+        // Kings
+        bool prevIsChecked = false;
+        bool prevIsDoubleCheked = false;
+        bool prevIsCheckmate = false;
+
         // State bitboards
         core::PinnedPieces prevPinnedBB{};
         board::Bitboard prevTargetsBB = board::Bitboard{0ULL};
@@ -87,6 +92,10 @@ namespace engine::game
                 unmakeInfo.prevEpSquare = m_state.m_epSquare;
                 unmakeInfo.prevHalfMoveClock = m_state.m_halfMoveClock;
                 unmakeInfo.prevFullMoveClock = m_state.m_fullMoveClock;
+
+                unmakeInfo.prevIsChecked = m_state.m_isChecked;
+                unmakeInfo.prevIsDoubleCheked = m_state.m_isDoubleChecked;
+                unmakeInfo.prevIsCheckmate = m_state.m_isCheckMate;
 
                 unmakeInfo.prevPinnedBB = m_state.m_pinnedBB;
                 unmakeInfo.prevTargetsBB = m_state.m_targetsBB;
@@ -145,7 +154,10 @@ namespace engine::game
 
             if constexpr (SAVE_STATE)
             {
-                m_unmakeStack[m_stackSize++] = std::move(unmakeInfo);
+                m_unmakeStack[m_stackSize] = unmakeInfo;
+                m_moveListStack[m_stackSize] = m_moveList;
+
+                m_stackSize++;
             }
 
             this->update(move, enemyColor);
