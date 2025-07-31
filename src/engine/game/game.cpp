@@ -226,7 +226,7 @@ namespace engine::game
 
         m_stackSize--;
 
-        UnmakeInfo unmakeInfo = std::move(m_unmakeStack[m_stackSize]);
+        UnmakeInfo unmakeInfo = m_unmakeStack[m_stackSize];
         MoveType moveType = move.getMoveType();
 
         // Check promotion first because the original
@@ -237,7 +237,7 @@ namespace engine::game
         }
         if (moveType == MoveType::CAPTURE)
         {
-            this->unmakeCapture(move, std::move(unmakeInfo));
+            this->unmakeCapture(move, unmakeInfo);
         }
         else if (moveType == MoveType::CASTLE) [[unlikely]]
         {
@@ -245,7 +245,7 @@ namespace engine::game
         }
         else if (moveType == MoveType::EN_PASSANT) [[unlikely]]
         {
-            this->unmakeEnPassant(move, std::move(unmakeInfo));
+            this->unmakeEnPassant(move, unmakeInfo);
         }
         else
         {
@@ -256,6 +256,10 @@ namespace engine::game
         m_state.m_halfMoveClock = unmakeInfo.prevHalfMoveClock;
         m_state.m_fullMoveClock = unmakeInfo.prevFullMoveClock;
         m_state.m_epSquare = unmakeInfo.prevEpSquare;
+
+        m_state.m_isChecked = unmakeInfo.prevIsChecked;
+        m_state.m_isDoubleChecked = unmakeInfo.prevIsDoubleCheked;
+        m_state.m_isCheckMate = unmakeInfo.prevIsCheckmate;
 
         m_state.m_pinnedBB = unmakeInfo.prevPinnedBB;
         m_state.m_targetsBB = unmakeInfo.prevTargetsBB;
