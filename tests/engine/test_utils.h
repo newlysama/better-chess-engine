@@ -34,25 +34,25 @@ namespace test
     {
         using engine::board::State;
 
-        EXPECT_EQ(a.m_halfMoveClock, b.m_halfMoveClock);
-        EXPECT_EQ(a.m_fullMoveClock, b.m_fullMoveClock);
-        EXPECT_EQ(a.m_sideToMove, b.m_sideToMove);
-        EXPECT_EQ(a.m_castlingRights, b.m_castlingRights);
+        ASSERT_EQ(a.m_halfMoveClock, b.m_halfMoveClock);
+        ASSERT_EQ(a.m_fullMoveClock, b.m_fullMoveClock);
+        ASSERT_EQ(a.m_sideToMove, b.m_sideToMove);
+        ASSERT_EQ(a.m_castlingRights, b.m_castlingRights);
 
-        EXPECT_EQ(a.m_epSquare, b.m_epSquare);
-        EXPECT_EQ(a.m_kgSquares, b.m_kgSquares);
-        EXPECT_EQ(a.m_isChecked, b.m_isChecked);
-        EXPECT_EQ(a.m_isDoubleChecked, b.m_isDoubleChecked);
-        EXPECT_EQ(a.m_isCheckMate, b.m_isCheckMate);
+        ASSERT_EQ(a.m_epSquare, b.m_epSquare);
+        ASSERT_EQ(a.m_kgSquares, b.m_kgSquares);
+        ASSERT_EQ(a.m_isChecked, b.m_isChecked);
+        ASSERT_EQ(a.m_isDoubleChecked, b.m_isDoubleChecked);
+        ASSERT_EQ(a.m_isCheckMate, b.m_isCheckMate);
 
-        EXPECT_EQ(a.m_pinnedBB, b.m_pinnedBB);
-        EXPECT_EQ(a.m_targetsBB, b.m_targetsBB);
-        EXPECT_EQ(a.m_checkersBB, b.m_checkersBB);
-        EXPECT_EQ(a.m_blockersBB, b.m_blockersBB);
+        ASSERT_EQ(a.m_pinnedBB, b.m_pinnedBB);
+        ASSERT_EQ(a.m_targetsBB, b.m_targetsBB);
+        ASSERT_EQ(a.m_checkersBB, b.m_checkersBB);
+        ASSERT_EQ(a.m_blockersBB, b.m_blockersBB);
 
-        EXPECT_EQ(a.m_piecesBB, b.m_piecesBB);
-        EXPECT_EQ(a.m_allOccBB, b.m_allOccBB);
-        EXPECT_EQ(a.m_teamsOccBB, b.m_teamsOccBB);
+        ASSERT_EQ(a.m_piecesBB, b.m_piecesBB);
+        ASSERT_EQ(a.m_allOccBB, b.m_allOccBB);
+        ASSERT_EQ(a.m_teamsOccBB, b.m_teamsOccBB);
     }
 } // namespace test
 
