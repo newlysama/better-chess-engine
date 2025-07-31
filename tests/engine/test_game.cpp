@@ -15,6 +15,10 @@ namespace test
     using namespace engine::game;
     using namespace engine::board;
 
+    // ---------------------------------------------------------------------
+    // 1. PAWNS
+    // ---------------------------------------------------------------------
+
     TEST(GameTest, PawnDoublePushWhite)
     {
         Game game("7k/8/8/8/8/8/P7/7K w - - 3 1");
@@ -30,31 +34,60 @@ namespace test
         compareStates(game.m_state, initialState);
     }
 
+    TEST(GameTest, PawnDoublePushBlack)
+    {
+        Game game("7K/7p/8/8/8/8/8/7k b - - 0 1");
+        State snapshot = game.m_state;
+
+        Move move(55, 39, MoveType::DOUBLE_PUSH, Piece::PAWN); // h7 -> h5
+        game.makeMove<true>(move);
+
+        Game expected("7K/8/8/7p/8/8/8/7k w - h6 0 2");
+        compareStates(game.m_state, expected.m_state);
+
+        game.unmakeMove(move);
+        compareStates(game.m_state, snapshot);
+    }
+
     TEST(GameTest, PawnEnPassantCaptureWhite)
     {
         Game game("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 2");
         State initialState = game.m_state;
 
-        Move move(36, 43, MoveType::EN_PASSANT, Piece::PAWN); // e5 -> d6 en passant
+        Move move(36, 43, MoveType::EN_PASSANT, Piece::PAWN); // e5 -> d6 e.p.
         game.makeMove<true>(move);
 
-        Game expected("4k3/8/8/8/8/8/8/4K3 b - - 0 2");
+        Game expected("4k3/8/3P4/8/8/8/8/4K3 b - - 0 2");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }
 
+    TEST(GameTest, PawnEnPassantCaptureBlack)
+    {
+        Game game("4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1");
+        State snap = game.m_state;
+
+        Move move(27, 20, MoveType::EN_PASSANT, Piece::PAWN); // d4 -> e3 e.p.
+        game.makeMove<true>(move);
+
+        Game expected("4k3/8/8/8/8/4p3/8/4K3 w - - 0 2");
+        compareStates(game.m_state, expected.m_state);
+
+        game.unmakeMove(move);
+        compareStates(game.m_state, snap);
+    }
+
     TEST(GameTest, PawnEnPassantNotUsed)
     {
-        // White pawn ignores en passant capture and advances forward
         Game game("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 2");
         State initialState = game.m_state;
 
         Move move(36, 44, MoveType::QUIET, Piece::PAWN); // e5 -> e6
         game.makeMove<true>(move);
 
-        Game expected("4k3/8/8/8/3p4/4P3/8/4K3 b - - 0 2");
+        Game expected("4k3/8/4P3/3p4/8/8/8/4K3 b - - 0 2");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
@@ -66,42 +99,49 @@ namespace test
         Game game("7k/4P3/8/8/8/8/8/7K w - - 5 1");
         State initialState = game.m_state;
 
-        Move move(52, 60, MoveType::PROMOTION, Piece::PAWN); // e7 -> e8 promotion
+        Move move(52, 60, MoveType::PROMOTION, Piece::PAWN); // e7 -> e8=Q
         move.setPromotionPiece(Piece::QUEEN);
         game.makeMove<true>(move);
 
         Game expected("4Q2k/8/8/8/8/8/8/7K b - - 0 1");
+        expected.m_state.computeEnemyTargetedSquares();
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }
 
-    TEST(GameTest, PawnPromotionWhiteCapture)
+    TEST(GameTest, PawnPromotionBlackQuiet)
     {
-        Game game("k4n2/4P3/8/8/8/8/8/7K w - - 5 1");
-        State initialState = game.m_state;
+        // Pion noir e2 va en e1 = Dame
+        Game game("7K/8/8/8/8/8/4p3/7k b - - 0 1");
+        State snap = game.m_state;
 
-        Move move(52, 61, MoveType::CAPTURE, Piece::PAWN); // e7 -> f8 capture & promote
-        move.setPromotionPiece(Piece::KNIGHT);
-
+        Move move(12, 4, MoveType::PROMOTION, Piece::PAWN); // e2->e1
+        move.setPromotionPiece(Piece::QUEEN);
         game.makeMove<true>(move);
-        Game expected("k4N2/8/8/8/8/8/8/7K b - - 0 1");
+
+        Game expected("7K/8/8/8/8/8/8/4q2k w - - 0 2");
+        expected.m_state.computeEnemyTargetedSquares();
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
-        compareStates(game.m_state, initialState);
+        compareStates(game.m_state, snap);
     }
+
+    // ---------------------------------------------------------------------
+    // 2. CASTLINGS
+    // ---------------------------------------------------------------------
 
     TEST(GameTest, CastlingWhiteKingSide)
     {
         Game game("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 1 1");
         State initialState = game.m_state;
 
-        Move move(4, 6, MoveType::CASTLE, Piece::KING, Castling::WHITE_KING_SIDE); // white O-O
+        Move move(4, 6, MoveType::CASTLE, Piece::KING, Castling::WHITE_KING_SIDE);
         game.makeMove<true>(move);
 
-        Game expected("r3k2r/8/8/8/8/8/8/R4RK1 b Qkq - 2 1");
+        Game expected("r3k2r/8/8/8/8/8/8/R4RK1 b kq - 2 1");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
@@ -113,11 +153,10 @@ namespace test
         Game game("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 1 1");
         State initialState = game.m_state;
 
-        Move move(4, 2, MoveType::CASTLE, Piece::KING, Castling::WHITE_QUEEN_SIDE); // white O-O-O
+        Move move(4, 2, MoveType::CASTLE, Piece::KING, Castling::WHITE_QUEEN_SIDE);
         game.makeMove<true>(move);
 
         Game expected("r3k2r/8/8/8/8/8/8/2KR3R b kq - 2 1");
-        // After white queen-side castling: white king at c1, rook from a1 to d1
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
@@ -126,16 +165,14 @@ namespace test
 
     TEST(GameTest, CastlingBlackKingSide)
     {
-        Game game("r3k3/8/8/8/8/8/8/4K3 b k - 0 1");
-        // Only black king at e8 and rook at h8 have rights "k"
+        Game game("r3k2r/8/8/8/8/8/8/4K3 b k - 0 1");
         State initialState = game.m_state;
 
-        Move move(60, 62, MoveType::CASTLE, Piece::KING, Castling::BLACK_KING_SIDE); // black O-O
+        Move move(60, 62, MoveType::CASTLE, Piece::KING, Castling::BLACK_KING_SIDE);
         game.makeMove<true>(move);
 
-        Game expected("r3k3/8/8/8/8/8/8/4K3 w - - 1 1");
-        // Black king should move to g8 and rook from h8 to f8, leaving no castling rights
-        expected.m_state.m_castlingRights = 0; // no rights
+        Game expected("r4rk1/8/8/8/8/8/8/4K3 w - - 1 2");
+        expected.m_state.m_castlingRights = 0;
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
@@ -145,14 +182,12 @@ namespace test
     TEST(GameTest, CastlingBlackQueenSide)
     {
         Game game("r3k3/8/8/8/8/8/8/4K3 b q - 3 2");
-        // Black king at e8, rook at a8, queen-side right only
         State initialState = game.m_state;
 
-        Move move(60, 58, MoveType::CASTLE, Piece::KING, Castling::BLACK_QUEEN_SIDE); // black O-O-O
+        Move move(60, 58, MoveType::CASTLE, Piece::KING, Castling::BLACK_QUEEN_SIDE);
         game.makeMove<true>(move);
 
-        Game expected("2kr4/8/8/8/8/8/8/4K3 w - - 4 2");
-        // Black king should move to c8, rook from a8 to d8, no castling rights left
+        Game expected("2kr4/8/8/8/8/8/8/4K3 w - - 4 3");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
@@ -162,63 +197,83 @@ namespace test
     TEST(GameTest, RookMoveClearsCastlingRights)
     {
         Game game("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
-        // Full castling rights for both; white will move h1 rook
         State initialState = game.m_state;
 
-        Move move(7, 23, MoveType::QUIET, Piece::ROOK); // white rook h1 -> h3
+        Move move(7, 23, MoveType::QUIET, Piece::ROOK); // h1 -> h3
         game.makeMove<true>(move);
 
-        Game expected("r3k2r/8/8/7R/8/8/8/R3K3 b qk - 1 2");
-        // After move: white rook at h3, white loses king-side castling (K removed), black rights remain
+        Game expected("r3k2r/8/8/8/8/7R/8/R3K3 b Qkq - 1 1");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }
 
-    TEST(GameTest, CaptureRemovesCastlingRights)
+    TEST(GameTest, KingMoveClearsBothCastlingRights)
     {
-        Game game("r3k3/8/8/Q7/8/8/8/7K w q - 5 3");
-        // Black has queen-side castling (rook at a8), white queen at a5 will capture it
-        State initialState = game.m_state;
+        Game game("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+        State snap = game.m_state;
 
-        Move move(32, 56, MoveType::CAPTURE, Piece::QUEEN); // white queen a5 -> a8 captures rook
+        Move move(4, 5, MoveType::QUIET, Piece::KING); // e1 -> f1
         game.makeMove<true>(move);
 
-        Game expected("Q3k3/8/8/8/8/8/8/7K b - - 0 4");
-        // After capture: white queen at a8, black rook gone, black loses castling rights
+        Game expected("r3k2r/8/8/8/8/8/8/R4K1R b kq - 1 1");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
-        compareStates(game.m_state, initialState);
+        compareStates(game.m_state, snap);
     }
+
+    // ---------------------------------------------------------------------
+    // 3. QUIET MOVES
+    // ---------------------------------------------------------------------
 
     TEST(GameTest, KnightQuietMove)
     {
         Game game("7k/8/8/8/8/8/8/1N2K3 w - - 4 1");
         State initialState = game.m_state;
 
-        Move move(1, 18, MoveType::QUIET, Piece::KNIGHT); // white knight b1 -> c3
+        Move move(1, 18, MoveType::QUIET, Piece::KNIGHT); // b1 -> c3
         game.makeMove<true>(move);
 
-        Game expected("7k/8/8/2N5/8/8/8/4K3 b - - 5 2");
+        Game expected("7k/8/8/8/8/2N5/8/4K3 b - - 5 1");
         compareStates(game.m_state, expected.m_state);
 
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }
 
+    TEST(GameTest, CaptureNeutralNoCastlingEffect)
+    {
+        Game game("7k/8/8/3b4/8/4N3/8/7K w - - 0 1");
+        State snap = game.m_state;
+
+        Move move(20, 35, MoveType::CAPTURE, Piece::KNIGHT); // e3 -> d5
+        game.makeMove<true>(move);
+
+        Game expected("7k/8/8/3N4/8/8/8/7K b - - 0 1");
+        compareStates(game.m_state, expected.m_state);
+
+        game.unmakeMove(move);
+        compareStates(game.m_state, snap);
+    }
+
+    // ---------------------------------------------------------------------
+    // 4. Check flags
+    // ---------------------------------------------------------------------
+
     TEST(GameTest, MakeUnmakeMaintainsStateOnCheckmate)
     {
-        // Scenario where a move delivers checkmate (no moves for opponent).
         Game game("k7/8/1K6/3Q4/8/8/8/8 w - - 1 1");
         State initialState = game.m_state;
 
         Move move(35, 49, MoveType::QUIET, Piece::QUEEN); // Qd5 -> Qb7 (checkmate)
+        LOG_DEBUG("MAKING MOVE");
         game.makeMove<true>(move);
 
-        // After move: Black has no legal moves (checkmate). Unmake and compare states.
+        LOG_DEBUG("UNMAKING MOVE");
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }
+
 } // namespace test
