@@ -14,15 +14,15 @@ jobs:
         console: [ true, false ]
         generate_magics: [ true, false ]
 
-      exclude:
-        - console: "true"
-          generate_magics: "true"
-        - mode: release
-          generate_magics: "true"
-        - mode: test
-          generate_magics: "true"
-        - mode: test
-          console: "true"
+        exclude:
+          - console: "true"
+            generate_magics: "true"
+          - mode: release
+            generate_magics: "true"
+          - mode: test
+            generate_magics: "true"
+          - mode: test
+            console: "true"
 
     steps:
       - uses: actions/checkout@v4
