@@ -9,4 +9,6 @@ if console == true
     subdir('ui/console/')
 endif
 
-subdir('main/')
+if mode not in ['test', 'benchmark']
+    subdir('main/')
+endif

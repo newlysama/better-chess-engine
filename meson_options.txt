@@ -12,7 +12,7 @@ option(
     'generate_magics',
     type        : 'boolean',
     value       : false,
-    description : 'Wether we want to generate new magic numbers.'
+    description : 'Whether we want to generate new magic numbers.'
 )
 
 # Play the game in the console instead of using the Website
@@ -20,7 +20,7 @@ option(
     'console',
     type        : 'boolean',
     value       : false,
-    description : 'Wether we want to play the game in the console.'
+    description : 'Whether we want to play the game in the console.'
 )
 
 # Start a server to enable remote players
@@ -28,5 +28,5 @@ option(
     'server',
     type        : 'boolean',
     value       : false,
-    description : 'Wether we want to start the server to play in multiplayer.'
+    description : 'Whether we want to start the server to play in multiplayer.'
 )

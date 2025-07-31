@@ -17,10 +17,15 @@
 
 namespace logging
 {
-#if defined(BUILD_RELEASE) || defined(BUILD_TEST) || defined(BUILD_BENCHMARK)
-    bool logInFile = true;
+#if defined(BUILD_RELEASE)
+    bool isRelease = true;
+    bool isTest = false;
+#elif defined(BUILD_TEST)
+    bool isTest = true;
+    bool isRelease = false;
 #else
-    bool logInFile = false;
+    bool isRelease = false;
+    bool isTest = false;
 #endif
 
     // Loggers
@@ -35,7 +40,7 @@ namespace logging
         spdlog::sink_ptr sink;
 
         // Fill sink depending on the build mode
-        if (logInFile)
+        if (isRelease || isTest)
         {
             sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(conf::paths::logFilePath, true);
         }
@@ -47,7 +52,7 @@ namespace logging
 
         // Create and configure logger
         logger = std::make_shared<spdlog::logger>("engine", std::initializer_list<spdlog::sink_ptr>{sink});
-        logger->set_level(logInFile ? spdlog::level::info : spdlog::level::trace);
+        logger->set_level(isRelease ? spdlog::level::info : spdlog::level::trace);
         logger->flush_on(spdlog::level::info);
         spdlog::register_logger(logger);
     }

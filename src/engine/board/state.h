@@ -81,7 +81,7 @@ namespace engine::board
         /**
          * @brief Check if a type of castling is enabled by checking its corresponding bit.
          *
-         * @return Wether this type of castling is enabled.
+         * @return Whether this type of castling is enabled.
          */
         template <core::Castling Type>
         inline constexpr bool hasCastlingRight() const noexcept
@@ -333,6 +333,12 @@ namespace engine::board
          */
         inline std::expected<void, std::string> setCastlingRightsFromFen(const std::string_view fen) noexcept
         {
+            // Start by clearing all castling rights
+            this->clearCastlingRight<core::Castling::WHITE_KING_SIDE>();
+            this->clearCastlingRight<core::Castling::WHITE_QUEEN_SIDE>();
+            this->clearCastlingRight<core::Castling::BLACK_KING_SIDE>();
+            this->clearCastlingRight<core::Castling::BLACK_QUEEN_SIDE>();
+
             if (fen == "-")
             {
                 return std::expected<void, std::string>{};

@@ -27,6 +27,44 @@ namespace engine::game
          */
         MoveList() noexcept;
 
+        /*****************************************
+         *               ITERATORS               *
+         *****************************************/
+
+        game::Move* begin() noexcept
+        {
+            return _m_moves;
+        }
+
+        game::Move* end() noexcept
+        {
+            return _m_moves + _m_size;
+        }
+
+        const game::Move* begin() const noexcept
+        {
+            return _m_moves;
+        }
+
+        const game::Move* end() const noexcept
+        {
+            return _m_moves + _m_size;
+        }
+
+        const game::Move* cbegin() const noexcept
+        {
+            return _m_moves;
+        }
+
+        const game::Move* cend() const noexcept
+        {
+            return _m_moves + _m_size;
+        }
+
+        /*****************************************
+         *               UTILITIES               *
+         *****************************************/
+
         /**
          * @brief Add a new move to the moves list, throw exception if it is full.
          *
@@ -54,10 +92,24 @@ namespace engine::game
         /**
          * @brief Check if a given move is present in the list.
          *
-         * @param [in] move : the move to look for
-         * @return bool : weather the move is present or not
+         * @param [in] other : the move to look for
+         * @return bool : whether the move is present or not
          */
-        bool contains(const game::Move& move) noexcept;
+        bool contains(const game::Move& other) const noexcept;
+
+        /**
+         * @brief Get a move in the list.
+         *
+         * @param [in] fromSquare : move's starting square
+         * @param [in] toSquare   : move's destination square
+         *
+         * @return The requested move if found, empty move if not
+         */
+        game::Move find(const int fromSquare, const int toSquare) const noexcept;
+
+        /*****************************************
+         *               GENERATION              *
+         *****************************************/
 
         /**
          * @brief Call each generation method to generate all legal moves.
@@ -138,8 +190,8 @@ namespace engine::game
          */
         void generateKingMoves(const board::State& state) noexcept;
 
-        game::Move _moves[256]; // Actual list of moves
-        std::size_t _size = 0;  // Current size of the list
+        game::Move _m_moves[256]; // Actual list of moves
+        std::size_t _m_size = 0;  // Current size of the list
     };
 } // namespace engine::game
 

@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:    [ debug, profile, release ]
+        mode:    [ debug, profile, release, test ]
         console: [ true, false ]
         generate_magics: [ true, false ]
 
@@ -19,13 +19,18 @@ jobs:
             generate_magics: true
           - mode: release
             generate_magics: true
+          - mode: test
+            generate_magics: true
+          - mode: test
+            console: true
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install build tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y meson ninja-build clang-19 lld-19 g++-14 build-essential libspdlog-dev libomp-19-dev
+          sudo apt-get install -y meson ninja-build clang-19 lld-19 g++-14 build-essential libspdlog-dev libomp-19-dev libgtest-dev
 
           echo "CC='clang-19'"    >> $GITHUB_ENV
           echo "CXX='clang++-19'" >> $GITHUB_ENV
@@ -48,4 +53,10 @@ jobs:
         run: |
           if [[ "${{ matrix.generate_magics }}" == "true" ]]; then
             ./build/src/main/chess
+          fi
+
+      - name: Run Tests
+        run: |
+          if [[ "${{ matrix.mode }}" == "test" ]]; then
+            ./build/tests/test_engine
           fi

@@ -189,8 +189,6 @@ namespace console_runner
 
     void ConsoleRunner::runGame() noexcept
     {
-        m_game.m_moveList.generateAllMoves(m_game.m_state);
-
         // Load UI header
         ConsoleUI::loadHeader();
 

@@ -28,6 +28,7 @@ namespace engine::game
         , m_moveList(MoveList{})
         , m_unmakeStack{}
     {
+        m_moveList.generateAllMoves(m_state);
     }
 
     Game::Game(const std::string& fenNotation)
@@ -49,6 +50,8 @@ namespace engine::game
         }
 
         m_state = State{parts};
+
+        m_moveList.generateAllMoves(m_state);
     }
 
     void Game::makeCapture(const Move& move, const Color& enemyColor, const Piece& enemyPiece) noexcept
@@ -213,12 +216,6 @@ namespace engine::game
         LOG_DEBUG("===============================");
 
         m_moveList.generateAllMoves(m_state);
-
-        // GAME OVER BABY
-        if (m_moveList.size() == 0)
-        {
-            m_state.m_isCheckMate = true;
-        }
     }
 
     void Game::unmakeMove(const game::Move& move) noexcept
@@ -229,7 +226,7 @@ namespace engine::game
 
         m_stackSize--;
 
-        UnmakeInfo unmakeInfo = std::move(m_unmakeStack[m_stackSize]);
+        UnmakeInfo unmakeInfo = m_unmakeStack[m_stackSize];
         MoveType moveType = move.getMoveType();
 
         // Check promotion first because the original
@@ -240,7 +237,7 @@ namespace engine::game
         }
         if (moveType == MoveType::CAPTURE)
         {
-            this->unmakeCapture(move, std::move(unmakeInfo));
+            this->unmakeCapture(move, unmakeInfo);
         }
         else if (moveType == MoveType::CASTLE) [[unlikely]]
         {
@@ -248,7 +245,7 @@ namespace engine::game
         }
         else if (moveType == MoveType::EN_PASSANT) [[unlikely]]
         {
-            this->unmakeEnPassant(move, std::move(unmakeInfo));
+            this->unmakeEnPassant(move, unmakeInfo);
         }
         else
         {
@@ -259,6 +256,15 @@ namespace engine::game
         m_state.m_halfMoveClock = unmakeInfo.prevHalfMoveClock;
         m_state.m_fullMoveClock = unmakeInfo.prevFullMoveClock;
         m_state.m_epSquare = unmakeInfo.prevEpSquare;
+
+        m_state.m_isChecked = unmakeInfo.prevIsChecked;
+        m_state.m_isDoubleChecked = unmakeInfo.prevIsDoubleCheked;
+        m_state.m_isCheckMate = unmakeInfo.prevIsCheckmate;
+
+        m_state.m_pinnedBB = unmakeInfo.prevPinnedBB;
+        m_state.m_targetsBB = unmakeInfo.prevTargetsBB;
+        m_state.m_checkersBB = unmakeInfo.prevCheckersBB;
+        m_state.m_blockersBB = unmakeInfo.prevBlockersBB;
 
         m_moveList = m_moveListStack[m_stackSize];
     }
