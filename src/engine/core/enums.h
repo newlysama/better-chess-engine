@@ -126,11 +126,10 @@ namespace engine::core
     {
         QUIET = 0,
         CAPTURE = 1,
-        PROMOTION = 2,
-        CASTLE = 3,
-        DOUBLE_PUSH = 4,
-        EN_PASSANT = 5,
-        N_MOVE_TYPES = 6,
+        CASTLE = 2,
+        DOUBLE_PUSH = 3,
+        EN_PASSANT = 4,
+        N_MOVE_TYPES = 5,
         UNKNOWN_MOVE_TYPE = 255
     };
 
