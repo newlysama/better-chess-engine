@@ -176,8 +176,7 @@ namespace engine::game
     {
         MoveType moveType = move.getMoveType();
 
-        if (moveType == MoveType::CAPTURE || moveType == MoveType::EN_PASSANT || moveType == MoveType::PROMOTION ||
-            move.getFromPiece() == Piece::PAWN)
+        if (moveType == MoveType::CAPTURE || move.getFromPiece() == Piece::PAWN)
         {
             m_state.m_halfMoveClock = 0;
         }
