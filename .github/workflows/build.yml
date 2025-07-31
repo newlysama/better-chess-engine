@@ -57,6 +57,6 @@ jobs:
 
       - name: Run Tests
         run: |
-          if [[ "${{ matrix.test }}" == "true" ]]; then
+          if [[ "${{ matrix.mode }}" == "test" ]]; then
             ./build/tests/test_engine
           fi
