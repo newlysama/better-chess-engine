@@ -99,8 +99,10 @@ namespace test
         Game game("7k/4P3/8/8/8/8/8/7K w - - 5 1");
         State initialState = game.m_state;
 
-        Move move(52, 60, MoveType::PROMOTION, Piece::PAWN); // e7 -> e8=Q
-        move.setPromotionPiece(Piece::QUEEN);
+        Move move(52, 60, MoveType::QUIET, Piece::PAWN); // e7 -> e8=Q
+        ASSERT_EQ(move.getMoveType(), MoveType::QUIET);
+        ASSERT_TRUE(move.isPromotion());
+        ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);
 
         Game expected("4Q2k/8/8/8/8/8/8/7K b - - 0 1");
@@ -117,8 +119,10 @@ namespace test
         Game game("7K/8/8/8/8/8/4p3/7k b - - 0 1");
         State snap = game.m_state;
 
-        Move move(12, 4, MoveType::PROMOTION, Piece::PAWN); // e2->e1
-        move.setPromotionPiece(Piece::QUEEN);
+        Move move(12, 4, MoveType::QUIET, Piece::PAWN); // e2->e1
+        ASSERT_EQ(move.getMoveType(), MoveType::QUIET);
+        ASSERT_TRUE(move.isPromotion());
+        ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);
 
         Game expected("7K/8/8/8/8/8/8/4q2k w - - 0 2");
@@ -268,10 +272,8 @@ namespace test
         State initialState = game.m_state;
 
         Move move(35, 49, MoveType::QUIET, Piece::QUEEN); // Qd5 -> Qb7 (checkmate)
-        LOG_DEBUG("MAKING MOVE");
         game.makeMove<true>(move);
 
-        LOG_DEBUG("UNMAKING MOVE");
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
     }

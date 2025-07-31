@@ -194,8 +194,6 @@ namespace utils
             return "QUIET";
         case engine::core::MoveType::CAPTURE:
             return "CAPTURE";
-        case engine::core::MoveType::PROMOTION:
-            return "PROMOTION";
         case engine::core::MoveType::CASTLE:
             return "CASTLE";
         case engine::core::MoveType::DOUBLE_PUSH:

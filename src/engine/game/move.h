@@ -28,17 +28,17 @@ namespace engine::game
      * @class Move
      *
      * @details
-     * We store a move on a 32 bits unigned int
      *
-     * ==> Those bits are combined to store a single 5 bits integer.
-     *      Bits 0 -> 5   : Initial square
-     *      Bits 6 -> 11  : Destination square
-     *
-     * ==> these ones are juste flags, never combined (1 bit = 1 piece or 1 type)
-     *      Bits 12 -> 15 : Types of castling (if any)
-     *      Bits 16 -> 19 : Promotion piece (if any) (0: Knhight - 1: Bishop - 2: Rook - 3: Queen)
-     *      Bits 20 -> 25 : Type of move
-     *      Bits 26 -> 31 : Intial square piece
+     * We store a move on a 32 bits integers (22 used, 10 useless, I know, this is kinda crap)
+     * ───────────────────────────────────────────────────────────────────────────────────────────
+     *  0  - 5  : from square      (6 bits)
+     *  6  - 11 : to square        (6 bits)
+     *  12 - 14 : moving piece     (3 bits)  0 = Pawn, 1 = Knight, 2 = Rook, 3 = Bishop, 5 = King
+     *  15 - 17 : move type        (3 bits)  0 = QUIET, 1 = CAPTURE, 2 = CASTLE, 3 = DOUBLE_PUSH, 4 = EN_PASSANT
+     *  18 - 19 : castling type    (2 bits)  0 = WK, 1 = WQ, 2 = BK, 3 = BQ
+     *  20      : promotion flag   (1 bit)   1 = move is a promotion
+     *  21      : prom. piece bit  (1 bit)   0 = Knight, 1 = Queen (unless asked by user, Queen is set by default)
+     *  22 - 31 : do whatever you want with those
      */
     class Move
     {
@@ -66,6 +66,12 @@ namespace engine::game
             this->setToSquare(to);
             this->setMoveType(type);
             this->setFromPiece(fromPiece);
+
+            if (fromPiece == core::Piece::PAWN &&
+                (board::State::getRankIndex(to) == 7 || board::State::getRankIndex(to) == 0)) [[unlikely]]
+            {
+                this->setPromotionPiece(core::Piece::QUEEN);
+            }
         }
 
         /**
@@ -117,50 +123,29 @@ namespace engine::game
             return int((m_data >> 6) & 0x3Fu);
         }
 
-        core::Castling getCastlingType() const noexcept
+        core::Piece getFromPiece() const noexcept
         {
-            // 4 bits of castlings, starting at bit 12
-            unsigned index = extractFlag(12, 4);
-            return index < static_cast<unsigned>(core::Castling::N_CASTLINGS) ? static_cast<core::Castling>(index)
-                                                                              : core::Castling::UNKNOWN_CASTLING;
-        }
-
-        core::Piece getPromotionPiece() const noexcept
-        {
-            // 4 bits of promotion piece, starting at bit 16
-            unsigned index = extractFlag(16, 4);
-
-            // Since possible promotion pieces have values that does not match
-            // the reserved bit indexes in m_data, we need to map them.
-            switch (index)
-            {
-            case 0:
-                return core::Piece::KNIGHT;
-            case 1:
-                return core::Piece::BISHOP;
-            case 2:
-                return core::Piece::ROOK;
-            case 3:
-                return core::Piece::QUEEN;
-            default:
-                return core::Piece::UNKNOWN_PIECE;
-            }
+            return static_cast<core::Piece>((m_data >> 12) & 0x7);
         }
 
         core::MoveType getMoveType() const noexcept
         {
-            // 6 bits of move type, starting at bit 20
-            unsigned index = extractFlag(20, 6);
-            return index < static_cast<unsigned>(core::MoveType::N_MOVE_TYPES) ? static_cast<core::MoveType>(index)
-                                                                               : core::MoveType::UNKNOWN_MOVE_TYPE;
+            return static_cast<core::MoveType>((m_data >> 15) & 0x7);
         }
 
-        core::Piece getFromPiece() const noexcept
+        core::Castling getCastlingType() const noexcept
         {
-            // 6 bits of from piece, starting at bit 26
-            unsigned index = extractFlag(26, 6);
-            return index < static_cast<unsigned>(core::Piece::N_PIECES) ? static_cast<core::Piece>(index)
-                                                                        : core::Piece::UNKNOWN_PIECE;
+            return static_cast<core::Castling>((m_data >> 18) & 0x3);
+        }
+
+        core::Piece getPromotionPiece() const noexcept
+        {
+            if (!isPromotion())
+            {
+                return core::Piece::UNKNOWN_PIECE;
+            }
+
+            return (m_data >> 21) & 0x1 ? core::Piece::QUEEN : core::Piece::KNIGHT;
         }
 
         /*----------------------------------------*
@@ -177,49 +162,32 @@ namespace engine::game
             m_data = (m_data & ~(0x3Fu << 6)) | ((uint32_t(square) & 0x3Fu) << 6);
         }
 
-        void setCastlingType(core::Castling castle) noexcept
+        void setFromPiece(core::Piece piece) noexcept
         {
-            m_data &= ~(0xFu << 12); // clear existing bits if any
-            m_data |= (1u << (12 + static_cast<unsigned>(castle)));
-        }
-
-        void setPromotionPiece(core::Piece piece) noexcept
-        {
-            // Since possible promotion pieces have values that does not match
-            // the reserved bit indexes in m_data, we need to map them.
-            unsigned p;
-            switch (piece)
-            {
-            case core::Piece::KNIGHT:
-                p = 0;
-                break;
-            case core::Piece::BISHOP:
-                p = 1;
-                break;
-            case core::Piece::ROOK:
-                p = 2;
-                break;
-            case core::Piece::QUEEN:
-                p = 3;
-                break;
-            default:
-                p = 4;
-            }
-
-            m_data &= ~(0xFu << 16); // clear existing bits if any
-            m_data |= (1u << (16 + static_cast<unsigned>(p)));
+            m_data = (m_data & ~(0x7u << 12)) | (static_cast<uint32_t>(piece) << 12);
         }
 
         void setMoveType(core::MoveType type) noexcept
         {
-            m_data &= ~(0x3Fu << 20); // clear existing bits if any
-            m_data |= (1u << (20 + static_cast<unsigned>(type)));
+            m_data = (m_data & ~(0x7u << 15)) | (static_cast<uint32_t>(type) << 15);
         }
 
-        void setFromPiece(core::Piece piece) noexcept
+        void setCastlingType(core::Castling castling) noexcept
         {
-            m_data &= ~(0x3Fu << 26); // clear existing bits if any
-            m_data |= (1u << (26 + static_cast<unsigned>(piece)));
+            m_data = (m_data & ~(0x3u << 18)) | (static_cast<uint32_t>(castling) << 18);
+        }
+
+        void setPromotionPiece(core::Piece piece) noexcept
+        {
+            m_data |= (1u << 20);
+            if (piece == core::Piece::QUEEN)
+            {
+                m_data |= (1u << 21); // 1 = Queen
+            }
+            else
+            {
+                m_data &= ~(1u << 21); // 0 = Knight
+            }
         }
 
         /*----------------------------------------*
@@ -246,14 +214,11 @@ namespace engine::game
         }
 
         /**
-         * @brief Check if this move is a promotion
-         * by checking if 1 promotion piece flag is set.
+         * @brief Check if this move is a promotion.
          */
         bool isPromotion() const noexcept
         {
-            int toSquare = this->getToSquare();
-            return (this->getFromPiece() == core::Piece::PAWN &&
-                    ((toSquare <= 63 && toSquare >= 56) || (toSquare >= 0 && toSquare <= 7)));
+            return (m_data >> 20) & 0x1;
         }
 
         // clang-format off
@@ -281,29 +246,6 @@ namespace engine::game
         // clang-format on
 
       private:
-        /**
-         * @brief Extract the index of the bit set to 1 in a specific range.
-         *
-         * @param [in] shift : start index of the relevant bits
-         * @param [in] width : number of bits we want to look at
-         * @return unsigned : the bit index
-         */
-        inline unsigned extractFlag(int shift, int width) const noexcept
-        {
-            // Create mask where each bit within [shift; shfit + width] is set to 1
-            uint32_t mask = ((1u << width) - 1u) << shift;
-
-            // Apply the mask on m_data to reveal the one bit set to 1
-            uint32_t revealed = m_data & mask;
-
-            if (revealed == 0) // out-of-range
-            {
-                return width;
-            }
-
-            return unsigned(std::countr_zero(revealed)) - unsigned(shift);
-        }
-
         uint32_t m_data;
     };
 } // namespace engine::game
