@@ -15,11 +15,8 @@
 #include "engine/board/magic_const.h"
 #include "engine/board/mask.h"
 #include "logging/logging.h"
-
-#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include "utils/enums_to_string.h"
 #include "utils/utils.h"
-#endif
 
 namespace engine::game
 {
@@ -125,8 +122,29 @@ namespace engine::game
         {
             int toSquare = targets.lsbIndex();
 
-            Move move{fromSquare, toSquare, moveType, fromPiece};
-            this->add(std::move(move));
+            // If move is a promotion, create the 4 types of it
+            if (fromPiece == Piece::PAWN && (State::getRankIndex(toSquare) == 7 || State::getRankIndex(toSquare) == 0))
+                [[unlikely]]
+            {
+                Move move{fromSquare, toSquare, moveType, fromPiece};
+
+                move.setPromotionPiece(Piece::KNIGHT);
+                this->add(move);
+
+                move.setPromotionPiece(Piece::ROOK);
+                this->add(move);
+
+                move.setPromotionPiece(Piece::BISHOP);
+                this->add(move);
+
+                move.setPromotionPiece(Piece::QUEEN);
+                this->add(move);
+            }
+            else
+            {
+                Move move{fromSquare, toSquare, moveType, fromPiece};
+                this->add(std::move(move));
+            }
 
             // Move to the next target
             targets.unset(toSquare);
