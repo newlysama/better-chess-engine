@@ -80,9 +80,9 @@ namespace engine::game
         {
             using namespace engine::core;
 
-            LOG_DEBUG("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
-                      utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
-                      utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
+            LOG_INFO("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
+                     utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
+                     utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
             // Save current state infos
             UnmakeInfo unmakeInfo;
