@@ -793,7 +793,7 @@ namespace engine::board
         Bitboard{(1ULL << 61) | (1ULL << 62)}, Bitboard{(1ULL << 57) | (1ULL << 58) | (1ULL << 59)}};
 
     inline constexpr core::CastlingMasks CASTLING_KING_PATH_MASKS = {
-        Bitboard{(1ULL << 4) | (1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 4) | (1ULL << 5) | (1ULL << 6)},
+        Bitboard{(1ULL << 4) | (1ULL << 5) | (1ULL << 6)}, Bitboard{(1ULL << 4) | (1ULL << 3) | (1ULL << 2)},
         Bitboard{(1ULL << 60) | (1ULL << 61) | (1ULL << 62)}, Bitboard{(1ULL << 60) | (1ULL << 59) | (1ULL << 58)}};
 
 } // namespace engine::board
