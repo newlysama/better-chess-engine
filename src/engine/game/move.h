@@ -12,15 +12,11 @@
 
 #include <bit>
 #include <cstdint>
-
-#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include <print>
 
+#include "engine/core/enums.h"
 #include "logging/logging.h"
 #include "utils/enums_to_string.h"
-#endif
-
-#include "engine/core/enums.h"
 
 namespace engine::game
 {
@@ -37,7 +33,7 @@ namespace engine::game
      *  15 - 17 : move type        (3 bits)  0 = QUIET, 1 = CAPTURE, 2 = CASTLE, 3 = DOUBLE_PUSH, 4 = EN_PASSANT
      *  18 - 19 : castling type    (2 bits)  0 = WK, 1 = WQ, 2 = BK, 3 = BQ
      *  20      : promotion flag   (1 bit)   1 = move is a promotion
-     *  21      : prom. piece bit  (1 bit)   0 = Knight, 1 = Queen (unless asked by user, Queen is set by default)
+     *  21 - 22 : promotion piece  (1 bit)   0 = Knight, 1 = Rook, 2 = Bishop, 3 = Queen
      *  22 - 31 : do whatever you want with those
      */
     class Move
@@ -66,12 +62,6 @@ namespace engine::game
             this->setToSquare(to);
             this->setMoveType(type);
             this->setFromPiece(fromPiece);
-
-            if (fromPiece == core::Piece::PAWN &&
-                (board::State::getRankIndex(to) == 7 || board::State::getRankIndex(to) == 0)) [[unlikely]]
-            {
-                this->setPromotionPiece(core::Piece::QUEEN);
-            }
         }
 
         /**
@@ -145,7 +135,17 @@ namespace engine::game
                 return core::Piece::UNKNOWN_PIECE;
             }
 
-            return (m_data >> 21) & 0x1 ? core::Piece::QUEEN : core::Piece::KNIGHT;
+            switch ((m_data >> 21) & 0x3)
+            {
+            case 0:
+                return core::Piece::KNIGHT;
+            case 1:
+                return core::Piece::BISHOP;
+            case 2:
+                return core::Piece::ROOK;
+            default:
+                return core::Piece::QUEEN;
+            }
         }
 
         /*----------------------------------------*
@@ -180,14 +180,24 @@ namespace engine::game
         void setPromotionPiece(core::Piece piece) noexcept
         {
             m_data |= (1u << 20);
-            if (piece == core::Piece::QUEEN)
+            uint32_t code = 0;
+
+            switch (piece)
             {
-                m_data |= (1u << 21); // 1 = Queen
+            case core::Piece::KNIGHT:
+                code = 0;
+                break;
+            case core::Piece::BISHOP:
+                code = 1;
+                break;
+            case core::Piece::ROOK:
+                code = 2;
+                break;
+            default:
+                code = 3;
             }
-            else
-            {
-                m_data &= ~(1u << 21); // 0 = Knight
-            }
+
+            m_data = (m_data & ~(0x3u << 21)) | (code << 21);
         }
 
         /*----------------------------------------*
