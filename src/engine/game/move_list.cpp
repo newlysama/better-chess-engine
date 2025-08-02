@@ -105,19 +105,6 @@ namespace engine::game
             }
         }
 
-        // clang-format off
-        #if !defined (BENCHMARK) && !defined(BUILD_RELEASE)
-            if (targets.popCount() > 0)
-            {
-                LOG_DEBUG("Generated {} {} {} legal moves",
-                            targets.popCount(),
-                            utils::toString(fromPiece),
-                            utils::toString(moveType)
-                        );
-            }
-        #endif
-        // clang-format on
-
         while (targets.m_data)
         {
             int toSquare = targets.lsbIndex();
@@ -170,20 +157,19 @@ namespace engine::game
 
         Move castle{fromSquare, CASTLING_TO_SQUARE[Castling], MoveType::CASTLE, Piece::KING, Castling};
         this->add(std::move(castle));
-
-        LOG_DEBUG("Generated {} legal move", utils::toString(Castling));
     }
 
     void MoveList::getEnPassantMoves(const State& state, int fromSquare) noexcept
     {
+        // Pawn must be on rank 5 (white) or 4 (black)
         int rankFrom = State::getRankIndex(fromSquare);
-
         if (!((state.m_sideToMove == Color::WHITE && rankFrom == 4) ||
               (state.m_sideToMove == Color::BLACK && rankFrom == 3)))
         {
             return;
         }
 
+        // Can only En Passant in diagonal
         int fileFrom = State::getFileIndex(fromSquare);
         int fileEnPassant = State::getFileIndex(state.m_epSquare);
         if (std::abs(fileFrom - fileEnPassant) != 1)
@@ -191,45 +177,30 @@ namespace engine::game
             return;
         }
 
-        // Check that enPassant doesn't leave our king in check
-        int capturedSquare = state.m_sideToMove == Color::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8;
-        if (State::getRankIndex(state.m_kgSquares[state.m_sideToMove]) == State::getRankIndex(capturedSquare))
+        const int capturedSquare = (state.m_sideToMove == Color::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8);
+
+        // Quick simulation that checks wether the En Passant is gonna leave the king in check
+        auto kingInCheck = [&](const State& s, Bitboard occ) -> bool {
+            State tmp = s;
+            tmp.m_allOccBB = occ;
+            tmp.computeEnemyTargetedSquares();
+
+            return tmp.m_isChecked;
+        };
+
+        Bitboard occAfter = state.m_allOccBB;
+        occAfter.unset(capturedSquare);
+        occAfter.unset(fromSquare);
+        occAfter.set(state.m_epSquare);
+
+        if (kingInCheck(state, occAfter))
         {
-            Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
-
-            // Get enemy Rooks and Queens that are on the same rank than our king
-            Bitboard attackers = state.m_piecesBB[enemyColor][Piece::ROOK] |
-                                 state.m_piecesBB[enemyColor][Piece::QUEEN] &
-                                     RANKS_MASKS[State::getRankIndex(state.m_kgSquares[state.m_sideToMove])];
-
-            while (attackers.isEmpty() == false)
-            {
-                int attackSquare = attackers.lsbIndex();
-                attackers.unset(attackSquare);
-
-                // Get blockers between the king and an attacker (excluding the captured enemy pawn)
-                Bitboard blockers = BETWEEN_MASKS[state.m_kgSquares[state.m_sideToMove]][attackSquare] &
-                                    state.m_allOccBB & ~Bitboard{1ULL << capturedSquare};
-
-                // Captured enemy pawn is the only blocker preventing
-                // our king from check, En Passant is illegal
-                if (blockers.isEmpty())
-                {
-                    return;
-                }
-            }
+            return;
         }
 
-        Move enPassant{fromSquare, state.m_epSquare, MoveType::EN_PASSANT, Piece::PAWN};
-        this->add(std::move(enPassant));
-
-        LOG_DEBUG("Generated {} legal move from {} to {}", utils::toString(enPassant.getMoveType()),
-                  utils::squareIndexToString(fromSquare), utils::squareIndexToString(state.m_epSquare));
+        this->add(Move{fromSquare, state.m_epSquare, MoveType::EN_PASSANT, Piece::PAWN});
     }
 
-    /**
-     * @todo Generate EnPassant and Promotions
-     */
     void MoveList::generatePawnsMoves(const State& state) noexcept
     {
         Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
@@ -449,8 +420,6 @@ namespace engine::game
         // Computes enemy targeted squares
         state.computeEnemyTargetedSquares();
 
-        LOG_DEBUG("Generating {} legal moves...", utils::toString(state.m_sideToMove));
-
         if (state.m_isDoubleChecked == false)
         {
             this->generatePawnsMoves(state);
@@ -467,7 +436,5 @@ namespace engine::game
         {
             state.m_isCheckMate = true;
         }
-
-        LOG_DEBUG("{} {} legal moves generated", _m_size, utils::toString(state.m_sideToMove));
     }
 } // namespace engine::game
