@@ -85,39 +85,46 @@ namespace test
 
         for (const engine::game::Move move : game.m_moveList)
         {
-            switch (move.getMoveType())
+            if (depth == 1)
             {
-            case engine::core::MoveType::CAPTURE:
-                counters.captures++;
-                break;
-            case engine::core::MoveType::CASTLE:
-                counters.castlings++;
-                break;
-            case engine::core::MoveType::EN_PASSANT:
-                counters.enPassants++;
-                break;
-            default:
-                break;
-            }
+                switch (move.getMoveType())
+                {
+                case engine::core::MoveType::CAPTURE:
+                    counters.captures++;
+                    break;
+                case engine::core::MoveType::CASTLE:
+                    counters.castlings++;
+                    break;
+                case engine::core::MoveType::EN_PASSANT:
+                    counters.enPassants++;
+                    counters.captures++;
+                    break;
+                default:
+                    break;
+                }
 
-            if (move.isPromotion())
-            {
-                counters.promotions++;
+                if (move.isPromotion())
+                {
+                    counters.promotions++;
+                }
             }
 
             game.makeMove<true>(move);
 
-            if (game.m_state.m_isChecked)
+            if (depth == 1)
             {
-                counters.checks++;
-            }
-            if (game.m_state.m_isDoubleChecked)
-            {
-                counters.doubleChecks++;
-            }
-            if (game.m_state.m_isCheckMate)
-            {
-                counters.checkmates++;
+                if (game.m_state.m_isChecked)
+                {
+                    counters.checks++;
+                }
+                if (game.m_state.m_isDoubleChecked)
+                {
+                    counters.doubleChecks++;
+                }
+                if (game.m_state.m_isCheckMate)
+                {
+                    counters.checkmates++;
+                }
             }
 
             nodes += perft(game, depth - 1, counters);
