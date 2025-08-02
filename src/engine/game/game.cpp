@@ -209,17 +209,6 @@ namespace engine::game
         }
 
         m_state.m_sideToMove = enemyColor;
-
-        LOG_DEBUG("===== BOARD STATE UPDATED =====");
-        LOG_DEBUG("New side to move: {}", utils::toString(m_state.m_sideToMove));
-        LOG_DEBUG("Half Move Clock: {} - Full Move Clock: {}", m_state.m_halfMoveClock, m_state.m_fullMoveClock);
-        LOG_DEBUG("White King Side Castling Right: {} - White Queen Side Castling Right: {}",
-                  m_state.hasCastlingRight<WHITE_KING_SIDE>(), m_state.hasCastlingRight<WHITE_QUEEN_SIDE>());
-        LOG_DEBUG("Black King Side Castling Right: {} - Black Queen Side Castling Right: {}",
-                  m_state.hasCastlingRight<BLACK_KING_SIDE>(), m_state.hasCastlingRight<BLACK_QUEEN_SIDE>());
-        LOG_DEBUG("En Passant square: {}", utils::squareIndexToString(m_state.m_epSquare));
-        LOG_DEBUG("===============================");
-
         m_moveList.generateAllMoves(m_state);
     }
 
