@@ -761,8 +761,8 @@ namespace engine::board
                     if (blockers.isEmpty() == false)
                     {
                         // Get the nearest block
-                        int blockerSquare =
-                            (dir == core::NORTH || dir == core::EAST) ? blockers.lsbIndex() : blockers.msbIndex();
+                        int blockerSquare = (dir == core::NORTH_EAST || dir == core::NORTH_WEST) ? blockers.lsbIndex()
+                                                                                                 : blockers.msbIndex();
 
                         // Get all squares between square and the blocker
                         Bitboard rayToBlock = BETWEEN_MASKS[square][blockerSquare] | Bitboard(1ULL << blockerSquare);
