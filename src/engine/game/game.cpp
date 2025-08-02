@@ -12,10 +12,7 @@
 #include <exception>
 
 #include "utils/enums_to_string.h"
-
-#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include "utils/utils.h"
-#endif
 
 namespace engine::game
 {
@@ -73,6 +70,11 @@ namespace engine::game
     {
         m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
         m_state.setPiece(unmakeInfo.capColor, unmakeInfo.capPiece, unmakeInfo.capSquare);
+
+        LOG_INFO("Unmade {} {} ({}) capture on {} {} ({})", utils::toString(m_state.m_sideToMove),
+                 utils::toString(move.getFromPiece()), utils::squareIndexToString(move.getFromSquare()),
+                 utils::toString(unmakeInfo.capColor), utils::toString(unmakeInfo.capPiece),
+                 utils::squareIndexToString(unmakeInfo.capSquare));
     }
 
     void Game::makeCastling(const Move& move) noexcept
@@ -85,24 +87,22 @@ namespace engine::game
         {
         case Castling::WHITE_KING_SIDE:
             m_state.movePiece(Piece::ROOK, 7, 5);
-            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::WHITE_QUEEN_SIDE:
             m_state.movePiece(Piece::ROOK, 0, 3);
-            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::BLACK_KING_SIDE:
             m_state.movePiece(Piece::ROOK, 63, 61);
-            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         case Castling::BLACK_QUEEN_SIDE:
             m_state.movePiece(Piece::ROOK, 56, 59);
-            LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
             break;
         default:
             LOG_ERROR("Move castling type is invalid: {}", utils::toString(move.getCastlingType()));
             break;
         }
+
+        LOG_INFO("Performed {} castling", utils::toString(move.getCastlingType()));
     }
 
     void Game::unmakeCastling(const Move& move) noexcept
@@ -129,6 +129,8 @@ namespace engine::game
             LOG_ERROR("Move castling type is invalid: {}", utils::toString(move.getCastlingType()));
             break;
         }
+
+        LOG_INFO("Unmade {} castling", utils::toString(move.getCastlingType()));
     }
 
     void Game::makeEnPassant(const Move& move, const Color& enemyColor, const int& capturedSquare) noexcept
@@ -146,6 +148,8 @@ namespace engine::game
     {
         m_state.movePiece(move.getFromPiece(), move.getToSquare(), move.getFromSquare());
         m_state.setPiece(unmakeInfo.capColor, Piece::PAWN, unmakeInfo.capSquare);
+
+        LOG_INFO("Unmade En Passant");
     }
 
     void Game::makePromotion(const game::Move& move) noexcept
@@ -170,6 +174,8 @@ namespace engine::game
     {
         m_state.unsetPiece(m_state.m_sideToMove, move.getPromotionPiece(), move.getToSquare());
         m_state.setPiece(m_state.m_sideToMove, Piece::PAWN, move.getFromSquare());
+
+        LOG_INFO("Unmade Promotion");
     }
 
     void Game::update(const Move& move, const Color& enemyColor) noexcept
@@ -219,7 +225,9 @@ namespace engine::game
 
     void Game::unmakeMove(const game::Move& move) noexcept
     {
-        using namespace engine::core;
+        LOG_INFO("Unmake move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
+                 utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
+                 utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
         m_state.m_sideToMove = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
 
