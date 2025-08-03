@@ -78,6 +78,11 @@ namespace engine::board
             return square & 7;
         };
 
+        core::Color getEnemyColor() const noexcept
+        {
+            return m_sideToMove == core::Color::WHITE ? core::Color::BLACK : core::Color::WHITE;
+        }
+
         /**
          * @brief Check if a type of castling is enabled by checking its corresponding bit.
          *

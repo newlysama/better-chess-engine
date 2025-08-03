@@ -218,7 +218,7 @@ namespace engine::game
                  utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
                  utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
-        m_state.m_sideToMove = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        m_state.m_sideToMove = m_state.getEnemyColor();
 
         m_stackSize--;
 

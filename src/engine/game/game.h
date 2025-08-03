@@ -103,7 +103,7 @@ namespace engine::game
                 unmakeInfo.prevCheckersBB = m_state.m_checkersBB;
             }
 
-            Color enemyColor = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+            Color enemyColor = m_state.getEnemyColor();
             MoveType moveType = move.getMoveType();
 
             // If move is a capture, move the from piece and remove the target piece

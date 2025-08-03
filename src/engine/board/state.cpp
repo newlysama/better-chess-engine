@@ -137,7 +137,7 @@ namespace engine::board
         }
 
         // Check if we are removing enemy's castling right by capturing a rook
-        Color enemyColor = (m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE);
+        Color enemyColor = this->getEnemyColor();
 
         // If target piece is a rook
         if (enemyColor == Color::WHITE && m_piecesBB[enemyColor][Piece::ROOK].isSet(toSquare))
@@ -231,7 +231,7 @@ namespace engine::board
 
     void State::computePinnedPieces() noexcept
     {
-        const Color enemyColor = m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        const Color enemyColor = this->getEnemyColor();
 
         // Clear the pinned pieces bitboards
         m_pinnedBB[m_sideToMove].fill(Bitboard{0ULL});
@@ -298,7 +298,7 @@ namespace engine::board
 
     void State::computeEnemyTargetedSquares() noexcept
     {
-        const Color enemyColor = m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        const Color enemyColor = this->getEnemyColor();
 
         // Restore m_checkersBB and m_blockersBB Bitboard
         m_checkersBB = Bitboard{0ULL};
