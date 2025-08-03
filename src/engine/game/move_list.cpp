@@ -142,7 +142,7 @@ namespace engine::game
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
-        if (!state.hasCastlingRight<Castling>() || state.m_isChecked)
+        if (!state.hasCastlingRight<Castling>())
         {
             return;
         }
@@ -394,18 +394,22 @@ namespace engine::game
         Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
         // Generate Castling targets
-        if (state.m_sideToMove == Color::WHITE)
+        if (state.m_sideToMove == Color::WHITE && !state.m_isChecked)
         {
             getCastlingMoves<Castling::WHITE_KING_SIDE>(state, fromSquare);
             getCastlingMoves<Castling::WHITE_QUEEN_SIDE>(state, fromSquare);
         }
-        else
+        else if (state.m_sideToMove == Color::BLACK && !state.m_isChecked)
         {
             getCastlingMoves<Castling::BLACK_KING_SIDE>(state, fromSquare);
             getCastlingMoves<Castling::BLACK_QUEEN_SIDE>(state, fromSquare);
         }
 
-        this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KING);
+        if (!state.m_isDoubleChecked)
+        {
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KING);
+        }
+
         this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::KING);
     }
 
