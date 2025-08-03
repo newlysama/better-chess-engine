@@ -303,4 +303,76 @@ namespace test
         EXPECT_EQ(nodes, 3894594);
     }
 
+    // ---------------------------------------------------------------------
+    // DEPTH 5
+    // ---------------------------------------------------------------------
+
+    TEST(PeftTest, FEN_1_DEPTH_5)
+    {
+        Game game(FEN_1);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+        Counters expected = {82719, 258, 0, 0, 27351, 0, 347};
+
+        EXPECT_EQ(nodes, 4865609);
+        counters.check(expected);
+    }
+
+    TEST(PeftTest, FEN_2_DEPTH_5)
+    {
+        Game game(FEN_2);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+        Counters expected = {35043416, 73365, 4993637, 8392, 3309887, 2637, 30171};
+
+        EXPECT_EQ(nodes, 193690690);
+        counters.check(expected);
+    }
+
+    TEST(PeftTest, FEN_3_DEPTH_5)
+    {
+        Game game(FEN_3);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+        Counters expected = {52051, 1165, 0, 0, 52950, 3, 0};
+
+        EXPECT_EQ(nodes, 674624);
+        counters.check(expected);
+    }
+
+    TEST(PeftTest, FEN_4_DEPTH_5)
+    {
+        Game game(FEN_4);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+        Counters expected = {2046173, 6512, 0, 329464, 200568, 0, 50562};
+
+        EXPECT_EQ(nodes, 15833292);
+        counters.check(expected);
+    }
+
+    TEST(PeftTest, FEN_5_DEPTH_5)
+    {
+        Game game(FEN_5);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+
+        EXPECT_EQ(nodes, 89941194);
+    }
+
+    TEST(PeftTest, FEN_6_DEPTH_5)
+    {
+        Game game(FEN_6);
+        Counters counters;
+
+        uint64_t nodes = perft(game, 5, counters);
+
+        EXPECT_EQ(nodes, 164075551);
+    }
+
 } // namespace test
