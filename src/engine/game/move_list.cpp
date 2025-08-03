@@ -90,16 +90,16 @@ namespace engine::game
             targets &= pinnedTargets;
         }
 
-        // If the king is in simple check, we can only
-        // capture checking pieces, and only move to
-        // square that block checking sliding pieces (if any)
-        if (state.m_isChecked)
+        // If the king is in simple check, non-king pieces can only
+        // capture checking pieces, and only move to square that
+        // block checking sliding pieces (if any)
+        if (state.m_isChecked && fromPiece != Piece::KING)
         {
             if (moveType == MoveType::CAPTURE)
             {
                 targets &= state.m_checkersBB;
             }
-            else if (fromPiece != Piece::KING)
+            else
             {
                 targets &= state.m_blockersBB;
             }
@@ -187,7 +187,6 @@ namespace engine::game
             tmp.movePiece(Piece::PAWN, fromSquare, tmp.m_epSquare);
             tmp.unsetPiece(enemyColor, Piece::PAWN, capturedSquare);
 
-            tmp.computePinnedPieces();
             tmp.computeEnemyTargetedSquares();
 
             return tmp.m_isChecked;
