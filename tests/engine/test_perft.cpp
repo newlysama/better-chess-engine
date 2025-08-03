@@ -253,7 +253,7 @@ namespace test
         Counters counters;
 
         uint64_t nodes = perft(game, 4, counters);
-        Counters expected = {757163, 1929, 128013, 15172, 25523, 42, 43};
+        Counters expected = {757163, 1929, 128013, 15172, 25523, 6, 43};
 
         EXPECT_EQ(nodes, 4085603);
         counters.check(expected);
