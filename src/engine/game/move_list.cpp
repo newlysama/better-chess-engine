@@ -432,9 +432,6 @@ namespace engine::game
         this->generateKingMoves(state);
 
         // GAME OVER BABY
-        if (state.m_isChecked && _m_size == 0)
-        {
-            state.m_isCheckMate = true;
-        }
+        state.m_isCheckMate = state.m_isChecked && (_m_size == 0);
     }
 } // namespace engine::game
