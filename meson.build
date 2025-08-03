@@ -105,20 +105,6 @@ if console == true
   endif
 endif
 
-
-#------------------------------#
-#             DEPS             #
-#------------------------------#
-
-# Google Benchmark (subprojects/google-benchmark.wrap → export benchmark_dep)
-if mode == 'benchmark'
-  benchmark_dep = dependency(
-    'google-benchmark',
-    required: mode == 'benchmark'
-  )
-endif
-
-
 inc_src = include_directories('src')
 
 
