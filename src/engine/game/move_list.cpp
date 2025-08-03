@@ -180,20 +180,18 @@ namespace engine::game
         const int capturedSquare = (state.m_sideToMove == Color::WHITE ? state.m_epSquare - 8 : state.m_epSquare + 8);
 
         // Quick simulation that checks wether the En Passant is gonna leave the king in check
-        auto kingInCheck = [&](const State& s, Bitboard occ) -> bool {
+        auto kingInCheck = [&](const State& s, const int capturedSquare, const int fromSquare) -> bool {
             State tmp = s;
-            tmp.m_allOccBB = occ;
+            Color enemyColor = tmp.getEnemyColor();
+
+            tmp.movePiece(Piece::PAWN, fromSquare, tmp.m_epSquare);
+            tmp.unsetPiece(enemyColor, Piece::PAWN, capturedSquare);
             tmp.computeEnemyTargetedSquares();
 
             return tmp.m_isChecked;
         };
 
-        Bitboard occAfter = state.m_allOccBB;
-        occAfter.unset(capturedSquare);
-        occAfter.unset(fromSquare);
-        occAfter.set(state.m_epSquare);
-
-        if (kingInCheck(state, occAfter))
+        if (kingInCheck(state, capturedSquare, fromSquare))
         {
             return;
         }
@@ -203,7 +201,7 @@ namespace engine::game
 
     void MoveList::generatePawnsMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard pawns = state.m_piecesBB[state.m_sideToMove][Piece::PAWN];
 
@@ -245,7 +243,7 @@ namespace engine::game
 
     void MoveList::generateKnightsMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard knights = state.m_piecesBB[state.m_sideToMove][Piece::KNIGHT];
 
@@ -274,7 +272,7 @@ namespace engine::game
 
     void MoveList::generateRooksMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard rooks = state.m_piecesBB[state.m_sideToMove][Piece::ROOK];
 
@@ -308,7 +306,7 @@ namespace engine::game
 
     void MoveList::generateBishopsMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard bishops = state.m_piecesBB[state.m_sideToMove][Piece::BISHOP];
 
@@ -342,7 +340,7 @@ namespace engine::game
 
     void MoveList::generateQueenMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard queen = state.m_piecesBB[state.m_sideToMove][Piece::QUEEN];
 
@@ -380,7 +378,7 @@ namespace engine::game
 
     void MoveList::generateKingMoves(const State& state) noexcept
     {
-        Color enemyColor = state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        Color enemyColor = state.getEnemyColor();
 
         Bitboard king = state.m_piecesBB[state.m_sideToMove][Piece::KING];
 
