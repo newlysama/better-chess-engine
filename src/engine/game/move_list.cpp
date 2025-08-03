@@ -186,6 +186,8 @@ namespace engine::game
 
             tmp.movePiece(Piece::PAWN, fromSquare, tmp.m_epSquare);
             tmp.unsetPiece(enemyColor, Piece::PAWN, capturedSquare);
+
+            tmp.computePinnedPieces();
             tmp.computeEnemyTargetedSquares();
 
             return tmp.m_isChecked;
