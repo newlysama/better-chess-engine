@@ -56,9 +56,9 @@ namespace engine::game
 
     bool MoveList::contains(const Move& other) const noexcept
     {
-        for (const Move& move : _m_moves)
+        for (std::size_t i = 0; i < _m_size; i++)
         {
-            if (other == move)
+            if (other == _m_moves[i])
             {
                 return true;
             }
@@ -69,11 +69,11 @@ namespace engine::game
 
     game::Move MoveList::find(const int fromSquare, const int toSquare) const noexcept
     {
-        for (const Move& move : _m_moves)
+        for (std::size_t i = 0; i < _m_size; i++)
         {
-            if (move.getFromSquare() == fromSquare && move.getToSquare() == toSquare)
+            if (_m_moves[i].getFromSquare() == fromSquare && _m_moves[i].getToSquare() == toSquare)
             {
-                return move;
+                return _m_moves[i];
             }
         }
 
