@@ -349,7 +349,7 @@ namespace test
         Counters counters;
 
         uint64_t nodes = perft(game, 5, counters);
-        Counters expected = {2046173, 6512, 0, 329464, 200568, 0, 50562};
+        Counters expected = {2046173, 6512, 0, 329464, 200568, 50, 50562};
 
         EXPECT_EQ(nodes, 15833292);
         counters.check(expected);
