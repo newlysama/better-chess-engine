@@ -76,6 +76,34 @@ namespace test
             EXPECT_EQ(doubleChecks, other.doubleChecks);
             EXPECT_EQ(checkmates, other.checkmates);
         }
+
+        void increment(const engine::game::Game& game, const engine::game::Move& move)
+        {
+            switch (move.getMoveType())
+            {
+            case engine::core::MoveType::CAPTURE:
+                captures++;
+                break;
+            case engine::core::MoveType::CASTLE:
+                castlings++;
+                break;
+            case engine::core::MoveType::EN_PASSANT:
+                enPassants++;
+                captures++;
+                break;
+            default:
+                break;
+            }
+
+            if (move.isPromotion())
+                promotions++;
+            if (game.m_state.m_isChecked)
+                checks++;
+            if (game.m_state.m_isDoubleChecked)
+                doubleChecks++;
+            if (game.m_state.m_isCheckMate)
+                checkmates++;
+        }
     };
 
     inline uint64_t perft(engine::game::Game& game, int depth, Counters& counters) noexcept
@@ -93,30 +121,7 @@ namespace test
 
             if (depth == 1)
             {
-                switch (move.getMoveType())
-                {
-                case engine::core::MoveType::CAPTURE:
-                    counters.captures++;
-                    break;
-                case engine::core::MoveType::CASTLE:
-                    counters.castlings++;
-                    break;
-                case engine::core::MoveType::EN_PASSANT:
-                    counters.enPassants++;
-                    counters.captures++;
-                    break;
-                default:
-                    break;
-                }
-
-                if (move.isPromotion())
-                    counters.promotions++;
-                if (game.m_state.m_isChecked)
-                    counters.checks++;
-                if (game.m_state.m_isDoubleChecked)
-                    counters.doubleChecks++;
-                if (game.m_state.m_isCheckMate)
-                    counters.checkmates++;
+                counters.increment(game, move);
             }
 
             nodes += perft(game, depth - 1, counters);
