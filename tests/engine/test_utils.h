@@ -110,22 +110,13 @@ namespace test
                 }
 
                 if (move.isPromotion())
-                {
                     counters.promotions++;
-                }
-
                 if (game.m_state.m_isChecked)
-                {
                     counters.checks++;
-                }
                 if (game.m_state.m_isDoubleChecked)
-                {
                     counters.doubleChecks++;
-                }
                 if (game.m_state.m_isCheckMate)
-                {
                     counters.checkmates++;
-                }
             }
 
             nodes += perft(game, depth - 1, counters);
