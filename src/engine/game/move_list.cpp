@@ -110,8 +110,8 @@ namespace engine::game
             int toSquare = targets.lsbIndex();
 
             // If move is a promotion, create the 4 types of it
-            if (fromPiece == Piece::PAWN && (State::getRankIndex(toSquare) == 7 || State::getRankIndex(toSquare) == 0))
-                [[unlikely]]
+            int toRank = State::getRankIndex(toSquare);
+            if (fromPiece == Piece::PAWN && (toRank == 7 || toRank == 0)) [[unlikely]]
             {
                 Move move{fromSquare, toSquare, moveType, fromPiece};
 
