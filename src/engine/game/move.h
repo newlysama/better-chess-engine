@@ -215,15 +215,6 @@ namespace engine::game
         }
 
         /**
-         * @brief Check if this move is a castling
-         * by checking if 1 castling flag is set.
-         */
-        bool isCastling() const noexcept
-        {
-            return (m_data & (0xFu << 12)) != 0;
-        }
-
-        /**
          * @brief Check if this move is a promotion.
          */
         bool isPromotion() const noexcept
