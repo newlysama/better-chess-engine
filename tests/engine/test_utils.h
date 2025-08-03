@@ -66,11 +66,15 @@ namespace test
         uint64_t doubleChecks = 0;
         uint64_t checkmates = 0;
 
-        bool operator==(const Counters& other) const noexcept
+        void check(const Counters& other) const noexcept
         {
-            return captures == other.captures && enPassants == other.enPassants && castlings == other.castlings &&
-                   promotions == other.promotions && checks == other.checks && doubleChecks == other.doubleChecks &&
-                   checkmates == other.checkmates;
+            EXPECT_EQ(captures, other.captures);
+            EXPECT_EQ(enPassants, other.enPassants);
+            EXPECT_EQ(castlings, other.castlings);
+            EXPECT_EQ(promotions, other.promotions);
+            EXPECT_EQ(checks, other.checks);
+            EXPECT_EQ(doubleChecks, other.doubleChecks);
+            EXPECT_EQ(checkmates, other.checkmates);
         }
     };
 

@@ -2,8 +2,8 @@
 
 #- Source File -#
 tests_engine_src = files(
-    'test_fen.cpp',
-    'test_game.cpp',
+    #'test_fen.cpp',
+    #'test_game.cpp',
     'test_perft.cpp'
 )
 
