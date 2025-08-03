@@ -80,7 +80,7 @@ namespace test
 
     inline uint64_t perft(engine::game::Game& game, int depth, Counters& counters) noexcept
     {
-        if (depth == 0)
+        if (depth == 0 || game.m_moveList.size() == 0)
         {
             return 1ULL;
         }
@@ -89,6 +89,8 @@ namespace test
 
         for (const engine::game::Move move : game.m_moveList)
         {
+            game.makeMove<true>(move);
+
             if (depth == 1)
             {
                 switch (move.getMoveType())
@@ -111,12 +113,7 @@ namespace test
                 {
                     counters.promotions++;
                 }
-            }
 
-            game.makeMove<true>(move);
-
-            if (depth == 1)
-            {
                 if (game.m_state.m_isChecked)
                 {
                     counters.checks++;
