@@ -16,10 +16,7 @@
 #include "logging/logging.h"
 #include "ui/console/console_ui.h"
 #include "utils/enums_to_string.h"
-
-#if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
 #include "utils/utils.h"
-#endif
 
 namespace console_runner
 {

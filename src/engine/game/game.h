@@ -80,9 +80,9 @@ namespace engine::game
         {
             using namespace engine::core;
 
-            LOG_DEBUG("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
-                      utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
-                      utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
+            LOG_INFO("Move request: [From square: {}] - [To square: {}] - [Move type: {}] - [From piece: {}]",
+                     utils::squareIndexToString(move.getFromSquare()), utils::squareIndexToString(move.getToSquare()),
+                     utils::toString(move.getMoveType()), utils::toString(move.getFromPiece()));
 
             // Save current state infos
             UnmakeInfo unmakeInfo;
@@ -103,7 +103,7 @@ namespace engine::game
                 unmakeInfo.prevCheckersBB = m_state.m_checkersBB;
             }
 
-            Color enemyColor = m_state.m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+            Color enemyColor = m_state.getEnemyColor();
             MoveType moveType = move.getMoveType();
 
             // If move is a capture, move the from piece and remove the target piece

@@ -108,17 +108,14 @@ namespace engine::board
             {
                 this->clearCastlingRight<Castling::WHITE_KING_SIDE>();
                 this->clearCastlingRight<Castling::WHITE_QUEEN_SIDE>();
-                LOG_DEBUG("Removed all white team castling rights");
             }
             else if (piece == Piece::ROOK && fromSquare == 0) // Initial white queen side rook position
             {
                 this->clearCastlingRight<Castling::WHITE_QUEEN_SIDE>();
-                LOG_DEBUG("Removed white queen side castling right");
             }
             else if (piece == Piece::ROOK && fromSquare == 7) // Initial white king side rook position
             {
                 this->clearCastlingRight<Castling::WHITE_KING_SIDE>();
-                LOG_DEBUG("Removed white king side castling right");
             }
         }
 
@@ -128,22 +125,19 @@ namespace engine::board
             {
                 this->clearCastlingRight<Castling::BLACK_KING_SIDE>();
                 this->clearCastlingRight<Castling::BLACK_QUEEN_SIDE>();
-                LOG_DEBUG("Removed all black team castling rights");
             }
             else if (piece == Piece::ROOK && fromSquare == 56) // Initial black queen side rook position
             {
                 this->clearCastlingRight<Castling::BLACK_QUEEN_SIDE>();
-                LOG_DEBUG("Removed black queen side castling right");
             }
             else if (piece == Piece::ROOK && fromSquare == 63) // Initial black king side rook position
             {
                 this->clearCastlingRight<Castling::BLACK_KING_SIDE>();
-                LOG_DEBUG("Removed black king side castling right");
             }
         }
 
         // Check if we are removing enemy's castling right by capturing a rook
-        Color enemyColor = (m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE);
+        Color enemyColor = this->getEnemyColor();
 
         // If target piece is a rook
         if (enemyColor == Color::WHITE && m_piecesBB[enemyColor][Piece::ROOK].isSet(toSquare))
@@ -151,12 +145,10 @@ namespace engine::board
             if (toSquare == 0) // Initial white queen side rook position
             {
                 this->clearCastlingRight<Castling::WHITE_QUEEN_SIDE>();
-                LOG_DEBUG("Removed white queen side castling right by capture");
             }
             else if (toSquare == 7) // Initial white king side rook position
             {
                 this->clearCastlingRight<Castling::WHITE_KING_SIDE>();
-                LOG_DEBUG("Removed white king side castling right by capture");
             }
         }
         else if (enemyColor == Color::BLACK && m_piecesBB[enemyColor][Piece::ROOK].isSet(toSquare))
@@ -164,12 +156,10 @@ namespace engine::board
             if (toSquare == 56) // Initial black queen side rook position
             {
                 this->clearCastlingRight<Castling::BLACK_QUEEN_SIDE>();
-                LOG_DEBUG("Removed black queen side castling right by capture");
             }
             else if (toSquare == 63) // Initial black king side rook position
             {
                 this->clearCastlingRight<Castling::BLACK_KING_SIDE>();
-                LOG_DEBUG("Removed black king side castling right by capture");
             }
         }
     }
@@ -212,9 +202,6 @@ namespace engine::board
         m_piecesBB[color][piece].set(square);
         m_allOccBB.set(square);
         m_teamsOccBB[color].set(square);
-
-        LOG_DEBUG("Added {} {} to {}", utils::toString(color), utils::toString(piece),
-                  utils::squareIndexToString(square));
     }
 
     void State::unsetPiece(const Color color, const Piece piece, const int square) noexcept
@@ -222,9 +209,6 @@ namespace engine::board
         m_piecesBB[color][piece].unset(square);
         m_allOccBB.unset(square);
         m_teamsOccBB[color].unset(square);
-
-        LOG_DEBUG("Removed {} {} from {}", utils::toString(color), utils::toString(piece),
-                  utils::squareIndexToString(square));
     }
 
     void State::movePiece(const Piece piece, const int fromSquare, const int toSquare) noexcept
@@ -247,16 +231,11 @@ namespace engine::board
 
     void State::computePinnedPieces() noexcept
     {
-        // Clear the actuel pinned pieces bitboards
+        const Color enemyColor = this->getEnemyColor();
+
+        // Clear the pinned pieces bitboards
         m_pinnedBB[m_sideToMove].fill(Bitboard{0ULL});
-
-        const Color enemyColor = m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
-
-        // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
-            int count = 0;
-        #endif
-        // clang-format on
+        m_pinnedBB[enemyColor].fill(Bitboard{0ULL});
 
         for (int direction = 0; direction < Direction::N_DIRECTIONS; direction++)
         {
@@ -314,20 +293,12 @@ namespace engine::board
 
             m_pinnedBB[m_sideToMove][firstSquare] =
                 BETWEEN_MASKS[m_kgSquares[m_sideToMove]][enemySquare] | Bitboard{1ULL << enemySquare};
-
-            // clang-format off
-            #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
-                count++;
-            #endif
-            // clang-format on
         }
-
-        LOG_DEBUG("Computed {} {} pinned pieces", count, utils::toString(m_sideToMove));
     }
 
     void State::computeEnemyTargetedSquares() noexcept
     {
-        const Color enemyColor = m_sideToMove == Color::WHITE ? Color::BLACK : Color::WHITE;
+        const Color enemyColor = this->getEnemyColor();
 
         // Restore m_checkersBB and m_blockersBB Bitboard
         m_checkersBB = Bitboard{0ULL};
@@ -442,8 +413,6 @@ namespace engine::board
         uint8_t numCheckers = m_checkersBB.popCount();
         m_isChecked = (numCheckers >= 1);
         m_isDoubleChecked = (numCheckers >= 2);
-
-        LOG_DEBUG("Computed {} targeted squares from {} team", m_targetsBB.popCount(), utils::toString(enemyColor));
     }
 
 } // namespace engine::board

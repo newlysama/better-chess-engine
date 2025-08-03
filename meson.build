@@ -21,28 +21,19 @@ server          = get_option('server')
 # Global project arguments
 add_project_arguments(
   '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
-  language: 'cpp'
-)
-
-# Performance arguments
-if mode in ['profile', 'benchmark', 'release']
-  add_project_arguments(
     '-Doptimization=3',
     '-march=native',
     '-mtune=native',
     '-funroll-loops',
     '-fomit-frame-pointer',
-    language: 'cpp',
-  )
-endif
+  language: 'cpp'
+)
 
 if mode == 'debug'
   add_project_arguments(
     '-DBUILD_DEBUG',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     '-Db_sanitize=address',
-    '-Db_lundef=false',
-    '-Doptimization=0',
     language: 'cpp'
   )
 
@@ -50,7 +41,6 @@ elif mode == 'profile'
   add_project_arguments(
     '-DBUILD_PROFILE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
-    '-Db_pch=true',
     language: 'cpp'
   )
 
@@ -65,9 +55,6 @@ elif mode == 'test'
   add_project_arguments(
     '-DBUILD_TEST',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
-    '-Db_sanitize=address',
-    '-Db_lundef=false',
-    '-Doptimization=0',
     language: 'cpp'
   )
 
@@ -81,8 +68,7 @@ elif mode == 'test'
 elif mode == 'benchmark'
   add_project_arguments(
     '-DBUILD_BENCHMARK',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN',
-    '-Db_pch=true',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_CRITICAL',
     language: 'cpp'
   )
 
@@ -118,20 +104,6 @@ if console == true
     )
   endif
 endif
-
-
-#------------------------------#
-#             DEPS             #
-#------------------------------#
-
-# Google Benchmark (subprojects/google-benchmark.wrap → export benchmark_dep)
-if mode == 'benchmark'
-  benchmark_dep = dependency(
-    'google-benchmark',
-    required: mode == 'benchmark'
-  )
-endif
-
 
 inc_src = include_directories('src')
 
