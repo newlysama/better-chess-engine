@@ -56,9 +56,9 @@ namespace engine::game
 
     bool MoveList::contains(const Move& other) const noexcept
     {
-        for (const Move& move : _m_moves)
+        for (std::size_t i = 0; i < _m_size; i++)
         {
-            if (other == move)
+            if (other == _m_moves[i])
             {
                 return true;
             }
@@ -69,11 +69,11 @@ namespace engine::game
 
     game::Move MoveList::find(const int fromSquare, const int toSquare) const noexcept
     {
-        for (const Move& move : _m_moves)
+        for (std::size_t i = 0; i < _m_size; i++)
         {
-            if (move.getFromSquare() == fromSquare && move.getToSquare() == toSquare)
+            if (_m_moves[i].getFromSquare() == fromSquare && _m_moves[i].getToSquare() == toSquare)
             {
-                return move;
+                return _m_moves[i];
             }
         }
 
@@ -90,16 +90,16 @@ namespace engine::game
             targets &= pinnedTargets;
         }
 
-        // If the king is in simple check, we can only
-        // capture checking pieces, and only move to
-        // square that block checking sliding pieces (if any)
-        if (state.m_isChecked)
+        // If the king is in simple check, non-king pieces can only
+        // capture checking pieces, and only move to square that
+        // block checking sliding pieces (if any)
+        if (state.m_isChecked && fromPiece != Piece::KING)
         {
             if (moveType == MoveType::CAPTURE)
             {
                 targets &= state.m_checkersBB;
             }
-            else if (fromPiece != Piece::KING)
+            else
             {
                 targets &= state.m_blockersBB;
             }
@@ -142,7 +142,7 @@ namespace engine::game
     void MoveList::getCastlingMoves(const State& state, int fromSquare) noexcept
     {
         // Can't castle
-        if (!state.hasCastlingRight<Castling>() || state.m_isChecked)
+        if (!state.hasCastlingRight<Castling>())
         {
             return;
         }
@@ -394,18 +394,22 @@ namespace engine::game
         Bitboard captureTargets = targets & state.m_teamsOccBB[enemyColor];
 
         // Generate Castling targets
-        if (state.m_sideToMove == Color::WHITE)
+        if (state.m_sideToMove == Color::WHITE && !state.m_isChecked)
         {
             getCastlingMoves<Castling::WHITE_KING_SIDE>(state, fromSquare);
             getCastlingMoves<Castling::WHITE_QUEEN_SIDE>(state, fromSquare);
         }
-        else
+        else if (state.m_sideToMove == Color::BLACK && !state.m_isChecked)
         {
             getCastlingMoves<Castling::BLACK_KING_SIDE>(state, fromSquare);
             getCastlingMoves<Castling::BLACK_QUEEN_SIDE>(state, fromSquare);
         }
 
-        this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KING);
+        if (!state.m_isDoubleChecked)
+        {
+            this->processTargets(state, captureTargets, fromSquare, MoveType::CAPTURE, Piece::KING);
+        }
+
         this->processTargets(state, quietTargets, fromSquare, MoveType::QUIET, Piece::KING);
     }
 
@@ -432,9 +436,6 @@ namespace engine::game
         this->generateKingMoves(state);
 
         // GAME OVER BABY
-        if (state.m_isChecked && _m_size == 0)
-        {
-            state.m_isCheckMate = true;
-        }
+        state.m_isCheckMate = state.m_isChecked && (_m_size == 0);
     }
 } // namespace engine::game

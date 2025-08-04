@@ -101,6 +101,7 @@ namespace test
 
         Move move(52, 60, MoveType::QUIET, Piece::PAWN); // e7 -> e8=Q
         ASSERT_EQ(move.getMoveType(), MoveType::QUIET);
+        move.setPromotionPiece(Piece::QUEEN);
         ASSERT_TRUE(move.isPromotion());
         ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);
@@ -121,6 +122,7 @@ namespace test
 
         Move move(12, 4, MoveType::QUIET, Piece::PAWN); // e2->e1
         ASSERT_EQ(move.getMoveType(), MoveType::QUIET);
+        move.setPromotionPiece(Piece::QUEEN);
         ASSERT_TRUE(move.isPromotion());
         ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);

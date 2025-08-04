@@ -54,7 +54,7 @@ elif mode == 'release'
 elif mode == 'test'
   add_project_arguments(
     '-DBUILD_TEST',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN',
     language: 'cpp'
   )
 
