@@ -5,7 +5,7 @@ tests_engine_src = files(
     'test_fen_constructor.cpp',
     'test_make_unmake.cpp',
     'test_movegen.cpp',
-    #'test_perft.cpp'
+    'test_perft.cpp'
 )
 
 #- Tests Library -#
