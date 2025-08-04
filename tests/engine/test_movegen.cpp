@@ -351,4 +351,87 @@ namespace test
         EXPECT_FALSE(game.m_moveList.contains(tested));
     }
 
+    // Scenario : king adjacency (illegal king moves next to enemy king)
+    TEST(MoveGen, KingCannotBecomeAdjacent)
+    {
+        // White to move : only h1-g1 must be legal
+        Game game1{"8/8/8/8/8/7k/8/7K w - - 0 1"};
+
+        EXPECT_TRUE(game1.m_moveList.contains(Move{7, 6, MoveType::QUIET, Piece::KING}));   // h1-g1
+        EXPECT_FALSE(game1.m_moveList.contains(Move{7, 15, MoveType::QUIET, Piece::KING})); // h1-h2
+        EXPECT_FALSE(game1.m_moveList.contains(Move{7, 14, MoveType::QUIET, Piece::KING})); // h1-g2
+
+        // Black to move : a6-a5 and a6-b5 must be absent
+        Game game2{"8/8/k7/8/K7/8/8/8 b - - 0 1"};
+
+        EXPECT_FALSE(game2.m_moveList.contains(Move{40, 32, MoveType::QUIET, Piece::KING})); // a6-a5
+        EXPECT_FALSE(game2.m_moveList.contains(Move{40, 33, MoveType::QUIET, Piece::KING})); // a6-b5
+    }
+
+    // Scenario : castling - king’s path square under attack
+    TEST(MoveGen, CastlingThroughAttackedSquareFiltered)
+    {
+        // White : black bishop on c4 attacks f1  →  O-O must be filtered out
+        Game whitePos{"4k3/8/8/8/2b5/8/8/R3K2R w KQ - 0 1"};
+
+        EXPECT_TRUE(
+            whitePos.m_moveList.contains(Move{4, 2, MoveType::CASTLE, Piece::KING, Castling::WHITE_QUEEN_SIDE}));
+        EXPECT_FALSE(
+            whitePos.m_moveList.contains(Move{4, 6, MoveType::CASTLE, Piece::KING, Castling::WHITE_KING_SIDE}));
+
+        // Black : white bishop on c5 attacks f8  →  O-O must be filtered out
+        Game blackPos{"r3k2r/8/8/2B5/8/8/8/7K b kq - 0 1"};
+
+        EXPECT_TRUE(
+            blackPos.m_moveList.contains(Move{60, 58, MoveType::CASTLE, Piece::KING, Castling::BLACK_QUEEN_SIDE}));
+        EXPECT_FALSE(
+            blackPos.m_moveList.contains(Move{60, 62, MoveType::CASTLE, Piece::KING, Castling::BLACK_KING_SIDE}));
+    }
+
+    // Scenario : en passant – illegal if it exposes own king
+    TEST(MoveGen, IllegalEnPassantThatExposesKing)
+    {
+        // e5xd6 e.p. would open the e-file and leave the white king in check
+        Game game{"r3k2r/8/8/4P3/8/8/4K3/3q4 w kq d6 0 2"};
+
+        EXPECT_FALSE(game.m_moveList.contains(Move{36, 43, MoveType::EN_PASSANT, Piece::PAWN})); // e5-d6 e.p.
+    }
+
+    // Scenario : pinned pieces – rook may slide on file but not leave it
+    TEST(MoveGen, PinnedPieceCannotLeaveLine)
+    {
+        Game game{"4r3/k7/8/8/8/8/4R3/4K3 w - - 0 1"};
+
+        EXPECT_TRUE(game.m_moveList.contains(Move{12, 20, MoveType::QUIET, Piece::ROOK}));  // e2-e3 allowed
+        EXPECT_FALSE(game.m_moveList.contains(Move{12, 11, MoveType::QUIET, Piece::ROOK})); // e2-d2 illegal
+        EXPECT_FALSE(game.m_moveList.contains(Move{12, 13, MoveType::QUIET, Piece::ROOK})); // e2-f2 illegal
+    }
+
+    // Scenario : promotion – pawn must promote, plain push disallowed
+    TEST(MoveGen, PawnMustPromoteOnLastRank)
+    {
+        Game game{"7k/6P1/8/8/8/8/8/7K w - - 0 1"}; // pawn g7
+
+        // Quiet non-promoting push must be absent
+        EXPECT_FALSE(game.m_moveList.contains(Move{54, 62, MoveType::QUIET, Piece::PAWN}));
+
+        // All four standard promotions must be present
+        Move promoQ{54, 62, MoveType::QUIET, Piece::PAWN};
+        promoQ.setPromotionPiece(Piece::QUEEN);
+
+        Move promoR{54, 62, MoveType::QUIET, Piece::PAWN};
+        promoR.setPromotionPiece(Piece::ROOK);
+
+        Move promoB{54, 62, MoveType::QUIET, Piece::PAWN};
+        promoB.setPromotionPiece(Piece::BISHOP);
+
+        Move promoN{54, 62, MoveType::QUIET, Piece::PAWN};
+        promoN.setPromotionPiece(Piece::KNIGHT);
+
+        EXPECT_TRUE(game.m_moveList.contains(promoQ));
+        EXPECT_TRUE(game.m_moveList.contains(promoR));
+        EXPECT_TRUE(game.m_moveList.contains(promoB));
+        EXPECT_TRUE(game.m_moveList.contains(promoN));
+    }
+
 } // namespace test
