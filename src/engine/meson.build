@@ -3,18 +3,15 @@
 
 #- Subdirs -#
 subdir('board/')
+subdir('game')
 
 #- Depedencies -#
-deps = [logging_dep, board_dep]
+deps = [logging_dep, board_dep, game_dep]
 
 # If we want to generate magic numbers, include magics_generator
-# and do not compile the game dep, as it is not needed
 if generate_magics == true
     subdir('magics_generator/')
     deps += magics_generator_dep
-else
-    subdir('game/')
-    deps += game_dep
 endif
 
 #- Engine Library -#
