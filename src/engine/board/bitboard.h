@@ -5,6 +5,9 @@
  * @par       This project is released under the MIT License
  *
  * @brief Bitboard wrapper.
+ * Every bit of this wrapped 64 bits unsigned integer represents a square of the Board :
+ * bit to 1 ==> square is occupied
+ * bit to 0 ==> square is empty
  */
 
 #ifndef BITBOARD_H_
@@ -16,14 +19,6 @@
 
 namespace engine::board
 {
-    /**
-     * @class Bitboard
-     * @brief Wrapper around an actual bitboard (64 bits unsigned int).
-     * @details
-     * Every bit of this wrapped 64 bits unsigned integer represents a square of the Board :
-     * bit to 1 ==> square is occupied
-     * bit to 0 ==> square is empty
-     */
     class Bitboard
     {
       public:
@@ -56,6 +51,7 @@ namespace engine::board
         /*----------------------------------------*
          *         COMPARAISON OPERATORS          *
          *----------------------------------------*/
+
         inline constexpr bool operator==(const Bitboard& bb) const noexcept
         {
             return m_data == bb.m_data;
@@ -69,6 +65,7 @@ namespace engine::board
         /*----------------------------------------*
          *           BITWISE OPERATORS            *
          *----------------------------------------*/
+
         inline constexpr Bitboard operator&(const Bitboard& bb) const noexcept
         {
             return Bitboard{m_data & bb.m_data};
@@ -102,6 +99,7 @@ namespace engine::board
         /*----------------------------------------*
          *         ASSIGNMENT OPERATORS           *
          *----------------------------------------*/
+
         inline constexpr Bitboard& operator=(const Bitboard&) noexcept = default;
 
         inline constexpr Bitboard& operator&=(const Bitboard& bb) noexcept
@@ -142,6 +140,7 @@ namespace engine::board
          * @brief Get a bit's value at a specific index.
          *
          * @param [in] index : index to look at
+         *
          * @return The bit's value
          */
         inline constexpr int at(int index) const noexcept
@@ -163,7 +162,8 @@ namespace engine::board
          * @brief Checker whether a bit is set to 1 at a specific index.
          *
          * @param [in] index : the bit's index
-         * @return Whether the bit is set or not
+         *
+         * @return True if the bit at index is set to 1, false otherwise
          */
         inline constexpr bool isSet(int index) const noexcept
         {
@@ -193,7 +193,7 @@ namespace engine::board
         /**
          * @brief  Check if the bitboard is empty.
          *
-         * @return Whether the bitboard is empty or not
+         * @return True if m_data is 0, false otherwise
          */
         inline constexpr bool isEmpty() const noexcept
         {
@@ -207,12 +207,7 @@ namespace engine::board
          */
         inline constexpr int lsbIndex() const noexcept
         {
-            // clang-format off
-            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
-                assert(m_data != 0);
-            #endif
-            // clang-format on
-
+            assert(m_data != 0);
             return std::countr_zero(m_data);
         }
 
@@ -223,12 +218,7 @@ namespace engine::board
          */
         inline constexpr int msbIndex() const noexcept
         {
-            // clang-format off
-            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
-                assert(m_data != 0);
-            #endif
-            // clang-format on
-
+            assert(m_data != 0);
             return 63 - std::countl_zero(m_data);
         }
 
@@ -237,12 +227,7 @@ namespace engine::board
          */
         inline constexpr void popLsb() noexcept
         {
-            // clang-format off
-            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
-                assert(m_data != 0);
-            #endif
-            // clang-format on
-
+            assert(m_data != 0);
             m_data &= ~(1ULL << this->lsbIndex());
         }
 
@@ -251,12 +236,7 @@ namespace engine::board
          */
         inline constexpr void popMsb() noexcept
         {
-            // clang-format off
-            #if !defined(BENCHMARK) && !defined(BUILD_RELEASE)
-                assert(m_data != 0);
-            #endif
-            // clang-format on
-
+            assert(m_data != 0);
             m_data &= ~(1ULL << this->msbIndex());
         }
 

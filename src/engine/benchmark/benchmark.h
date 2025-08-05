@@ -18,7 +18,8 @@
 
 namespace engine::benchmark
 {
-    const std::array<std::string, 35> BenchmarkStates = {
+    // Array of FEN we will use for the benchmark
+    const std::array<std::string, 35> BenchmarkFEN = {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10",
         "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 11",
@@ -56,8 +57,8 @@ namespace engine::benchmark
         "4k3/3q1r2/1N2r1b1/3ppN2/2nPP3/1B1R2n1/2R1Q3/3K4 w - - 5 1"};
 
     using Clock = std::chrono::steady_clock;
-    using NodesPerSec = std::array<uint64_t, BenchmarkStates.size()>;
-    using Times = std::array<int64_t, BenchmarkStates.size()>;
+    using NodesPerSec = std::array<uint64_t, BenchmarkFEN.size()>;
+    using Times = std::array<int64_t, BenchmarkFEN.size()>;
 
     /**
      * @brief Simple perft function counting leaves from a given state and depth.
@@ -65,6 +66,7 @@ namespace engine::benchmark
      * @param [in] game  : Current state of the game
      * @param [in] depth : Current depth
      * @tparam isRoot    : Is the current depth the root depth
+     *
      * @return : the number of leaves
      */
     template <bool isRoot>
@@ -124,7 +126,7 @@ namespace engine::benchmark
      * @param [in] allNodesPerSec : array of all nodes/sec measures
      * @param [in] allTimes       : array of all perft execution times
      */
-    void handleBenchmarkResults(const NodesPerSec& allNodesPerSec, const Times& allTimes)
+    void handleBenchmarkResults(const NodesPerSec allNodesPerSec, const Times allTimes)
     {
         std::locale::global(std::locale{"en_US.UTF-8"});
 
@@ -145,7 +147,7 @@ namespace engine::benchmark
 
             totalNodesPerSecond += nodesPerSec;
         }
-        uint64_t averageNodesPerSecond = totalNodesPerSecond / BenchmarkStates.size();
+        uint64_t averageNodesPerSecond = totalNodesPerSecond / BenchmarkFEN.size();
 
         for (const int64_t& time : allTimes)
         {
@@ -156,7 +158,7 @@ namespace engine::benchmark
 
             totalTime += time;
         }
-        int64_t averageTime = totalTime / BenchmarkStates.size();
+        int64_t averageTime = totalTime / BenchmarkFEN.size();
 
         std::println(">>>>>>>>>> BENCHMARK RESULTS <<<<<<<<<<");
         std::println();
@@ -171,11 +173,11 @@ namespace engine::benchmark
     }
 
     /**
-     * @brief Launch perft's benchmark on each position give by BenchmarkStates.
+     * @brief Launch perft's benchmark on each position given by BenchmarkFEN.
      *
      * @param [in] depth : Depth we want to go too
      */
-    void benchmark_perft(int depth)
+    void benchmark_perft(const int depth)
     {
         std::locale::global(std::locale{"en_US.UTF-8"});
 
@@ -184,13 +186,13 @@ namespace engine::benchmark
         NodesPerSec allNodesPerSec;
         Times allTimes;
 
-        for (std::size_t i = 0; i < BenchmarkStates.size(); i++)
+        for (std::size_t i = 0; i < BenchmarkFEN.size(); i++)
         {
             std::println("==============================================================================");
-            std::println("Benchmark for FEN : {}", BenchmarkStates[i]);
+            std::println("Benchmark for FEN : {}", BenchmarkFEN[i]);
 
             uint64_t nodes = 0;
-            engine::game::Game game{BenchmarkStates[i]};
+            engine::game::Game game{BenchmarkFEN[i]};
             const auto t0 = Clock::now();
 
             nodes = perft<true>(game, depth);

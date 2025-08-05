@@ -52,15 +52,14 @@ namespace engine::board
      * @brief Shifts a given Bitboard in a given direction.
      *
      * @param [in] bb : Bitboard to shift
+     *
      * @return the shifted bitboard
      */
     template <core::Direction D>
     constexpr Bitboard shiftDir(Bitboard bb)
     {
-        // clang-format off
         switch (D)
         {
-        // ——— Sliding / King / Pawn ———
         case core::Direction::NORTH:
             return (bb & ~RANKS_MASKS[core::Rank::RANK_8]) << 8;
 
@@ -85,7 +84,6 @@ namespace engine::board
         case core::Direction::NORTH_WEST:
             return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~FILES_MASKS[core::File::FILE_A]) << 7;
         }
-        // clang-format on
 
         return Bitboard{0ULL};
     }
@@ -94,7 +92,8 @@ namespace engine::board
      * @brief Special shiftDir to handle Pawn double pushes and Knight directions
      *
      * @param [in] bb : Bitboard to shift
-     * @return : the shifted Bitboard
+     *
+     * @return the shifted Bitboard
      */
     template <core::SpecialDirection D>
     constexpr Bitboard shiftDir(Bitboard bb) noexcept
@@ -102,14 +101,14 @@ namespace engine::board
         // clang-format off
         switch (D)
         {
-        //  ——— Pawns double push ———
+        //  Pawns double push
         case core::SpecialDirection::NORTH_NORTH:
             return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]) << 16;
 
         case core::SpecialDirection::SOUTH_SOUTH:
             return (bb & ~RANKS_MASKS[core::Rank::RANK_1] & ~RANKS_MASKS[core::Rank::RANK_2]) >> 16;
 
-        // ——— Knights ———
+        // Knights
         // two North + one East
         case core::SpecialDirection::NNE:
             return (bb & ~RANKS_MASKS[core::Rank::RANK_8] & ~RANKS_MASKS[core::Rank::RANK_7]&
@@ -157,6 +156,7 @@ namespace engine::board
 
     /**
      * @brief Builds diagonals masks.
+     *
      * @return 1x15 array of diagonals masks
      */
     inline consteval core::DiagonalMasks initDiagonalsMasks() noexcept
@@ -165,7 +165,6 @@ namespace engine::board
 
         for (int square = 0; square < 64; square++)
         {
-            // file's index - rank's index + 7 -> range [0,14]
             int file = square & 7;
             int rank = square >> 3;
 
@@ -180,6 +179,7 @@ namespace engine::board
 
     /**
      * @brief Builds anti-diagonals masks.
+     *
      * @return 1x15 array of anti-diagonals masks
      */
     inline consteval core::DiagonalMasks initAntiDiagonalsMasks() noexcept
@@ -191,7 +191,6 @@ namespace engine::board
             int file = square & 7;
             int rank = square >> 3;
 
-            // file's index + rank's index -> range [0,14]
             int maskIndex = file + rank;
 
             masks[maskIndex] |= Bitboard{1ULL << square};
@@ -214,7 +213,7 @@ namespace engine::board
         {
             Bitboard squareBB = Bitboard{1ULL << square};
 
-            for (int direction = 0; direction < core::N_DIRECTIONS; direction++)
+            for (int direction = 0; direction < core::Direction::N_DIRECTIONS; direction++)
             {
                 core::Direction dir = static_cast<core::Direction>(direction);
                 Bitboard ray{};
@@ -228,6 +227,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::NORTH>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -238,6 +238,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::SOUTH>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -248,6 +249,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::EAST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -258,6 +260,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::WEST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -268,6 +271,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::NORTH_EAST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -278,6 +282,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::NORTH_WEST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -288,6 +293,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::SOUTH_EAST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -298,6 +304,7 @@ namespace engine::board
                         bb = shiftDir<core::Direction::SOUTH_WEST>(bb);
                         if (bb == 0)
                             break;
+
                         ray |= bb;
                     }
                     break;
@@ -316,6 +323,7 @@ namespace engine::board
 
     /**
      * @brief Builds 'between 2 squares' masks.
+     *
      * @return 2x64 array of between masks
      */
     inline consteval core::BetweenMasks initBetweenMasks() noexcept
@@ -375,6 +383,7 @@ namespace engine::board
 
     /**
      * @brief Builds pawns attacks masks, depending on the color.
+     *
      * @return 1x64 array of attacks masks
      */
     template <core::Color Color>
@@ -400,6 +409,7 @@ namespace engine::board
 
     /**
      * @brief Builds pawns double pushes masks, depending on the color.
+     *
      * @return 1x64 array of attacks masks
      */
     template <core::Color Color>
@@ -432,13 +442,14 @@ namespace engine::board
 
     /**
      * @brief Builds pawns pushes masks, depending on the color.
+     *
      * @return 1x64 array of attacks masks
      */
     template <core::Color Color>
     inline consteval core::BitboardTable initPawnPushesMasks() noexcept
     {
         core::BitboardTable masks{};
-        for (int square = 0; square < 64; ++square)
+        for (int square = 0; square < 64; square++)
         {
             Bitboard squareBB = Bitboard{1ULL << square};
             if constexpr (Color == core::Color::WHITE)
@@ -471,6 +482,7 @@ namespace engine::board
 
     /**
      * @brief Builds knights attacks masks.
+     *
      * @return 1x64 array of attacks masks
      */
     inline consteval core::BitboardTable initKnightAttacksMasks() noexcept
@@ -491,6 +503,7 @@ namespace engine::board
 
     /**
      * @brief Builds kings attacks masks.
+     *
      * @return 1x64 array of attacks masks
      */
     inline consteval core::BitboardTable initKingAttacksMasks() noexcept
@@ -513,6 +526,7 @@ namespace engine::board
 
     /**
      * @brief Builds rooks attacks masks.
+     *
      * @return 1x64 array of attacks masks
      */
     inline consteval core::BitboardTable initRookAttacksMasks() noexcept
@@ -538,6 +552,7 @@ namespace engine::board
 
     /**
      * @brief Builds bishop attacks masks.
+     *
      * @return 1x64 array of attacks masks
      */
     inline consteval core::BitboardTable initBishopAttacksMasks() noexcept
@@ -577,7 +592,6 @@ namespace engine::board
 
         for (int square = 0; square < 64; square++)
         {
-            // Get file / rank indexes
             int file = square & 7;
             int rank = square >> 3;
 
@@ -607,7 +621,6 @@ namespace engine::board
 
         for (int square = 0; square < 64; square++)
         {
-            // Get file / rank indexes
             int file = square & 7;
             int rank = square >> 3;
 
@@ -671,10 +684,10 @@ namespace engine::board
                 Bitboard occupancyMasked = occupancyBB & ROOK_RELEVANT_MASKS[square];
 
                 // directions rook : N, S, E, W
-                constexpr std::array<core::Direction, 4> dirs = {core::Direction::NORTH, core::Direction::SOUTH,
-                                                                 core::Direction::EAST, core::Direction::WEST};
+                constexpr std::array<core::Direction, 4> directions = {core::Direction::NORTH, core::Direction::SOUTH,
+                                                                       core::Direction::EAST, core::Direction::WEST};
 
-                for (auto dir : dirs)
+                for (auto dir : directions)
                 {
                     Bitboard fullRay = RAY_MASKS[square][dir];
 
@@ -748,11 +761,11 @@ namespace engine::board
                 Bitboard occupancyMasked = occupancyBB & BISHOP_RELEVANT_MASKS[square];
 
                 // directions Bishop
-                constexpr std::array<core::Direction, 4> dirs = {
+                constexpr std::array<core::Direction, 4> directions = {
                     core::Direction::NORTH_WEST, core::Direction::NORTH_EAST, core::Direction::SOUTH_WEST,
                     core::Direction::SOUTH_EAST};
 
-                for (auto dir : dirs)
+                for (auto dir : directions)
                 {
                     Bitboard fullRay = RAY_MASKS[square][dir];
 
