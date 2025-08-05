@@ -42,7 +42,7 @@ static int run(const options::Options& optitons)
     return 0;
 
 #elif defined(BUILD_BENCHMARK)
-    benchmark::benchmark_perft(5);
+    engine::benchmark::benchmark_perft(5);
     return 0;
 #endif
 }

@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:    [ debug, profile, release, test ]
+        mode:    [ debug, profile, release, test, benchmark ]
         console: [ true, false ]
         generate_magics: [ true, false ]
 
@@ -22,6 +22,10 @@ jobs:
           - mode: test
             generate_magics: true
           - mode: test
+            console: true
+          - mode: benchmark
+            generate_magics: true
+          - mode: benchmark
             console: true
 
     steps:
@@ -59,4 +63,10 @@ jobs:
         run: |
           if [[ "${{ matrix.mode }}" == "test" ]]; then
             ./build/tests/test_engine
+          fi
+
+      - name: Run Benchmarks
+        run: |
+          if [[ "${{ matrix.mode }}" == "benchmark" ]]; then
+            ./build/src/main/chess
           fi

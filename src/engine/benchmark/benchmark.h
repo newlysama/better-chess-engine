@@ -16,7 +16,7 @@
 #include "engine/game/game.h"
 #include "engine/game/move_list.h"
 
-namespace benchmark
+namespace engine::benchmark
 {
     const std::array<std::string, 35> BenchmarkStates = {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -74,6 +74,9 @@ namespace benchmark
             return 1ULL;
 
         game.m_moveList.generateAllMoves(game.m_state);
+
+        if (depth == 1)
+            return game.m_moveList.size();
 
         // If we are at first exection, multi-task the each branch
         if constexpr (isRoot)
@@ -209,4 +212,4 @@ namespace benchmark
 
         handleBenchmarkResults(allNodesPerSec, allTimes);
     }
-} // namespace benchmark
+} // namespace engine::benchmark
