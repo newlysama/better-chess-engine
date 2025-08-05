@@ -82,6 +82,13 @@ namespace engine::core
     typedef std::array<board::Bitboard, Castling::N_CASTLINGS> CastlingMasks;
 
     /**
+     * @typedef RookCastlingMap
+     * @brief   1x4 array of pair<int, Castling> mapping
+     * the 4 rooks starting squares to their according castling.
+     */
+    typedef std::array<std::pair<int, Castling>, Castling::N_CASTLINGS> RookCastlingMap;
+
+    /**
      * @typedef BetweenMasks
      * @brief   Masks of squares strictly between any two squares (for line checks, pinned pieces, ...).
      */

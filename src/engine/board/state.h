@@ -184,6 +184,16 @@ namespace engine::board
         // Informations about enabled castlings
         core::CastlingRights m_castlingRights = (1 << core::Castling::N_CASTLINGS) - 1;
 
+        // clang-format off
+        // Mapping of rooks starting square with their according castling right
+        core::RookCastlingMap m_rookCastlingMap = {{
+            {0,  core::Castling::WHITE_QUEEN_SIDE}, // a1
+            {7,  core::Castling::WHITE_KING_SIDE }, // h1
+            {56, core::Castling::BLACK_QUEEN_SIDE}, // a8
+            {63, core::Castling::BLACK_KING_SIDE }  // h8
+        }};
+        // clang-format on
+
         int m_epSquare = -1; // When En Passant is enabled, this var is set
 
         core::KingSquares m_kgSquares = {3, 60}; // Square for each king
