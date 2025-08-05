@@ -209,7 +209,6 @@ namespace engine::game
         }
 
         m_state.m_sideToMove = enemyColor;
-        m_moveList.generateAllMoves(m_state);
     }
 
     void Game::unmakeMove(const game::Move& move) noexcept

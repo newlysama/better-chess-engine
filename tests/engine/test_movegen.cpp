@@ -518,4 +518,60 @@ namespace test
         EXPECT_FALSE(game.m_moveList.contains(illegalSide));
     }
 
+    // Scenario : pinned knight cannot move
+    TEST(MoveGen, IllegalMove_PinnedKnight)
+    {
+        Game game{"4r2k/8/8/8/8/8/4N3/4K3 w - - 0 1"};
+
+        Move g3{12, 22, MoveType::QUIET, Piece::KNIGHT}; // e2 -> g3
+        Move f4{12, 21, MoveType::QUIET, Piece::KNIGHT}; // e2 -> f4
+        Move g1{12, 14, MoveType::QUIET, Piece::KNIGHT}; // e2 -> g1
+
+        EXPECT_FALSE(game.m_moveList.contains(g3));
+        EXPECT_FALSE(game.m_moveList.contains(f4));
+        EXPECT_FALSE(game.m_moveList.contains(g1));
+    }
+
+    // Scenario : pinned between 2 aligned enemy pieces rook can only capture first
+    TEST(MoveGen, IllegalMove_PinnedRookWithXRay)
+    {
+        Game game{"3r3k/3q4/8/8/3R4/8/3K4/8 w - - 0 1"};
+
+        Move captureQueen{27, 51, MoveType::CAPTURE, Piece::ROOK};         // d4 -> d7
+        Move illegalCaptureSecond{27, 59, MoveType::CAPTURE, Piece::ROOK}; // d4 -> d8
+
+        EXPECT_TRUE(game.m_moveList.contains(captureQueen));
+        EXPECT_FALSE(game.m_moveList.contains(illegalCaptureSecond));
+    }
+
+    // Scenario : pinned rook can't go behind the king
+    TEST(MoveGen, IllegalMove_PinnedRookBehindKing)
+    {
+        Game game{"3q3k/8/8/8/3R4/3K4/8/8 w - - 0 1"};
+        Move illegalDownOne{27, 19, MoveType::QUIET, Piece::ROOK};  // d4 -> d3 (occupé par le roi)
+        Move illegalDownTwo{27, 11, MoveType::QUIET, Piece::ROOK};  // d4 -> d2
+        Move illegalDownThree{27, 3, MoveType::QUIET, Piece::ROOK}; // d4 -> d1
+        EXPECT_FALSE(game.m_moveList.contains(illegalDownOne));
+        EXPECT_FALSE(game.m_moveList.contains(illegalDownTwo));
+        EXPECT_FALSE(game.m_moveList.contains(illegalDownThree));
+    }
+
+    // Scenario : pinned bishop can't go behind the king
+    TEST(MoveGen, IllegalMove_PinnedBishopBehindKing)
+    {
+        Game game{"8/8/8/8/4B3/3K4/2q5/8 w - - 0 1"};
+
+        Move toF5{28, 37, MoveType::QUIET, Piece::BISHOP}; // e4 -> f5
+        Move toG6{28, 46, MoveType::QUIET, Piece::BISHOP}; // e4 -> g6
+        Move toH7{28, 55, MoveType::QUIET, Piece::BISHOP}; // e4 -> h7
+        Move toC2{28, 10, MoveType::QUIET, Piece::BISHOP}; // e4 -> c2
+        Move toG2{28, 14, MoveType::QUIET, Piece::BISHOP}; // e4 -> g2
+
+        EXPECT_FALSE(game.m_moveList.contains(toF5));
+        EXPECT_FALSE(game.m_moveList.contains(toG6));
+        EXPECT_FALSE(game.m_moveList.contains(toH7));
+        EXPECT_FALSE(game.m_moveList.contains(toC2));
+        EXPECT_FALSE(game.m_moveList.contains(toG2));
+    }
+
 } // namespace test
