@@ -97,7 +97,7 @@ namespace engine::game
         {
             if (moveType == MoveType::CAPTURE)
             {
-                targets &= state.m_checkersBB;
+                targets &= (state.m_checkersBB | state.m_blockersBB);
             }
             else
             {
