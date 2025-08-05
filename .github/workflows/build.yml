@@ -10,22 +10,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode:    [ debug, profile, release, test, benchmark ]
+        mode:    [ debug, profile, release, test ]
         console: [ true, false ]
         generate_magics: [ true, false ]
 
         exclude:
           - console: true
             generate_magics: true
-          - mode: release
-            generate_magics: true
           - mode: test
             generate_magics: true
           - mode: test
-            console: true
-          - mode: benchmark
-            generate_magics: true
-          - mode: benchmark
             console: true
 
     steps:
