@@ -53,11 +53,24 @@ namespace engine::game
 
     void Game::makeCapture(const Move& move, const Color& enemyColor, const Piece& enemyPiece) noexcept
     {
-        // Since state.unsetPiece() will delete target piece from general occupancy,
-        // state.checkCastlingRemoval() in state.movePiece() won't detect
-        // if we take an enemy rook or not and therefore will not be able
-        // to remove the enemy castling right correctly
-        m_state.checkCastlingRemoval(move.getFromPiece(), move.getFromSquare(), move.getToSquare());
+        // Check if we capture a rook, which would remove a castling right
+        if (enemyPiece == Piece::ROOK)
+        {
+            if (enemyColor == Color::WHITE)
+            {
+                if (move.getToSquare() == 56) // Initial queen side black rook pos
+                    m_state.clearCastlingRight<BLACK_QUEEN_SIDE>();
+                else if (move.getToSquare() == 63) // Initial king side black rook pos
+                    m_state.clearCastlingRight<BLACK_KING_SIDE>();
+            }
+            else
+            {
+                if (move.getToSquare() == 0) // Initial queen side white rook pos
+                    m_state.clearCastlingRight<WHITE_QUEEN_SIDE>();
+                else if (move.getToSquare() == 7) // Initial king side white rook pos
+                    m_state.clearCastlingRight<WHITE_KING_SIDE>();
+            }
+        }
 
         m_state.unsetPiece(enemyColor, enemyPiece, move.getToSquare());
         m_state.movePiece(move.getFromPiece(), move.getFromSquare(), move.getToSquare());

@@ -49,6 +49,7 @@ namespace engine::board
          *
          * @param [in] rankInex  : rank's index
          * @param [in] fileIndex : file's index
+         *
          * @return the square's index
          */
         static inline constexpr int getSquareIndex(const int rankIndex, const int fileIndex) noexcept
@@ -60,6 +61,7 @@ namespace engine::board
          * @brief Get a rank's index, bases on a square's index
          *
          * @param [in] square : square's index
+         *
          * @return the rank's index
          */
         static inline constexpr int getRankIndex(const int square) noexcept
@@ -71,6 +73,7 @@ namespace engine::board
          * @brief Get a files's index, bases on a square's index.
          *
          * @param [in] square : square's index
+         *
          * @return the file's index
          */
         static inline constexpr int getFileIndex(const int square) noexcept
@@ -86,7 +89,7 @@ namespace engine::board
         /**
          * @brief Check if a type of castling is enabled by checking its corresponding bit.
          *
-         * @return Whether this type of castling is enabled.
+         * @return True if this type of castling is enabled, fasle otherwise
          */
         template <core::Castling Type>
         inline constexpr bool hasCastlingRight() const noexcept
@@ -112,20 +115,10 @@ namespace engine::board
         }
 
         /**
-         * @brief Check if we are losing any castling right by :
-         * - Moving a rook / king from it's initial position
-         * - Capturing an enemy rook (making him lose 1 castling right)
-         *
-         * @param [in] piece      : Piece being moved
-         * @param [in] fromSquare : Initial square
-         * @param [in] toSquare   : Destination square
-         */
-        void checkCastlingRemoval(const core::Piece piece, const int fromSquare, const int toSquare) noexcept;
-
-        /**
          * @brief Get a piece on a given square.
          *
          * @param [in] square : the square to check
+         *
          * @return the found Piece
          */
         core::Piece getPiece(const int square) const noexcept;
@@ -135,6 +128,7 @@ namespace engine::board
          *
          * @param [in] color  : the team to check
          * @param [in] square : the square to check
+         *
          * @return the found Piece
          */
         core::Piece getPiece(const core::Color color, const int square) const noexcept;
@@ -192,18 +186,18 @@ namespace engine::board
 
         int m_epSquare = -1; // When En Passant is enabled, this var is set
 
-        core::KingSquares m_kgSquares;  // Square for each king
-        bool m_isChecked = false;       // Check state for the current king
-        bool m_isDoubleChecked = false; // Double check state for the current king
-        bool m_isCheckMate = false;     // GAME OVER BABY
+        core::KingSquares m_kgSquares = {3, 60}; // Square for each king
+        bool m_isChecked = false;                // Check state for the current king
+        bool m_isDoubleChecked = false;          // Double check state for the current king
+        bool m_isCheckMate = false;              // GAME OVER BABY
 
         core::PinnedPieces m_pinnedBB;          // Bitboards of available destinations for each pinned piece
-        Bitboard m_targetsBB;                   // Squares targeted by enemy moves
+        Bitboard m_targetsBB = Bitboard{0ULL};  // Squares targeted by enemy moves
         Bitboard m_checkersBB = Bitboard{0ULL}; // Bitboard of squares that put the current king in check
         Bitboard m_blockersBB = Bitboard{0ULL}; // Bitboard of squares that block a king's check from sliding pieces
 
         core::PiecesBitboards m_piecesBB;      // Occupancy for each team and each piece
-        Bitboard m_allOccBB;                   // Occupancy for all pieces
+        Bitboard m_allOccBB;                   // General occupancy
         core::ColoredOccupancies m_teamsOccBB; // Team specific occupancies
 
       private:
@@ -212,12 +206,12 @@ namespace engine::board
          *****************************************/
 
         /**
-         * @brief Internal function that splits the occupancy part of the fen notation
-         * into an array of 8 strings.
+         * @brief Internal function that splits the occupancy
+         * part of the fen notation into an array of 8 strings.
          *
          * @param [in] fen : occupancy part of the fen notation
-         * @return std::expected<std::array<std::string, 8>, std::string> :
-         * the built array or error message if fen not valid
+         *
+         * @return the built array or error message if fen not valid
          */
         inline std::expected<std::array<std::string, 8>, std::string> getFenOccupancies(const std::string& fen) noexcept
         {
@@ -242,7 +236,7 @@ namespace engine::board
          * @brief Fills the occupancy bitboards from pre-computed substring of the FEN notation.
          *
          * @param [in] fen : occupancy part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen error
+         * @return nothing / error message if FEN invalid
          */
         inline std::expected<void, std::string> setOccupanciesFromFen(const std::string& fen) noexcept
         {
@@ -317,7 +311,8 @@ namespace engine::board
          * @brief Set the m_sideToMove field.
          *
          * @param [in] fen : side to move part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         *
+         * @return nothing / error message if fen is invalid
          */
         inline std::expected<void, std::string> setSideToMoveFromFen(const std::string_view fen) noexcept
         {
@@ -334,7 +329,8 @@ namespace engine::board
          * @brief Fills the castlingRights field.
          *
          * @param [in] fen : castling rights part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         *
+         * @return nothing / error message if fen is invalid
          */
         inline std::expected<void, std::string> setCastlingRightsFromFen(const std::string_view fen) noexcept
         {
@@ -375,7 +371,8 @@ namespace engine::board
          * @brief Fills the m_epSquare field.
          *
          * @param [in] fen : en passant square part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         *
+         * @return nothing / error message if fen is invalid
          */
         inline std::expected<void, std::string> setEnPassantSquareFromFen(const std::string_view fen) noexcept
         {
@@ -397,7 +394,8 @@ namespace engine::board
          * @brief Fills the m_halfMoveClock field.
          *
          * @param [in] fen : half move clock part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         *
+         * @return nothing / error message if fen is invalid
          */
         inline std::expected<void, std::string> setHalfMoveClockFromFen(const std::string_view fen) noexcept
         {
@@ -417,7 +415,8 @@ namespace engine::board
          * @brief Fills the m_fullMoveClock field.
          *
          * @param [in] fen : full move clock part of the FEN notation
-         * @return std::expected<void, std::string> : nothing / error message if fen is invalid
+         *
+         * @return nothing / error message if fen is invalid
          */
         inline std::expected<void, std::string> setFullMoveClockFromFen(const std::string_view fen) noexcept
         {
