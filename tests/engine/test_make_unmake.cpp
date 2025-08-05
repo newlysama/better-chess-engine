@@ -26,6 +26,7 @@ namespace test
 
         Move move(8, 24, MoveType::DOUBLE_PUSH, Piece::PAWN); // a2 -> a4
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("7k/8/8/8/P7/8/8/7K b - a3 0 1");
         compareStates(game.m_state, expected.m_state);
@@ -41,6 +42,7 @@ namespace test
 
         Move move(55, 39, MoveType::DOUBLE_PUSH, Piece::PAWN); // h7 -> h5
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("7K/8/8/7p/8/8/8/7k w - h6 0 2");
         compareStates(game.m_state, expected.m_state);
@@ -56,6 +58,7 @@ namespace test
 
         Move move(36, 43, MoveType::EN_PASSANT, Piece::PAWN); // e5 -> d6 e.p.
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("4k3/8/3P4/8/8/8/8/4K3 b - - 0 2");
         compareStates(game.m_state, expected.m_state);
@@ -71,6 +74,7 @@ namespace test
 
         Move move(27, 20, MoveType::EN_PASSANT, Piece::PAWN); // d4 -> e3 e.p.
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("4k3/8/8/8/8/4p3/8/4K3 w - - 0 2");
         compareStates(game.m_state, expected.m_state);
@@ -86,6 +90,7 @@ namespace test
 
         Move move(36, 44, MoveType::QUIET, Piece::PAWN); // e5 -> e6
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("4k3/8/4P3/3p4/8/8/8/4K3 b - - 0 2");
         compareStates(game.m_state, expected.m_state);
@@ -105,6 +110,7 @@ namespace test
         ASSERT_TRUE(move.isPromotion());
         ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("4Q2k/8/8/8/8/8/8/7K b - - 0 1");
         expected.m_state.computeEnemyTargetedSquares();
@@ -126,6 +132,7 @@ namespace test
         ASSERT_TRUE(move.isPromotion());
         ASSERT_EQ(move.getPromotionPiece(), Piece::QUEEN);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("7K/8/8/8/8/8/8/4q2k w - - 0 2");
         expected.m_state.computeEnemyTargetedSquares();
@@ -146,6 +153,7 @@ namespace test
 
         Move move(4, 6, MoveType::CASTLE, Piece::KING, Castling::WHITE_KING_SIDE);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("r3k2r/8/8/8/8/8/8/R4RK1 b kq - 2 1");
         compareStates(game.m_state, expected.m_state);
@@ -161,6 +169,7 @@ namespace test
 
         Move move(4, 2, MoveType::CASTLE, Piece::KING, Castling::WHITE_QUEEN_SIDE);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("r3k2r/8/8/8/8/8/8/2KR3R b kq - 2 1");
         compareStates(game.m_state, expected.m_state);
@@ -176,6 +185,7 @@ namespace test
 
         Move move(60, 62, MoveType::CASTLE, Piece::KING, Castling::BLACK_KING_SIDE);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("r4rk1/8/8/8/8/8/8/4K3 w - - 1 2");
         expected.m_state.m_castlingRights = 0;
@@ -192,6 +202,7 @@ namespace test
 
         Move move(60, 58, MoveType::CASTLE, Piece::KING, Castling::BLACK_QUEEN_SIDE);
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("2kr4/8/8/8/8/8/8/4K3 w - - 4 3");
         compareStates(game.m_state, expected.m_state);
@@ -207,6 +218,7 @@ namespace test
 
         Move move(7, 23, MoveType::QUIET, Piece::ROOK); // h1 -> h3
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("r3k2r/8/8/8/8/7R/8/R3K3 b Qkq - 1 1");
         compareStates(game.m_state, expected.m_state);
@@ -222,6 +234,7 @@ namespace test
 
         Move move(4, 5, MoveType::QUIET, Piece::KING); // e1 -> f1
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("r3k2r/8/8/8/8/8/8/R4K1R b kq - 1 1");
         compareStates(game.m_state, expected.m_state);
@@ -241,6 +254,7 @@ namespace test
 
         Move move(1, 18, MoveType::QUIET, Piece::KNIGHT); // b1 -> c3
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("7k/8/8/8/8/2N5/8/4K3 b - - 5 1");
         compareStates(game.m_state, expected.m_state);
@@ -256,6 +270,7 @@ namespace test
 
         Move move(20, 35, MoveType::CAPTURE, Piece::KNIGHT); // e3 -> d5
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         Game expected("7k/8/8/3N4/8/8/8/7K b - - 0 1");
         compareStates(game.m_state, expected.m_state);
@@ -275,6 +290,7 @@ namespace test
 
         Move move(35, 49, MoveType::QUIET, Piece::QUEEN); // Qd5 -> Qb7 (checkmate)
         game.makeMove<true>(move);
+        game.m_moveList.generateAllMoves(game.m_state);
 
         game.unmakeMove(move);
         compareStates(game.m_state, initialState);
