@@ -75,6 +75,9 @@ namespace engine::benchmark
 
         game.m_moveList.generateAllMoves(game.m_state);
 
+        if (depth == 1)
+            return game.m_moveList.size();
+
         // If we are at first exection, multi-task the each branch
         if constexpr (isRoot)
         {
