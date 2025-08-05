@@ -122,8 +122,10 @@ namespace test
 
     inline uint64_t perft(engine::game::Game& game, int depth, int originalDepth, Counters& counters) noexcept
     {
-        if (depth == 0 || game.m_moveList.size() == 0)
+        if (depth == 0)
             return 1ULL;
+
+        game.m_moveList.generateAllMoves(game.m_state);
 
         if (depth == originalDepth)
         {
@@ -141,6 +143,7 @@ namespace test
                     for (std::size_t i = range.begin(); i != range.end(); ++i)
                     {
                         localGame.makeMove<true>(game.m_moveList[i]);
+                        localGame.m_moveList.generateAllMoves(localGame.m_state);
 
                         if (depth == 1)
                         {
@@ -168,6 +171,7 @@ namespace test
         for (const engine::game::Move mv : game.m_moveList)
         {
             game.makeMove<true>(mv);
+            game.m_moveList.generateAllMoves(game.m_state);
 
             if (depth == 1)
             {
