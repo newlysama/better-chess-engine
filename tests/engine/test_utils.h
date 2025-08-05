@@ -120,14 +120,15 @@ namespace test
         }
     };
 
-    inline uint64_t perft(engine::game::Game& game, int depth, int originalDepth, Counters& counters) noexcept
+    template <bool isRoot>
+    inline uint64_t perft(engine::game::Game& game, int depth, Counters& counters) noexcept
     {
         if (depth == 0)
             return 1ULL;
 
         game.m_moveList.generateAllMoves(game.m_state);
 
-        if (depth == originalDepth)
+        if constexpr (isRoot)
         {
             // Local counters per thread
             tbb::combinable<Counters> tlsCounters([] { return Counters{}; });
@@ -150,7 +151,7 @@ namespace test
                             localCounters.increment(localGame, game.m_moveList[i]);
                         }
 
-                        local += perft(localGame, depth - 1, originalDepth, localCounters);
+                        local += perft<false>(localGame, depth - 1, localCounters);
 
                         localGame.unmakeMove(game.m_moveList[i]);
                     }
@@ -178,7 +179,7 @@ namespace test
                 counters.increment(game, mv);
             }
 
-            nodes += perft(game, depth - 1, originalDepth, counters);
+            nodes += perft<false>(game, depth - 1, counters);
 
             game.unmakeMove(mv);
         }

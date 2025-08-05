@@ -7,20 +7,11 @@
  * @brief Entry point of the program
  */
 
-#include "logging/logging.h"
-#include "main/options.h"
-
-#if defined(PLAY_CONSOLE)
-#include "main/console_runner/console_runner.h"
-
-#elif defined(PLAY_SERVER)
-// TODO: include your server header
-
-#elif defined(GENERATE_MAGICS)
-
+#include "engine/benchmark/benchmark.h"
 #include "engine/magics_generator/magics_generator.h"
-
-#endif
+#include "logging/logging.h"
+#include "main/console_runner/console_runner.h"
+#include "main/options.h"
 
 /**
  * @brief Run the program according to the defined options
@@ -28,11 +19,11 @@
  * @param [in] options : processed user entered options
  */
 
-static int run(const options::Options& opt)
+static int run(const options::Options& optitons)
 {
 #if defined(PLAY_CONSOLE)
 
-    auto fen = opt.perftFen;
+    auto fen = optitons.perftFen;
 
     console_runner::ConsoleRunner runner =
         fen.has_value() ? console_runner::ConsoleRunner{fen.value()} : console_runner::ConsoleRunner{};
@@ -41,17 +32,17 @@ static int run(const options::Options& opt)
 
     return 0;
 
-/*───────────────────────────────────────────────────────────────────────────*/
 #elif defined(PLAY_SERVER)
-
     LOG_INFO("Starting server (not implemented yet)");
     // TODO: server loop here
     return 0;
 
-/*───────────────────────────────────────────────────────────────────────────*/
 #elif defined(GENERATE_MAGICS)
-
     engine::magics_generator::initMagics();
+    return 0;
+
+#elif defined(BUILD_BENCHMARK)
+    benchmark::benchmark_perft(5);
     return 0;
 #endif
 }
