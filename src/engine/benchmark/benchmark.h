@@ -16,7 +16,7 @@
 #include "engine/game/game.h"
 #include "engine/game/move_list.h"
 
-namespace benchmark
+namespace engine::benchmark
 {
     const std::array<std::string, 35> BenchmarkStates = {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -209,4 +209,4 @@ namespace benchmark
 
         handleBenchmarkResults(allNodesPerSec, allTimes);
     }
-} // namespace benchmark
+} // namespace engine::benchmark
