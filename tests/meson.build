@@ -17,7 +17,7 @@ subdir('engine/')
 #- Tests executable -#
 test_exe = executable('test_engine',
   sources: tests_engine_src,
-  dependencies: [gtest_dep, gtest_main_dep, tests_engine_dep],
+  dependencies: [tbb_dep, gtest_dep, gtest_main_dep, tests_engine_dep],
   include_directories: inc_src,
 )
 

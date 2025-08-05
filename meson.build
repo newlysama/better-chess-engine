@@ -18,6 +18,11 @@ generate_magics = get_option('generate_magics')
 console         = get_option('console')
 server          = get_option('server')
 
+tbb_dep = dependency(
+  'tbb',
+  required: true
+)
+
 # Global project arguments
 add_project_arguments(
   '-DPROJECT_ROOT="' + meson.project_source_root() + '"',
@@ -26,6 +31,11 @@ add_project_arguments(
     '-mtune=native',
     '-funroll-loops',
     '-fomit-frame-pointer',
+  language: 'cpp'
+)
+
+add_project_link_arguments(
+  '-ltbb',
   language: 'cpp'
 )
 

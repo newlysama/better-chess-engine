@@ -12,6 +12,9 @@
 
 #include <cstdint>
 #include <gtest/gtest.h>
+#include <tbb/blocked_range.h>
+#include <tbb/combinable.h>
+#include <tbb/parallel_reduce.h>
 
 #include "engine/board/state.h"
 #include "engine/core/const.h"
@@ -66,6 +69,17 @@ namespace test
         uint64_t doubleChecks = 0;
         uint64_t checkmates = 0;
 
+        void operator+=(const Counters other) noexcept
+        {
+            captures += other.captures;
+            enPassants += other.enPassants;
+            castlings += other.castlings;
+            promotions += other.promotions;
+            checks += other.checks;
+            doubleChecks += other.doubleChecks;
+            checkmates += other.checkmates;
+        }
+
         void check(const Counters& other) const noexcept
         {
             EXPECT_EQ(captures, other.captures);
@@ -106,26 +120,63 @@ namespace test
         }
     };
 
-    inline uint64_t perft(engine::game::Game& game, int depth, Counters& counters) noexcept
+    inline uint64_t perft(engine::game::Game& game, int depth, int originalDepth, Counters& counters) noexcept
     {
         if (depth == 0 || game.m_moveList.size() == 0)
-        {
             return 1ULL;
+
+        if (depth == originalDepth)
+        {
+            // Local counters per thread
+            tbb::combinable<Counters> tlsCounters([] { return Counters{}; });
+
+            // Parallel reduce on each node
+            uint64_t nodes = tbb::parallel_reduce(
+                tbb::blocked_range<std::size_t>(0, game.m_moveList.size()), uint64_t{0},
+                [&](const tbb::blocked_range<std::size_t>& range, uint64_t local) -> uint64_t {
+                    // Local copy of game
+                    engine::game::Game localGame = game;
+                    Counters& localCounters = tlsCounters.local();
+
+                    for (std::size_t i = range.begin(); i != range.end(); ++i)
+                    {
+                        localGame.makeMove<true>(game.m_moveList[i]);
+
+                        if (depth == 1)
+                        {
+                            localCounters.increment(localGame, game.m_moveList[i]);
+                        }
+
+                        local += perft(localGame, depth - 1, originalDepth, localCounters);
+
+                        localGame.unmakeMove(game.m_moveList[i]);
+                    }
+
+                    return local;
+                },
+
+                // Reduce
+                std::plus<uint64_t>());
+
+            // Combines the local counters
+            tlsCounters.combine_each([&](const Counters& c) { counters += c; });
+
+            return nodes;
         }
 
         uint64_t nodes = 0;
-
-        for (const engine::game::Move move : game.m_moveList)
+        for (const engine::game::Move mv : game.m_moveList)
         {
-            game.makeMove<true>(move);
+            game.makeMove<true>(mv);
 
             if (depth == 1)
             {
-                counters.increment(game, move);
+                counters.increment(game, mv);
             }
 
-            nodes += perft(game, depth - 1, counters);
-            game.unmakeMove(move);
+            nodes += perft(game, depth - 1, originalDepth, counters);
+
+            game.unmakeMove(mv);
         }
 
         return nodes;
