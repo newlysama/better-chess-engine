@@ -20,9 +20,8 @@ namespace options
 {
     struct Options
     {
-        #if defined(PLAY_CONSOLE)
-            std::optional<std::string> perftFen{};
-        #endif
+        std::optional<std::string> fen{};
+        bool benchmark;
     };
 
     /**
@@ -34,24 +33,34 @@ namespace options
         Options opt;
 
         #if defined(PLAY_CONSOLE)
-            // zero or two extra arguments: --perft <fen>
             if (args.empty())
                 return opt;
 
-            if (args.size() == 2 && args[0] == "--perft")
+            // --bench
+            if (args.size() == 1 && args[0] == "--bench")
             {
-                opt.perftFen = std::string(args[1]);
+                opt.benchmark = true;
+                return opt;
+            }
+            else
+            {
+                opt.benchmark = false;
+            }
+
+            // --fen <FEN>
+            if (args.size() == 2 && args[0] == "--fen")
+            {
+                opt.fen = std::string(args[1]);
                 return opt;
             }
 
-            return std::unexpected("Syntax: ./chess [--perft <fen>]");
-
+            return std::unexpected("Usage : ./chess [--fen <fen> | --bench]");
         #else
-            // no argument allowed in every other build
             if (!args.empty())
+            {
                 return std::unexpected("This build takes no command-line options");
+            }
             return opt;
-
         #endif
     }
 

@@ -223,7 +223,7 @@ namespace engine::game
         }
 
         // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
+        #if !defined(BUILD_RELEASE)
         inline void print() const noexcept
         {
             std::println("From    : {}", getFromSquare());

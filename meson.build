@@ -44,6 +44,7 @@ if mode == 'debug'
     '-DBUILD_DEBUG',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     '-Db_sanitize=address',
+    'b_ndebug',
     language: 'cpp'
   )
 
@@ -51,6 +52,7 @@ elif mode == 'profile'
   add_project_arguments(
     '-DBUILD_PROFILE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
+    'b_ndebug',
     language: 'cpp'
   )
 
@@ -72,18 +74,6 @@ elif mode == 'test'
     '-pthread',
     '-lgtest',
     '-lgtest_main',
-    language: 'cpp'
-  )
-
-elif mode == 'benchmark'
-  add_project_arguments(
-    '-DBUILD_BENCHMARK',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_CRITICAL',
-    language: 'cpp'
-  )
-
-  add_project_link_arguments(
-    '-pthread',
     language: 'cpp'
   )
 endif
