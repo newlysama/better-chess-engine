@@ -87,7 +87,7 @@ namespace console_runner
             std::cin >> promotion;
             piece = utils::fromString(promotion);
 
-            if (piece == Piece::UNKNOWN_PIECE || piece == Piece::KING || piece == Piece::PAWN) [[unlikely]]
+            if (piece == Piece::UNKNOWN_PIECE || piece == Piece::KING || piece == Piece::PAWN)
             {
                 LOG_INFO("User entered non existing piece: {}", promotion);
                 std::print("Please enter a valid piece (queen, rook, bishop or knight): ");
@@ -239,13 +239,14 @@ namespace console_runner
                 continue;
             }
 
-            if (move.value().isPromotion() == true) [[unlikely]]
+            if (move.value().isPromotion() == true)
             {
                 move.value().setPromotionPiece(this->askPromotion());
             }
 
             m_game.makeMove<true>(move.value());
             lastMove = move.value();
+            m_game.m_moveList.generateAllMoves(m_game.m_state);
 
             // Print new state
             ConsoleUI::RenderState(m_game.m_state);
