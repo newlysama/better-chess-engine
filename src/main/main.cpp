@@ -19,11 +19,16 @@
  * @param [in] options : processed user entered options
  */
 
-static int run(const options::Options& optitons)
+static int run(const options::Options& options)
 {
 #if defined(PLAY_CONSOLE)
+    if (options.benchmark)
+    {
+        engine::benchmark::benchmark_perft(options.benchmark_depth);
+        return 0;
+    }
 
-    auto fen = optitons.perftFen;
+    auto fen = options.fen;
 
     console_runner::ConsoleRunner runner =
         fen.has_value() ? console_runner::ConsoleRunner{fen.value()} : console_runner::ConsoleRunner{};
@@ -41,8 +46,7 @@ static int run(const options::Options& optitons)
     engine::magics_generator::initMagics();
     return 0;
 
-#elif defined(BUILD_BENCHMARK)
-    engine::benchmark::benchmark_perft(5);
+#else
     return 0;
 #endif
 }
@@ -57,7 +61,7 @@ int main(int argc, char* argv[])
 
     if (!parsed)
     {
-        LOG_ERROR("Argument error: {}", parsed.error());
+        std::println("Argument error: {}", parsed.error());
         return EXIT_FAILURE;
     }
 

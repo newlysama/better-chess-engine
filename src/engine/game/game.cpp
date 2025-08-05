@@ -56,19 +56,19 @@ namespace engine::game
         // Check if we capture a rook, which would remove a castling right
         if (enemyPiece == Piece::ROOK)
         {
-            if (enemyColor == Color::WHITE)
+            for (const auto& [square, right] : m_state.m_rookCastlingMap)
             {
-                if (move.getToSquare() == 56) // Initial queen side black rook pos
-                    m_state.clearCastlingRight<BLACK_QUEEN_SIDE>();
-                else if (move.getToSquare() == 63) // Initial king side black rook pos
-                    m_state.clearCastlingRight<BLACK_KING_SIDE>();
-            }
-            else
-            {
-                if (move.getToSquare() == 0) // Initial queen side white rook pos
-                    m_state.clearCastlingRight<WHITE_QUEEN_SIDE>();
-                else if (move.getToSquare() == 7) // Initial king side white rook pos
-                    m_state.clearCastlingRight<WHITE_KING_SIDE>();
+                bool rightIsWhite =
+                    (right == core::Castling::WHITE_KING_SIDE || right == core::Castling::WHITE_QUEEN_SIDE);
+                if ((rightIsWhite && enemyColor == core::Color::WHITE) ||
+                    (!rightIsWhite && enemyColor == core::Color::BLACK))
+                {
+                    if (move.getToSquare() == square)
+                    {
+                        m_state.m_castlingRights &= ~(1U << right);
+                        break;
+                    }
+                }
             }
         }
 

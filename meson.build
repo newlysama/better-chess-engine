@@ -74,23 +74,11 @@ elif mode == 'test'
     '-lgtest_main',
     language: 'cpp'
   )
-
-elif mode == 'benchmark'
-  add_project_arguments(
-    '-DBUILD_BENCHMARK',
-    '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_CRITICAL',
-    language: 'cpp'
-  )
-
-  add_project_link_arguments(
-    '-pthread',
-    language: 'cpp'
-  )
 endif
 
 if generate_magics == true
-  if (server == true) or (console == true) or mode in ['test', 'benchmark', 'release']
-    error('Cannot use generate_magics with server/console option or release/test/benchmark build modes.')
+  if server == true or console == true or mode == 'test'
+    error('Cannot use generate_magics with server/console option or test build mode.')
   else
     add_project_arguments(
       '-DGENERATE_MAGICS',

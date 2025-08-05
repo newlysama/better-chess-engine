@@ -20,9 +20,9 @@ namespace options
 {
     struct Options
     {
-        #if defined(PLAY_CONSOLE)
-            std::optional<std::string> perftFen{};
-        #endif
+        std::optional<std::string> fen{};
+        bool benchmark;
+        int benchmark_depth;
     };
 
     /**
@@ -30,28 +30,49 @@ namespace options
      */
     inline std::expected<Options, std::string> parse(int argc, char* argv[])
     {
-        std::vector<std::string_view> args{argv + 1, argv + argc};
+        std::vector<std::string> args{argv + 1, argv + argc};
         Options opt;
 
         #if defined(PLAY_CONSOLE)
-            // zero or two extra arguments: --perft <fen>
             if (args.empty())
                 return opt;
 
-            if (args.size() == 2 && args[0] == "--perft")
+            // --bench
+            if (args.size() == 2 && args[0] == "--bench")
             {
-                opt.perftFen = std::string(args[1]);
+                opt.benchmark = true;
+                int depth = std::stoi(args[1]);
+
+                if (depth < 1 || depth > 10)
+                {
+                    return std::unexpected("Usage : ./chess --bench <depth> (0 < depth < 10)");
+                }
+                else
+                {
+                    opt.benchmark_depth = depth;
+                }
+
+                return opt;
+            }
+            else
+            {
+                opt.benchmark = false;
+            }
+
+            // --fen <FEN>
+            if (args.size() == 2 && args[0] == "--fen")
+            {
+                opt.fen = std::string(args[1]);
                 return opt;
             }
 
-            return std::unexpected("Syntax: ./chess [--perft <fen>]");
-
+            return std::unexpected("Usage : ./chess [--fen <fen> | --bench <depth>]");
         #else
-            // no argument allowed in every other build
             if (!args.empty())
+            {
                 return std::unexpected("This build takes no command-line options");
+            }
             return opt;
-
         #endif
     }
 

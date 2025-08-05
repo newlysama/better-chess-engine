@@ -148,37 +148,26 @@ namespace engine::board
 
     void State::movePiece(const Piece piece, const int fromSquare, const int toSquare) noexcept
     {
-        // Keep track of the kings indexes and update castling rights
         if (piece == Piece::KING)
         {
+            // Keep track of the kings indexes
             m_kgSquares[m_sideToMove] = toSquare;
 
+            // Update castling rights
             if (m_sideToMove == Color::WHITE)
-            {
-                this->clearCastlingRight<WHITE_KING_SIDE>();
-                this->clearCastlingRight<WHITE_QUEEN_SIDE>();
-            }
+                m_castlingRights &= ~((1U << Castling::WHITE_KING_SIDE) | (1U << Castling::WHITE_QUEEN_SIDE));
             else
-            {
-                this->clearCastlingRight<BLACK_KING_SIDE>();
-                this->clearCastlingRight<BLACK_QUEEN_SIDE>();
-            }
+                m_castlingRights &= ~((1U << Castling::BLACK_KING_SIDE) | (1U << Castling::BLACK_QUEEN_SIDE));
         }
         else if (piece == Piece::ROOK)
         {
-            if (m_sideToMove == Color::WHITE)
+            for (const auto& [square, right] : m_rookCastlingMap)
             {
-                if (fromSquare == 0) // Initial white queen side rook position
-                    this->clearCastlingRight<Castling::WHITE_QUEEN_SIDE>();
-                else if (fromSquare == 7) // Initial white king side rook position
-                    this->clearCastlingRight<Castling::WHITE_KING_SIDE>();
-            }
-            else
-            {
-                if (fromSquare == 56) // Initial black queen side rook position
-                    this->clearCastlingRight<Castling::BLACK_QUEEN_SIDE>();
-                else if (fromSquare == 63) // Initial black king side rook position
-                    this->clearCastlingRight<Castling::BLACK_KING_SIDE>();
+                if (fromSquare == square)
+                {
+                    m_castlingRights &= ~(1U << right);
+                    break;
+                }
             }
         }
 

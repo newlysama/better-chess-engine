@@ -30,12 +30,7 @@ namespace engine::game
 
     void MoveList::add(const Move& move) noexcept
     {
-        // clang-format off
-        #if !defined(BUILD_RELEASE) && !defined(BENCHMARK)
-            assert(_m_size < 256);
-        #endif
-        // clang-format on
-
+        assert(_m_size < 256);
         _m_moves[_m_size++] = move;
     }
 
