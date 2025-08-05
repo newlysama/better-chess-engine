@@ -22,6 +22,7 @@ namespace options
     {
         std::optional<std::string> fen{};
         bool benchmark;
+        int benchmark_depth;
     };
 
     /**
@@ -29,7 +30,7 @@ namespace options
      */
     inline std::expected<Options, std::string> parse(int argc, char* argv[])
     {
-        std::vector<std::string_view> args{argv + 1, argv + argc};
+        std::vector<std::string> args{argv + 1, argv + argc};
         Options opt;
 
         #if defined(PLAY_CONSOLE)
@@ -37,9 +38,20 @@ namespace options
                 return opt;
 
             // --bench
-            if (args.size() == 1 && args[0] == "--bench")
+            if (args.size() == 2 && args[0] == "--bench")
             {
                 opt.benchmark = true;
+                int depth = std::stoi(args[1]);
+
+                if (depth < 1 || depth > 10)
+                {
+                    return std::unexpected("Usage : ./chess --bench <depth> (0 < depth < 10)");
+                }
+                else
+                {
+                    opt.benchmark_depth = depth;
+                }
+
                 return opt;
             }
             else
@@ -54,7 +66,7 @@ namespace options
                 return opt;
             }
 
-            return std::unexpected("Usage : ./chess [--fen <fen> | --bench]");
+            return std::unexpected("Usage : ./chess [--fen <fen> | --bench <depth>]");
         #else
             if (!args.empty())
             {

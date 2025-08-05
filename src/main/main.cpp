@@ -24,7 +24,7 @@ static int run(const options::Options& options)
 #if defined(PLAY_CONSOLE)
     if (options.benchmark)
     {
-        engine::benchmark::benchmark_perft(6);
+        engine::benchmark::benchmark_perft(options.benchmark_depth);
         return 0;
     }
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
     if (!parsed)
     {
-        LOG_ERROR("Argument error: {}", parsed.error());
+        std::println("Argument error: {}", parsed.error());
         return EXIT_FAILURE;
     }
 
