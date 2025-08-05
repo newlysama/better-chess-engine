@@ -19,7 +19,7 @@ option(
 option(
     'console',
     type        : 'boolean',
-    value       : true,
+    value       : false,
     description : 'Whether we want to play the game in the console.'
 )
 
