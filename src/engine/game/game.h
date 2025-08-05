@@ -5,6 +5,8 @@
  * @par       This project is released under the MIT License
  *
  * @brief Game API
+ * Holds the current state, the current legal moves list, and
+ * handles the different move requests.
  */
 
 #ifndef GAME_H_
@@ -19,6 +21,7 @@
 
 namespace engine::game
 {
+    // Necessaries to unmake a move
     struct UnmakeInfo
     {
         // State infos
@@ -44,12 +47,6 @@ namespace engine::game
         board::Bitboard prevBlockersBB = board::Bitboard{0ULL};
     };
 
-    /**
-     * @class Game
-     * @brief Game API.
-     * Holds the current state, the current legal moves list, and
-     * handles the different move requests.
-     */
     class Game
     {
       public:
