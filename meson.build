@@ -44,7 +44,6 @@ if mode == 'debug'
     '-DBUILD_DEBUG',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
     '-Db_sanitize=address',
-    'b_ndebug',
     language: 'cpp'
   )
 
@@ -52,7 +51,6 @@ elif mode == 'profile'
   add_project_arguments(
     '-DBUILD_PROFILE',
     '-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE',
-    'b_ndebug',
     language: 'cpp'
   )
 
@@ -79,8 +77,8 @@ elif mode == 'test'
 endif
 
 if generate_magics == true
-  if (server == true) or (console == true) or mode in ['test', 'benchmark', 'release']
-    error('Cannot use generate_magics with server/console option or release/test/benchmark build modes.')
+  if server == true or console == true or mode == 'test'
+    error('Cannot use generate_magics with server/console option or test build mode.')
   else
     add_project_arguments(
       '-DGENERATE_MAGICS',
