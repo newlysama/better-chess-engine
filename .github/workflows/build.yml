@@ -58,9 +58,3 @@ jobs:
           if [[ "${{ matrix.mode }}" == "test" ]]; then
             ./build/tests/test_engine
           fi
-
-      - name: Run Benchmarks
-        run: |
-          if [[ "${{ matrix.mode }}" == "benchmark" ]]; then
-            ./build/src/main/chess
-          fi
