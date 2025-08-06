@@ -21,6 +21,8 @@ namespace engine::board
 
     State::State() noexcept
         : m_pinnedBB{}
+        , m_allOccBB{}
+        , m_teamsOccBB{}
         , m_piecesBB{
             {// -- White pieces --
              {
@@ -39,14 +41,27 @@ namespace engine::board
                  Bitboard{0x0800'0000'0000'0000ULL}, // queen
                  Bitboard{0x1000'0000'0000'0000ULL}  // king
              }}
-            },
-        m_allOccBB{}, m_teamsOccBB{}
+            }
     {
-        // Builds occupancy bitboards
+        // Fills pieceAt with empty pieces
+        for (auto& row : m_pieceAt)
+            row.fill(Piece::UNKNOWN_PIECE);
+
+        // Builds occupancy bitboards and fills m_pieceAt
         for (std::size_t piece = 0; piece < Piece::N_PIECES; piece++)
         {
-            m_teamsOccBB[Color::WHITE] |= m_piecesBB[Color::WHITE][piece];
-            m_teamsOccBB[Color::BLACK] |= m_piecesBB[Color::BLACK][piece];
+            for (Color color : {WHITE, BLACK})
+            {
+                Bitboard bb = m_piecesBB[color][piece];
+                m_teamsOccBB[color] |= bb;
+
+                while (!bb.isEmpty())
+                {
+                    int square = bb.lsbIndex();
+                    m_pieceAt[color][square] = static_cast<Piece>(piece);
+                    bb.unset(square);
+                }
+            }
         }
 
         m_allOccBB = m_teamsOccBB[Color::WHITE] | m_teamsOccBB[Color::BLACK];
@@ -103,32 +118,13 @@ namespace engine::board
     {
         for (Color color : {Color::WHITE, Color::BLACK})
         {
-            for (Piece piece = Piece::PAWN; piece < Piece::N_PIECES; piece = static_cast<Piece>(piece + 1))
+            if (m_pieceAt[color][square] != Piece::UNKNOWN_PIECE)
             {
-                if (m_piecesBB[color][piece].isSet(square))
-                {
-                    return piece;
-                }
+                return m_pieceAt[color][square];
             }
         }
 
         LOG_ERROR("Trying to access piece at square {}, but no piece was found", square);
-        return Piece::UNKNOWN_PIECE;
-    }
-
-    Piece State::getPiece(const Color color, const int square) const noexcept
-    {
-        for (Piece piece = Piece::PAWN; piece < Piece::N_PIECES; piece = static_cast<Piece>(piece + 1))
-        {
-            if (m_piecesBB[color][piece].isSet(square))
-            {
-                return piece;
-            }
-        }
-
-        LOG_ERROR("Trying to access piece of team {} at square {}, but no piece was found", utils::toString(color),
-                  square);
-
         return Piece::UNKNOWN_PIECE;
     }
 
@@ -137,6 +133,7 @@ namespace engine::board
         m_piecesBB[color][piece].set(square);
         m_allOccBB.set(square);
         m_teamsOccBB[color].set(square);
+        m_pieceAt[color][square] = piece;
     }
 
     void State::unsetPiece(const Color color, const Piece piece, const int square) noexcept
@@ -144,6 +141,7 @@ namespace engine::board
         m_piecesBB[color][piece].unset(square);
         m_allOccBB.unset(square);
         m_teamsOccBB[color].unset(square);
+        m_pieceAt[color][square] = Piece::UNKNOWN_PIECE;
     }
 
     void State::movePiece(const Piece piece, const int fromSquare, const int toSquare) noexcept
@@ -226,7 +224,7 @@ namespace engine::board
 
             // Check if enemy piece is a sliding piece that can move
             // on the current ray given the current direction
-            Piece enemyPiece = this->getPiece(enemyColor, enemySquare);
+            Piece enemyPiece = m_pieceAt[enemyColor][enemySquare];
             if (enemyPiece != Piece::QUEEN)
             {
                 if (isDirOrtho && enemyPiece != Piece::ROOK)

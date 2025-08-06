@@ -107,7 +107,7 @@ namespace engine::game
             if (moveType == MoveType::CAPTURE)
             {
                 int toSquare = move.getToSquare();
-                Piece toRemove = m_state.getPiece(enemyColor, toSquare);
+                Piece toRemove = m_state.m_pieceAt[enemyColor][toSquare];
 
                 if constexpr (SAVE_STATE)
                 {
