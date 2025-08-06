@@ -3,252 +3,252 @@
 Benchmark for FEN : rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 Depth          : 6
 Nodes searched : 119,060,324
-Time           : 2,656 ms
-Nodes/second   : 44,824,178
+Time           : 2,097 ms
+Nodes/second   : 56,766,431
 
 ==============================================================================
 Benchmark for FEN : r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10
 Depth          : 6
 Nodes searched : 8,031,647,558
-Time           : 83,856 ms
-Nodes/second   : 95,778,723
+Time           : 82,455 ms
+Nodes/second   : 97,405,325
 
 ==============================================================================
 Benchmark for FEN : 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 11
 Depth          : 6
 Nodes searched : 11,030,082
-Time           : 197 ms
-Nodes/second   : 55,936,598
+Time           : 177 ms
+Nodes/second   : 62,181,944
 
 ==============================================================================
 Benchmark for FEN : 4rrk1/pp1n3p/3q2pQ/2p1pb2/2PP4/2P3N1/P2B2PP/4RRK1 b - - 7 19
 Depth          : 6
 Nodes searched : 2,821,731,715
-Time           : 29,957 ms
-Nodes/second   : 94,190,925
+Time           : 29,700 ms
+Nodes/second   : 95,005,332
 
 ==============================================================================
 Benchmark for FEN : rq3rk1/ppp2ppp/1bnpb3/3N2B1/3NP3/7P/PPPQ1PP1/2KR3R w - - 7 14
 Depth          : 6
 Nodes searched : 2,943,931,917
-Time           : 37,892 ms
-Nodes/second   : 77,692,240
+Time           : 36,999 ms
+Nodes/second   : 79,565,875
 
 ==============================================================================
 Benchmark for FEN : r1bq1r1k/1pp1n1pp/1p1p4/4p2Q/4Pp2/1BNP4/PPP2PPP/3R1RK1 w - - 2 14
 Depth          : 6
 Nodes searched : 1,795,661,682
-Time           : 22,978 ms
-Nodes/second   : 78,145,340
+Time           : 23,123 ms
+Nodes/second   : 77,654,247
 
 ==============================================================================
 Benchmark for FEN : r3r1k1/2p2ppp/p1p1bn2/8/1q2P3/2NPQN2/PPP3PP/R4RK1 b - - 2 15
 Depth          : 6
 Nodes searched : 7,102,556,808
-Time           : 67,924 ms
-Nodes/second   : 104,565,166
+Time           : 66,293 ms
+Nodes/second   : 107,137,772
 
 ==============================================================================
 Benchmark for FEN : r1bbk1nr/pp3p1p/2n5/1N4p1/2Np1B2/8/PPP2PPP/2KR1B1R w kq - 0 13
 Depth          : 6
 Nodes searched : 1,489,390,805
-Time           : 20,169 ms
-Nodes/second   : 73,843,853
+Time           : 20,698 ms
+Nodes/second   : 71,955,386
 
 ==============================================================================
 Benchmark for FEN : r1bq1rk1/ppp1nppp/4n3/3p3Q/3P4/1BP1B3/PP1N2PP/R4RK1 w - - 1 16
 Depth          : 6
 Nodes searched : 2,140,907,095
-Time           : 27,405 ms
-Nodes/second   : 78,120,355
+Time           : 27,097 ms
+Nodes/second   : 79,008,185
 
 ==============================================================================
 Benchmark for FEN : 4r1k1/r1q2ppp/ppp2n2/4P3/5Rb1/1N1BQ3/PPP3PP/R5K1 w - - 1 17
 Depth          : 6
 Nodes searched : 8,086,191,948
-Time           : 83,061 ms
-Nodes/second   : 97,352,314
+Time           : 81,479 ms
+Nodes/second   : 99,241,616
 
 ==============================================================================
 Benchmark for FEN : 2rqkb1r/ppp2p2/2npb1p1/1N1Nn2p/2P1PP2/8/PP2B1PP/R1BQK2R b KQ - 0 11
 Depth          : 6
 Nodes searched : 2,854,799,873
-Time           : 32,952 ms
-Nodes/second   : 86,634,815
+Time           : 31,873 ms
+Nodes/second   : 89,567,485
 
 ==============================================================================
 Benchmark for FEN : r1bq1r1k/b1p1npp1/p2p3p/1p6/3PP3/1B2NN2/PP3PPP/R2Q1RK1 w - - 1 16
 Depth          : 6
 Nodes searched : 1,713,961,775
-Time           : 22,274 ms
-Nodes/second   : 76,948,011
+Time           : 21,886 ms
+Nodes/second   : 78,311,179
 
 ==============================================================================
 Benchmark for FEN : 3r1rk1/p5pp/bpp1pp2/8/q1PP1P2/b3P3/P2NQRPP/1R2B1K1 b - - 6 22
 Depth          : 6
 Nodes searched : 1,615,682,276
-Time           : 20,831 ms
-Nodes/second   : 77,558,371
+Time           : 19,543 ms
+Nodes/second   : 82,672,282
 
 ==============================================================================
 Benchmark for FEN : r1q2rk1/2p1bppp/2Pp4/p6b/Q1PNp3/4B3/PP1R1PPP/2K4R w - - 2 18
 Depth          : 6
 Nodes searched : 1,829,316,383
-Time           : 22,447 ms
-Nodes/second   : 81,494,179
+Time           : 22,819 ms
+Nodes/second   : 80,163,235
 
 ==============================================================================
 Benchmark for FEN : 4k2r/1pb2ppp/1p2p3/1R1p4/3P4/2r1PN2/P4PPP/1R4K1 b - - 3 22
 Depth          : 6
 Nodes searched : 504,947,578
-Time           : 6,837 ms
-Nodes/second   : 73,849,855
+Time           : 6,669 ms
+Nodes/second   : 75,708,643
 
 ==============================================================================
 Benchmark for FEN : 3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26
 Depth          : 6
 Nodes searched : 6,573,023,426
-Time           : 65,135 ms
-Nodes/second   : 100,912,723
+Time           : 65,242 ms
+Nodes/second   : 100,747,992
 
 ==============================================================================
 Benchmark for FEN : 6k1/6p1/6Pp/ppp5/3pn2P/1P3K2/1PP2P2/3N4 b - - 0 1
 Depth          : 6
 Nodes searched : 3,679,275
-Time           : 92 ms
-Nodes/second   : 39,883,739
+Time           : 88 ms
+Nodes/second   : 41,362,941
 
 ==============================================================================
 Benchmark for FEN : 3b4/5kp1/1p1p1p1p/pP1PpP1P/P1P1P3/3KN3/8/8 w - - 0 1
 Depth          : 6
 Nodes searched : 856,742
-Time           : 47 ms
-Nodes/second   : 18,163,242
+Time           : 43 ms
+Nodes/second   : 19,728,325
 
 ==============================================================================
 Benchmark for FEN : 2K5/p7/7P/5pR1/8/5k2/r7/8 w - - 0 1
 Depth          : 6
 Nodes searched : 24,116,594
-Time           : 325 ms
-Nodes/second   : 74,086,138
+Time           : 314 ms
+Nodes/second   : 76,747,978
 
 ==============================================================================
 Benchmark for FEN : 8/6pk/1p6/8/PP3p1p/5P2/4KP1q/3Q4 w - - 0 1
 Depth          : 6
 Nodes searched : 19,113,386
-Time           : 348 ms
-Nodes/second   : 54,812,166
+Time           : 375 ms
+Nodes/second   : 50,900,212
 
 ==============================================================================
 Benchmark for FEN : 7k/3p2pp/4q3/8/4Q3/5Kp1/P6b/8 w - - 0 1
 Depth          : 6
 Nodes searched : 174,227,680
-Time           : 2,081 ms
-Nodes/second   : 83,696,873
+Time           : 1,889 ms
+Nodes/second   : 92,195,762
 
 ==============================================================================
 Benchmark for FEN : 8/2p5/8/2kPKp1p/2p4P/2P5/3P4/8 w - - 0 1
 Depth          : 6
 Nodes searched : 138,040
-Time           : 9 ms
-Nodes/second   : 15,175,901
+Time           : 8 ms
+Nodes/second   : 16,838,253
 
 ==============================================================================
 Benchmark for FEN : 8/1p3pp1/7p/5P1P/2k3P1/8/2K2P2/8 w - - 0 1
 Depth          : 6
 Nodes searched : 1,087,607
-Time           : 32 ms
-Nodes/second   : 32,965,779
+Time           : 30 ms
+Nodes/second   : 35,274,121
 
 ==============================================================================
 Benchmark for FEN : 8/pp2r1k1/2p1p3/3pP2p/1P1P1P1P/P5KR/8/8 w - - 0 1
 Depth          : 6
 Nodes searched : 7,604,274
-Time           : 205 ms
-Nodes/second   : 36,980,012
+Time           : 184 ms
+Nodes/second   : 41,196,374
 
 ==============================================================================
 Benchmark for FEN : 8/3p4/p1bk3p/Pp6/1Kp1PpPp/2P2P1P/2P5/5B2 b - - 0 1
 Depth          : 6
 Nodes searched : 780,813
-Time           : 32 ms
-Nodes/second   : 23,962,344
+Time           : 31 ms
+Nodes/second   : 25,049,340
 
 ==============================================================================
 Benchmark for FEN : 5k2/7R/4P2p/5K2/p1r2P1p/8/8/8 b - - 0 1
 Depth          : 6
 Nodes searched : 8,883,763
-Time           : 168 ms
-Nodes/second   : 52,808,187
+Time           : 144 ms
+Nodes/second   : 61,589,721
 
 ==============================================================================
 Benchmark for FEN : 6k1/6p1/P6p/r1N5/5p2/7P/1b3PP1/4R1K1 w - - 0 1
 Depth          : 6
 Nodes searched : 185,148,576
-Time           : 2,320 ms
-Nodes/second   : 79,777,670
+Time           : 2,259 ms
+Nodes/second   : 81,958,564
 
 ==============================================================================
 Benchmark for FEN : 1r3k2/4q3/2Pp3b/3Bp3/2Q2p2/1p1P2P1/1P2KP2/3N4 w - - 0 1
 Depth          : 6
 Nodes searched : 521,538,480
-Time           : 5,925 ms
-Nodes/second   : 88,011,280
+Time           : 5,994 ms
+Nodes/second   : 87,007,433
 
 ==============================================================================
 Benchmark for FEN : 6k1/4pp1p/3p2p1/P1pPb3/R7/1r2P1PP/3B1P2/6K1 w - - 0 1
 Depth          : 6
 Nodes searched : 237,698,119
-Time           : 3,114 ms
-Nodes/second   : 76,331,131
+Time           : 3,091 ms
+Nodes/second   : 76,889,498
 
 ==============================================================================
 Benchmark for FEN : 8/3p3B/5p2/5P2/p7/PP5b/k7/6K1 w - - 0 1
 Depth          : 6
 Nodes searched : 940,794
-Time           : 30 ms
-Nodes/second   : 30,893,311
+Time           : 33 ms
+Nodes/second   : 28,135,474
 
 ==============================================================================
 Benchmark for FEN : 5rk1/q6p/2p3bR/1pPp1rP1/1P1Pp3/P3B1Q1/1K3P2/R7 w - - 93 90
 Depth          : 6
 Nodes searched : 1,611,305,870
-Time           : 18,775 ms
-Nodes/second   : 85,821,047
+Time           : 18,023 ms
+Nodes/second   : 89,401,218
 
 ==============================================================================
 Benchmark for FEN : 4rrk1/1p1nq3/p7/2p1P1pp/3P2bp/3Q1Bn1/PPPB4/1K2R1NR w - - 40 21
 Depth          : 6
 Nodes searched : 6,136,386,428
-Time           : 58,508 ms
-Nodes/second   : 104,879,540
+Time           : 58,012 ms
+Nodes/second   : 105,777,572
 
 ==============================================================================
 Benchmark for FEN : r3k2r/3nnpbp/q2pp1p1/p7/Pp1PPPP1/4BNN1/1P5P/R2Q1RK1 w kq - 0 16
 Depth          : 6
 Nodes searched : 3,743,975,028
-Time           : 41,144 ms
-Nodes/second   : 90,995,012
+Time           : 40,172 ms
+Nodes/second   : 93,197,883
 
 ==============================================================================
 Benchmark for FEN : 3Qb1k1/1r2ppb1/pN1n2q1/Pp1Pp1Pr/4P2p/4BP2/4B1R1/1R5K b - - 11 40
 Depth          : 6
 Nodes searched : 2,667,668,163
-Time           : 25,242 ms
-Nodes/second   : 105,680,589
+Time           : 24,363 ms
+Nodes/second   : 109,495,920
 
 ==============================================================================
 Benchmark for FEN : 4k3/3q1r2/1N2r1b1/3ppN2/2nPP3/1B1R2n1/2R1Q3/3K4 w - - 5 1
 Depth          : 6
 Nodes searched : 4,067,960,694
-Time           : 35,411 ms
-Nodes/second   : 114,877,691
+Time           : 35,481 ms
+Nodes/second   : 114,650,160
 
 >>>>>>>>>> BENCHMARK RESULTS <<<<<<<<<<
 
-Maximum time reached : 83,856 ms
-Minimum time reached : 9 ms
-Average time reached : 21,153 ms
-Maximum nodes/sec reached : 114,877,691
-Minimum nodes/sec reached : 15,175,901
-Average nodes/sec reached : 71,647,122
+Maximum time reached : 82,455 ms
+Minimum time reached : 8 ms
+Average time reached : 20,819 ms
+Maximum nodes/sec reached : 114,650,160
+Minimum nodes/sec reached : 16,838,253
+Average nodes/sec reached : 73,728,276
