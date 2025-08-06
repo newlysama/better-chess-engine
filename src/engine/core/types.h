@@ -31,6 +31,12 @@ namespace engine::core
     typedef std::array<board::Bitboard, Color::N_COLORS> ColoredOccupancies;
 
     /**
+     * @typedef PieceAt
+     * @brief   2x64 array holding each square's Piece.
+     */
+    typedef std::array<std::array<Piece, 64>, Color::N_COLORS> PieceAt;
+
+    /**
      * @typedef CastlingRights
      * @brief   8 bits unsigned int where bits represent a type of castling right.
      * @details

@@ -124,16 +124,6 @@ namespace engine::board
         core::Piece getPiece(const int square) const noexcept;
 
         /**
-         * @brief Get a piece from a given team and square.
-         *
-         * @param [in] color  : the team to check
-         * @param [in] square : the square to check
-         *
-         * @return the found Piece
-         */
-        core::Piece getPiece(const core::Color color, const int square) const noexcept;
-
-        /**
          * @brief Add a piece to a given team on a given square.
          *
          * @param [in] color  : Team to add the piece to
@@ -206,9 +196,10 @@ namespace engine::board
         Bitboard m_checkersBB = Bitboard{0ULL}; // Bitboard of squares that put the current king in check
         Bitboard m_blockersBB = Bitboard{0ULL}; // Bitboard of squares that block a king's check from sliding pieces
 
-        core::PiecesBitboards m_piecesBB;      // Occupancy for each team and each piece
         Bitboard m_allOccBB;                   // General occupancy
         core::ColoredOccupancies m_teamsOccBB; // Team specific occupancies
+        core::PiecesBitboards m_piecesBB;      // Occupancy for each team and each piece
+        core::PieceAt m_pieceAt;               // Piece type on each square
 
       private:
         /*****************************************
@@ -297,6 +288,7 @@ namespace engine::board
                         m_piecesBB[pair.first][pair.second].set(square);
                         m_teamsOccBB[pair.first].set(square);
                         m_allOccBB.set(square);
+                        m_pieceAt[pair.first][square] = pair.second;
 
                         // Set the king's square
                         if (pair.second == core::Piece::KING)
