@@ -78,25 +78,28 @@ namespace engine::game
     void MoveList::processTargets(const State& state, Bitboard& targets, const int fromSquare, const MoveType moveType,
                                   const Piece fromPiece) noexcept
     {
-        // Filter pinned pieces moves
-        Bitboard pinnedTargets = state.m_pinnedBB[state.m_sideToMove][fromSquare];
-        if (pinnedTargets.isEmpty() == false && fromPiece != Piece::KING)
+        if (fromPiece != Piece::KING)
         {
-            targets &= pinnedTargets;
-        }
-
-        // If the king is in simple check, non-king pieces can only
-        // capture checking pieces, and only move to square that
-        // block checking sliding pieces (if any)
-        if (state.m_isChecked && fromPiece != Piece::KING)
-        {
-            if (moveType == MoveType::CAPTURE)
+            // Filter pinned pieces moves
+            Bitboard pinnedTargets = state.m_pinnedBB[state.m_sideToMove][fromSquare];
+            if (!pinnedTargets.isEmpty())
             {
-                targets &= (state.m_checkersBB | state.m_blockersBB);
+                targets &= pinnedTargets;
             }
-            else
+
+            // If the king is in simple check, non-king pieces can only
+            // capture checking pieces, and only move to square that
+            // block checking sliding pieces (if any)
+            if (state.m_isChecked)
             {
-                targets &= state.m_blockersBB;
+                if (moveType == MoveType::CAPTURE)
+                {
+                    targets &= (state.m_checkersBB | state.m_blockersBB);
+                }
+                else
+                {
+                    targets &= state.m_blockersBB;
+                }
             }
         }
 
