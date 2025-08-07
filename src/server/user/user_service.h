@@ -13,6 +13,7 @@
 #include <expected>
 
 #include "server/core/types.h"
+#include "server/user/user.h"
 
 namespace server::user
 {
@@ -36,7 +37,7 @@ namespace server::user
          *
          * @return The requested user if present, an error message if not
          */
-        std::expected<std::shared_ptr<User>, std::string> getUser(const UserId id) const noexcept;
+        std::expected<std::shared_ptr<User>, std::string> getUser(const core::UserId id) const noexcept;
 
         /**
          * @brief Add a user the m_userMap.
@@ -45,7 +46,7 @@ namespace server::user
          *
          * @return Noting if insertion was successful, an error message if not
          */
-        std::expected<void, std::string> addUser(const UserId id) noexcept;
+        std::expected<void, std::string> addUser(const core::UserId id) noexcept;
 
       private:
         core::UsersMap m_userMap; // Map each user with its id
