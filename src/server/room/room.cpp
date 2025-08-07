@@ -22,11 +22,11 @@ namespace server::room
 
     Room::Room(RoomId id) noexcept
         : m_id(id)
-        , m_joinCode(this->createJoiningCode())
         , m_game(Game{})
         , m_players{}
         , m_spectators{}
     {
+        this->createJoiningCode();
         m_players.reserve(2);
     }
 
