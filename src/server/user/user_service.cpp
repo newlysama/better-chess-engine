@@ -33,13 +33,12 @@ namespace server::user
 
     std::expected<void, std::string> UserService::addUser(const UserId id) noexcept
     {
-        UsersMap::const_accessor acc;
+        UsersMap::accessor acc;
         if (m_userMap.find(acc, id))
         {
             return std::unexpected(std::format("User {} already exists", id));
         }
 
-        acc.upgrade_to_writer();
-        m_userMap.insert(acc, std::make_shared<User>(id));
+        m_userMap.insert(acc, {id, std::make_shared<User>(User{id})});
     }
 } // namespace server::user
