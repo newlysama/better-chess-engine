@@ -7,6 +7,8 @@ subdir('engine/')
 
 if console == true
     subdir('ui/console/')
+elif server == true
+    subdir('server')
 endif
 
 if mode != 'test'
