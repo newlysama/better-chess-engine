@@ -23,7 +23,7 @@ namespace server::user
 
         ~User() = default;
 
-        operator==(const User & other)
+        bool operator==(const User& other)
         {
             return m_id == other.m_id;
         }
