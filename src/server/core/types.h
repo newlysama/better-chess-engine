@@ -17,8 +17,8 @@
 
 namespace server::user
 {
-    class User
-};
+    class User;
+}
 
 namespace server::core
 {
