@@ -11,6 +11,7 @@
 #define TYPES_H_
 
 #include <array>
+#include <unordered_map>
 #include <vector>
 
 #include "engine/board/bitboard.h"
@@ -89,10 +90,9 @@ namespace engine::core
 
     /**
      * @typedef RookCastlingMap
-     * @brief   1x4 array of pair<int, Castling> mapping
-     * the 4 rooks starting squares to their according castling.
+     * @brief   Rook start squares with according castling rights mapping.
      */
-    typedef std::array<std::pair<int, Castling>, Castling::N_CASTLINGS> RookCastlingMap;
+    typedef std::unordered_map<int, Castling> RookCastlingMap;
 
     /**
      * @typedef BetweenMasks

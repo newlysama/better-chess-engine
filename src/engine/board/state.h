@@ -108,10 +108,9 @@ namespace engine::board
         /**
          * @brief Disable a type of castling.
          */
-        template <core::Castling Type>
-        inline constexpr void clearCastlingRight() noexcept
+        inline constexpr void clearCastlingRight(core::Castling castle) noexcept
         {
-            m_castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(Type)));
+            m_castlingRights &= static_cast<uint8_t>(~(uint8_t{1} << static_cast<unsigned>(castle)));
         }
 
         /**
@@ -176,12 +175,12 @@ namespace engine::board
 
         // clang-format off
         // Mapping of rooks starting square with their according castling right
-        core::RookCastlingMap m_rookCastlingMap = {{
+        core::RookCastlingMap m_rookCastlingMap = {
             {0,  core::Castling::WHITE_QUEEN_SIDE}, // a1
             {7,  core::Castling::WHITE_KING_SIDE }, // h1
             {56, core::Castling::BLACK_QUEEN_SIDE}, // a8
             {63, core::Castling::BLACK_KING_SIDE }  // h8
-        }};
+        };
         // clang-format on
 
         int m_epSquare = -1; // When En Passant is enabled, this var is set
@@ -337,10 +336,10 @@ namespace engine::board
         inline std::expected<void, std::string> setCastlingRightsFromFen(const std::string_view fen) noexcept
         {
             // Start by clearing all castling rights
-            this->clearCastlingRight<core::Castling::WHITE_KING_SIDE>();
-            this->clearCastlingRight<core::Castling::WHITE_QUEEN_SIDE>();
-            this->clearCastlingRight<core::Castling::BLACK_KING_SIDE>();
-            this->clearCastlingRight<core::Castling::BLACK_QUEEN_SIDE>();
+            this->clearCastlingRight(core::Castling::WHITE_KING_SIDE);
+            this->clearCastlingRight(core::Castling::WHITE_QUEEN_SIDE);
+            this->clearCastlingRight(core::Castling::BLACK_KING_SIDE);
+            this->clearCastlingRight(core::Castling::BLACK_QUEEN_SIDE);
 
             if (fen == "-")
             {

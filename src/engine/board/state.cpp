@@ -157,16 +157,9 @@ namespace engine::board
             else
                 m_castlingRights &= ~((1U << Castling::BLACK_KING_SIDE) | (1U << Castling::BLACK_QUEEN_SIDE));
         }
-        else if (piece == Piece::ROOK)
+        else if (piece == Piece::ROOK && m_rookCastlingMap.find(fromSquare) != m_rookCastlingMap.end())
         {
-            for (const auto& [square, right] : m_rookCastlingMap)
-            {
-                if (fromSquare == square)
-                {
-                    m_castlingRights &= ~(1U << right);
-                    break;
-                }
-            }
+            this->clearCastlingRight(m_rookCastlingMap[fromSquare]);
         }
 
         this->unsetPiece(m_sideToMove, piece, fromSquare);
