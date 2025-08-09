@@ -10,7 +10,7 @@ server_src = files(
 )
 
 pistache_dep = dependency(
-  'pistache',
+  'libpistache',
   required: true
 )
 
