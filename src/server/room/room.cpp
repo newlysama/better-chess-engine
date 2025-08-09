@@ -22,7 +22,7 @@ namespace server::room
 
     Room::Room(RoomId id) noexcept
         : m_id(id)
-        , m_game(Game{})
+        , m_game{}
         , m_players{}
         , m_spectators{}
     {
@@ -131,7 +131,7 @@ namespace server::room
         }
 
         // Use emplace since user is shared_ptr, not already weak_ptr
-        m_spectators.emplace(user);
+        m_spectators.emplace(user->m_id, user);
         LOG_INFO("Added user {} to room {}'s spectators", user->m_id, m_id);
 
         return std::expected<void, std::string>{};
