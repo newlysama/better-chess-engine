@@ -15,7 +15,7 @@ namespace server::user
 {
     using namespace server::core;
 
-    explicit UserService::UserService() noexcept
+    UserService::UserService() noexcept
         : m_userMap{}
     {
     }
