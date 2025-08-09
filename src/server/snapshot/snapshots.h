@@ -11,31 +11,36 @@
 #define SNAPSHOTS_H_
 
 #include <cstdint>
+#include <optional>
+#include <string_view>
 #include <vector>
 
 #include "engine/game/move.h"
 #include "server/core/types.h"
 
-namespace server::snapshots
+namespace server::snapshot
 {
     struct MoveSnapshot
     {
-        uint8_t fromSquare;
-        uint8_t toSquare;
-    }
+        int fromSquare;
+        int toSquare;
+        std::optional<int> capturedSquare;
+        std::optional<std::string_view> promotionPiece;
+        std::optional<std::string_view> castlingType;
+    };
 
     struct GameSnapshot
     {
         core::RoomId roomId;
-        std::string fen;
-        char8_t turn;
+        std::string_view fen;
+        std::string_view turn;
         uint16_t halfmove;
         uint16_t fullmove;
         bool inCheck;
         bool checkMate;
-        engine::game::Move lastMove;
-        std::vector<> legalMoves;
-    }
-} // namespace server::snapshots
+        MoveSnapshot lastMove;
+        std::vector<MoveSnapshot> legalMoves;
+    };
+} // namespace server::snapshot
 
 #endif // SNAPSHOTS_H_
