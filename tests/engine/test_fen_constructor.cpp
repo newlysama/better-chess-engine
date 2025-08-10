@@ -515,4 +515,44 @@ namespace test
 
 #undef ASSERT_CASTLING
 
+    // ===========================
+    //   State::getFenOccupancy
+    // ===========================
+
+    TEST(FenOccupancyTest, OCC_Startpos)
+    {
+        const std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        Game game(fen);
+        const State& state = game.m_state;
+
+        ASSERT_EQ(state.getFenOccupancy(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    }
+
+    TEST(FenOccupancyTest, OCC_OnlyKingsCorners)
+    {
+        const std::string fen = "7k/8/8/8/8/8/8/K7 w - - 0 1";
+        Game game(fen);
+        const State& state = game.m_state;
+
+        ASSERT_EQ(state.getFenOccupancy(), "7k/8/8/8/8/8/8/K7");
+    }
+
+    TEST(FenOccupancyTest, OCC_CompressionMixed)
+    {
+        const std::string fen = "7k/pppppppp/8/8/8/8/PPPPPPPP/K7 b - - 0 1";
+        Game game(fen);
+        const State& state = game.m_state;
+
+        ASSERT_EQ(state.getFenOccupancy(), "7k/pppppppp/8/8/8/8/PPPPPPPP/K7");
+    }
+
+    TEST(FenOccupancyTest, OCC_FromExistingSuiteLikeK6)
+    {
+        const std::string fen = "rnb1kbnr/pppppppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3";
+        Game game(fen);
+        const State& state = game.m_state;
+
+        ASSERT_EQ(state.getFenOccupancy(), "rnb1kbnr/pppppppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR");
+    }
+
 } // namespace test
