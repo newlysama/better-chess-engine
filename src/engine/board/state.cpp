@@ -71,6 +71,10 @@ namespace engine::board
     {
         std::expected<void, std::string> res{};
 
+        // Fill m_pieceAt with UNKNOWN_PIECEs
+        for (auto& row : m_pieceAt)
+            row.fill(Piece::UNKNOWN_PIECE);
+
         res = this->setOccupanciesFromFen(fenNotation[0]);
         if (!res.has_value())
         {
@@ -112,6 +116,51 @@ namespace engine::board
             LOG_ERROR(res.error());
             throw std::invalid_argument(res.error());
         }
+    }
+
+    std::string State::getFenOccupancy() const noexcept
+    {
+        std::string fen;
+
+        for (int rank = 7; rank >= 0; rank--)
+        {
+            int emptyCount = 0;
+
+            for (int file = 0; file < 8; file++)
+            {
+                const int square = this->getSquareIndex(rank, file);
+
+                if (Piece piece = m_pieceAt[Color::WHITE][square]; piece != Piece::UNKNOWN_PIECE)
+                {
+                    if (emptyCount > 0)
+                    {
+                        fen += char('0' + emptyCount);
+                        emptyCount = 0;
+                    }
+                    fen += utils::pieceToFenChar(Color::WHITE, piece);
+                }
+                else if (Piece piece = m_pieceAt[Color::BLACK][square]; piece != Piece::UNKNOWN_PIECE)
+                {
+                    if (emptyCount > 0)
+                    {
+                        fen += char('0' + emptyCount);
+                        emptyCount = 0;
+                    }
+                    fen += utils::pieceToFenChar(Color::BLACK, piece);
+                }
+                else
+                {
+                    emptyCount++;
+                }
+            }
+
+            if (emptyCount > 0)
+                fen += char('0' + emptyCount);
+            if (rank > 0)
+                fen += '/';
+        }
+
+        return fen;
     }
 
     Piece State::getPiece(int square) const noexcept

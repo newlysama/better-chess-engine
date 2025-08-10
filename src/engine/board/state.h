@@ -45,6 +45,11 @@ namespace engine::board
         ~State() = default;
 
         /**
+         * @brief Builds a FEN string occupancy.
+         */
+        std::string getFenOccupancy() const noexcept;
+
+        /**
          * @brief Get a square's index, based on the rank's and file's indexes.
          *
          * @param [in] rankInex  : rank's index
@@ -248,9 +253,9 @@ namespace engine::board
                 return std::unexpected(parts.error());
             }
 
-            for (std::size_t rank = 0; rank < 8; rank++)
+            for (int rank = 0; rank < 8; rank++)
             {
-                std::size_t file = 0;
+                int file = 0;
                 for (std::size_t index = 0; index < parts.value()[rank].size(); index++)
                 {
                     const unsigned char c = parts.value()[rank][index];
@@ -269,7 +274,7 @@ namespace engine::board
                     else
                     {
                         // Check that we get a valid square
-                        std::size_t square = getSquareIndex(rank, file);
+                        int square = getSquareIndex(rank, file);
                         if (square < 0 || square > 63)
                         {
                             return std::unexpected(std::format("FEN's occupancy part error: out of range "
