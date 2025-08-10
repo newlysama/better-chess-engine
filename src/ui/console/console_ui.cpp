@@ -71,20 +71,12 @@ namespace ui::console
 
     std::string ConsoleUI::getSquare(State& state, int square) noexcept
     {
-        for (int color = 0; color < Color::N_COLORS; color++)
-        {
-            for (int piece = 0; piece < Piece::N_PIECES; piece++)
-            {
-                Bitboard bb = state.m_piecesBB[color][piece];
-                if (bb.isSet(square))
-                {
-                    return ConsoleUI::getColoredPiece(static_cast<Color>(color), static_cast<Piece>(piece));
-                }
-            }
-        }
-
-        // No piece, empty square
-        return " ";
+        if (Piece piece = state.m_pieceAt[Color::WHITE][square]; piece != Piece::UNKNOWN_PIECE)
+            return ConsoleUI::getColoredPiece(Color::WHITE, piece);
+        else if (Piece piece = state.m_pieceAt[Color::BLACK][square]; piece != Piece::UNKNOWN_PIECE)
+            return ConsoleUI::getColoredPiece(Color::BLACK, piece);
+        else
+            return " ";
     }
 
     void ConsoleUI::printHeader() noexcept
