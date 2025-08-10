@@ -77,6 +77,37 @@ namespace utils
             return {Color::UNKNOWN_COLOR, Piece::UNKNOWN_PIECE};
         }
     }
+
+    /**
+     * @brief Given a Color and a Piece, return the corresponding char in FEN notation.
+     *
+     * @param [in] color : piece color
+     * @param [in] piece : piece type
+     *
+     * @return FEN representation of the piece
+     */
+    inline char pieceToFenChar(engine::core::Color color, engine::core::Piece piece) noexcept
+    {
+        using namespace engine::core;
+
+        switch (piece)
+        {
+        case Piece::PAWN:
+            return (color == Color::WHITE) ? 'P' : 'p';
+        case Piece::KNIGHT:
+            return (color == Color::WHITE) ? 'N' : 'n';
+        case Piece::ROOK:
+            return (color == Color::WHITE) ? 'R' : 'r';
+        case Piece::BISHOP:
+            return (color == Color::WHITE) ? 'B' : 'b';
+        case Piece::QUEEN:
+            return (color == Color::WHITE) ? 'Q' : 'q';
+        case Piece::KING:
+            return (color == Color::WHITE) ? 'K' : 'k';
+        default:
+            return '\0'; // Unknown piece/color
+        }
+    }
 } // namespace utils
 
 #endif // UTILS_H_
