@@ -3,6 +3,7 @@
 
 #- Subdirs -#
 subdir('user/')
+subdir('snapshot')
 subdir('room/')
 
 server_src = files(
