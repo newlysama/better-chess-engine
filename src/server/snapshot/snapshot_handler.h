@@ -7,10 +7,11 @@
  * @brief JSON <---> Snapshots translations.
  */
 
-// snapshots_handler.h
 #ifndef SNAPSHOT_HANDLER_H_
 #define SNAPSHOT_HANDLER_H_
 
+#include <expected>
+#include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
@@ -18,73 +19,41 @@
 
 namespace server::snapshot
 {
+    /**
+     * @brief Fills a StringBuffer with MoveSnapthot's elements.
+     *
+     * @param [out] writer       : the buffer to fill
+     * @param [in]  moveSnapshot : the snapshot to fill with
+     */
+    void moveToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, const MoveSnapshot& moveSnapshot) noexcept;
 
-    inline void moveToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, const MoveSnapshot& moveSnapshot)
-    {
-        writer.StartArray();
+    /**
+     * @brief Fills a MoveSnapshot with Value's elements, doing strong checkings.
+     *
+     * @param [in]  value : document to fill the snapshot with
+     * @param [out] move  : snapshot to be filled
+     *
+     * @return Nothing if value is valid, error message if not
+     */
+    std::expected<void, std::string> jsonToMove(const rapidjson::Value& value, MoveSnapshot& move) noexcept;
 
-        writer.Uint(static_cast<unsigned>(moveSnapshot.fromSquare));
-        writer.Uint(static_cast<unsigned>(moveSnapshot.toSquare));
+    /**
+     * @brief Fills a StringBuffer with GameSnapshots elements.
+     *
+     * @param [out] writer       : the buffer to fill
+     * @param [in]  gameSnapshot : the snapshot to fill with
+     */
+    void gameToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot) noexcept;
 
-        if (moveSnapshot.capturedSquare)
-        {
-            writer.Int(moveSnapshot.capturedSquare.value());
-        }
-
-        if (moveSnapshot.promotionPiece)
-        {
-            const auto& s = moveSnapshot.promotionPiece.value();
-            writer.String(s.data(), static_cast<rapidjson::SizeType>(s.size()));
-        }
-
-        if (moveSnapshot.castlingType)
-        {
-            const auto& s = moveSnapshot.castlingType.value();
-            writer.String(s.data(), static_cast<rapidjson::SizeType>(s.size()));
-        }
-
-        writer.EndArray();
-    }
-
-    inline void gameToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot)
-    {
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-        writer.StartObject();
-
-        writer.Key("roomId");
-        writer.Uint(gameSnapshot.roomId);
-
-        writer.Key("fen");
-        writer.String(gameSnapshot.fen.data(), static_cast<rapidjson::SizeType>(gameSnapshot.fen.size()));
-
-        writer.Key("turn");
-        writer.String(gameSnapshot.turn.data(), static_cast<rapidjson::SizeType>(gameSnapshot.turn.size()));
-
-        writer.Key("halfmove");
-        writer.Uint(gameSnapshot.halfmove);
-
-        writer.Key("fullmove");
-        writer.Uint(gameSnapshot.fullmove);
-
-        writer.Key("inCheck");
-        writer.Bool(gameSnapshot.inCheck);
-
-        writer.Key("checkMate");
-        writer.Bool(gameSnapshot.checkMate);
-
-        writer.Key("lastMove");
-        moveToJson(writer, gameSnapshot.lastMove);
-
-        writer.Key("legalMoves");
-        writer.StartArray();
-
-        for (const MoveSnapshot& mv : gameSnapshot.legalMoves)
-            moveToJson(writer, mv);
-
-        writer.EndArray();
-
-        writer.EndObject();
-    }
+    /**
+     * @brief Fills a GameSnapshot with Value's elements, doing strong checkings.
+     *
+     * @param [in]  value : document to fill the snapshot with
+     * @param [out] game  : snapshot to be filled
+     *
+     * @return Nothing if value is valid, error message if not
+     */
+    std::expected<void, std::string> jsonToGame(const rapidjson::Value& value, GameSnapshot& game) noexcept;
 
 } // namespace server::snapshot
 
