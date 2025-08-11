@@ -66,7 +66,7 @@ namespace server::room
          *
          * @param [in] user : the user to add
          *
-         * @return Nothing if succesfull, error message user if not
+         * @return Nothing if succesfull, error message if not
          */
         std::expected<void, std::string> addPlayer(const std::shared_ptr<user::User>& user) noexcept;
 
@@ -75,7 +75,7 @@ namespace server::room
          *
          * @param [in] user : the user to add
          *
-         * @return Nothing if succesfull, error message user if not
+         * @return Nothing if succesfull, error message if not
          */
         std::expected<void, std::string> addSpectator(const std::shared_ptr<user::User>& user) noexcept;
 
@@ -84,7 +84,7 @@ namespace server::room
          *
          * @param [in] user : the user to remove
          *
-         * @return Nothing if succesfull, error message user if not
+         * @return Nothing if succesfull, error message if not
          */
         std::expected<void, std::string> removePlayer(const std::shared_ptr<user::User>& user) noexcept;
 
@@ -93,7 +93,7 @@ namespace server::room
          *
          * @param [in] user : the user to remove
          *
-         * @return Nothing if succesfull, error message user if not
+         * @return Nothing if succesfull, error message if not
          */
         std::expected<void, std::string> removeSpectator(const std::shared_ptr<user::User>& user) noexcept;
 
