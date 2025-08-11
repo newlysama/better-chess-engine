@@ -25,7 +25,8 @@ namespace server::snapshot
      * @param [out] writer       : the buffer to fill
      * @param [in]  moveSnapshot : the snapshot to fill with
      */
-    void moveToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer, const MoveSnapshot& moveSnapshot) noexcept;
+    void moveSnapshotToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
+                            const MoveSnapshot& moveSnapshot) noexcept;
 
     /**
      * @brief Fills a MoveSnapshot with Value's elements, doing strong checkings.
@@ -35,7 +36,7 @@ namespace server::snapshot
      *
      * @return Nothing if value is valid, error message if not
      */
-    std::expected<void, std::string> jsonToMove(const rapidjson::Value& value, MoveSnapshot& move) noexcept;
+    std::expected<void, std::string> jsonToMoveSnapshot(const rapidjson::Value& value, MoveSnapshot& move) noexcept;
 
     /**
      * @brief Fills a StringBuffer with GameSnapshots elements.
@@ -43,7 +44,7 @@ namespace server::snapshot
      * @param [out] writer       : the buffer to fill
      * @param [in]  gameSnapshot : the snapshot to fill with
      */
-    void gameToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot) noexcept;
+    void gameSnapshotToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot) noexcept;
 
     /**
      * @brief Fills a GameSnapshot with Value's elements, doing strong checkings.
@@ -53,7 +54,7 @@ namespace server::snapshot
      *
      * @return Nothing if value is valid, error message if not
      */
-    std::expected<void, std::string> jsonToGame(const rapidjson::Value& value, GameSnapshot& game) noexcept;
+    std::expected<void, std::string> jsonToGameSnapshot(const rapidjson::Value& value, GameSnapshot& game) noexcept;
 
 } // namespace server::snapshot
 

@@ -12,7 +12,6 @@
 
 #include <cstdint>
 #include <optional>
-#include <string_view>
 #include <vector>
 
 #include "engine/game/move.h"
@@ -25,15 +24,15 @@ namespace server::snapshot
         int fromSquare;
         int toSquare;
         std::optional<int> capturedSquare;
-        std::optional<std::string_view> promotionPiece;
-        std::optional<std::string_view> castlingType;
+        std::optional<std::string> promotionPiece;
+        std::optional<std::string> castlingType;
     };
 
     struct GameSnapshot
     {
         core::RoomId roomId;
-        std::string_view fen;
-        std::string_view turn;
+        std::string fen;
+        std::string turn;
         uint16_t halfmove;
         uint16_t fullmove;
         bool inCheck;
