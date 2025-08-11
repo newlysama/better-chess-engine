@@ -2,7 +2,8 @@
 
 #- Source File -#
 room_src = files(
-  'room.cpp'
+  'room.cpp',
+  'room_service.cpp'
 )
 
 #- Room Library -#
