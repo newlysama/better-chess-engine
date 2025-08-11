@@ -45,7 +45,7 @@ namespace server::room
             out[i] = JOINING_CODE_ALPHABET[dist(rd)];
         }
 
-        m_joinCode = std::string_view{std::move(out.data())};
+        m_joinCode = out;
     }
 
     bool Room::checkPlayers() noexcept
@@ -164,7 +164,7 @@ namespace server::room
             if (it->second.lock() == user)
             {
                 m_spectators.erase(it);
-                LOG_INFO("Removed user {} from room {}'s players", user->m_id, m_id);
+                LOG_INFO("Removed user {} from room {}'s spectators", user->m_id, m_id);
 
                 return std::expected<void, std::string>{};
             }

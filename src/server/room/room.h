@@ -108,7 +108,7 @@ namespace server::room
 
       private:
         core::Id m_id;                     // Id of the Room
-        std::string_view m_joinCode;       // Code to join the room
+        std::string m_joinCode;            // Code to join the room
         engine::game::Game m_game;         // Instance of the engine
         core::RoomPlayers m_players;       // Vector of the 2 players
         core::RoomSpectators m_spectators; // Map of the spectators
