@@ -43,6 +43,10 @@ namespace server::user
          */
         void deleteUser(core::Id id) noexcept;
 
+      private:
+        core::UsersMap m_usersMap; // Map each user with its id
+        core::IdPool m_idPool;     // Ids management pool
+
         /**
          * @brief Get a user if already presents in the map.
          *
@@ -51,10 +55,6 @@ namespace server::user
          * @return The requested user if present, an error message if not
          */
         std::expected<std::shared_ptr<User>, std::string> getUser(const core::Id id) const noexcept;
-
-      private:
-        core::UsersMap m_usersMap; // Map each user with its id
-        core::IdPool m_idPool;     // Ids management pool
     };
 } // namespace server::user
 

@@ -45,15 +45,6 @@ namespace server::room
         void closeRoom(const core::Id id) noexcept;
 
         /**
-         * @brief Get a room if already presents in the map.
-         *
-         * @param [in] id : requested room's id
-         *
-         * @return The requested room if present, an error message if not
-         */
-        std::expected<std::shared_ptr<Room>, std::string> getRoom(const core::Id id) const noexcept;
-
-        /**
          * @brief Sends a MoveSnapshot to apply to a specific room.
          *
          * @param [in] id       : the room's id to send the snapshot to
@@ -67,6 +58,15 @@ namespace server::room
       private:
         core::RoomsMap m_roomsMap; // Maps each room with its id
         core::IdPool m_idPool;     // Id's management pool
+
+        /**
+         * @brief Get a room if already presents in the map.
+         *
+         * @param [in] id : requested room's id
+         *
+         * @return The requested room if present, an error message if not
+         */
+        std::expected<std::shared_ptr<Room>, std::string> getRoom(const core::Id id) const noexcept;
     };
 } // namespace server::room
 

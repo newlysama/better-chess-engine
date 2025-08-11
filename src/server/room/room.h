@@ -34,11 +34,6 @@ namespace server::room
         ~Room() = default;
 
         /**
-         * @brief Generates a random joining code.
-         */
-        void createJoiningCode() noexcept;
-
-        /**
          * @brief Look for expired pointers in m_players, and clear them.
          *
          * @return True if found some, false otherwise.
@@ -51,15 +46,6 @@ namespace server::room
          * @return True if found some, false otherwise.
          */
         bool checkSpectators() noexcept;
-
-        /**
-         * @brief Check if a user is present in m_players.
-         *
-         * @param [in] user : user to look for
-         *
-         * @return true if present, false otherwise
-         */
-        bool playersContains(const std::shared_ptr<user::User>& user) const noexcept;
 
         /**
          * @brief Add a user to room's players.
@@ -112,6 +98,20 @@ namespace server::room
         engine::game::Game m_game;         // Instance of the engine
         core::RoomPlayers m_players;       // Vector of the 2 players
         core::RoomSpectators m_spectators; // Map of the spectators
+
+        /**
+         * @brief Generates a random joining code.
+         */
+        void createJoiningCode() noexcept;
+
+        /**
+         * @brief Check if a user is present in m_players.
+         *
+         * @param [in] user : user to look for
+         *
+         * @return true if present, false otherwise
+         */
+        bool playersContains(const std::shared_ptr<user::User>& user) const noexcept;
     };
 } // namespace server::room
 
