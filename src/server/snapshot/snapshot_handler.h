@@ -15,46 +15,57 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "engine/game/game.h"
+#include "engine/game/move.h"
 #include "server/snapshot/snapshots.h"
 
 namespace server::snapshot
 {
     /**
-     * @brief Fills a StringBuffer with MoveSnapthot's elements.
+     * @brief Builds a MoveSnapshot from an engine Move.
      *
-     * @param [out] writer       : the buffer to fill
+     * @param [in] move  : the engine Move object
+     * @param [in] color : the team playing the move
+     *
+     * @return The built snapshot
+     */
+    MoveSnapshot moveToMoveSnapshot(const engine::game::Move& move, const engine::core::Color color) noexcept;
+
+    /**
+     * @brief Fills a Writer with MoveSnapthot's elements.
+     *
+     * @param [out] writer       : the Writer to write in
      * @param [in]  moveSnapshot : the snapshot to fill with
      */
     void moveSnapshotToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                             const MoveSnapshot& moveSnapshot) noexcept;
 
     /**
-     * @brief Fills a MoveSnapshot with Value's elements, doing strong checkings.
+     * @brief Builds a MoveSnapshot with Value's elements, doing strong checkings.
      *
      * @param [in]  value : document to fill the snapshot with
-     * @param [out] move  : snapshot to be filled
      *
      * @return Nothing if value is valid, error message if not
      */
-    std::expected<void, std::string> jsonToMoveSnapshot(const rapidjson::Value& value, MoveSnapshot& move) noexcept;
+    std::expected<MoveSnapshot, std::string> jsonToMoveSnapshot(const rapidjson::Value& value) noexcept;
+
+    /**
+     * @brief Builds a GameSnapshot from an engine Game.
+     * The room's id and last played move's snapshot are filled elsewhere.
+     *
+     * @param [in] game : the engine Game object
+     *
+     * @return The built GameSnapshot
+     */
+    GameSnapshot gameToGameSnapshot(engine::game::Game& game) noexcept;
 
     /**
      * @brief Fills a StringBuffer with GameSnapshots elements.
      *
-     * @param [out] writer       : the buffer to fill
+     * @param [out] buffer       : the StringBuffer to write in
      * @param [in]  gameSnapshot : the snapshot to fill with
      */
     void gameSnapshotToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot) noexcept;
-
-    /**
-     * @brief Fills a GameSnapshot with Value's elements, doing strong checkings.
-     *
-     * @param [in]  value : document to fill the snapshot with
-     * @param [out] game  : snapshot to be filled
-     *
-     * @return Nothing if value is valid, error message if not
-     */
-    std::expected<void, std::string> jsonToGameSnapshot(const rapidjson::Value& value, GameSnapshot& game) noexcept;
 
 } // namespace server::snapshot
 

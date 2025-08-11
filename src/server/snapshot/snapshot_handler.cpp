@@ -11,10 +11,59 @@
 
 #include <string>
 
+#include "engine/core/enums.h"
+#include "engine/game/move_list.h"
 #include "utils/utils.h"
 
 namespace server::snapshot
 {
+    using namespace engine::core;
+    using namespace engine::game;
+    using namespace engine::board;
+
+    MoveSnapshot moveToMoveSnapshot(const engine::game::Move& move, const engine::core::Color color) noexcept
+    {
+        MoveSnapshot snapshot;
+
+        snapshot.fromSquare = move.getFromSquare();
+        snapshot.toSquare = move.getToSquare();
+
+        MoveType type = move.getMoveType();
+        if (type == MoveType::CAPTURE)
+        {
+            snapshot.capturedSquare = snapshot.toSquare;
+        }
+        else if (type == MoveType::EN_PASSANT)
+        {
+            snapshot.capturedSquare = color == Color::WHITE ? snapshot.toSquare - 8 : snapshot.toSquare + 8;
+        }
+        else if (type == MoveType::CASTLE)
+        {
+            Castling castling = move.getCastlingType();
+            switch (castling)
+            {
+            case Castling::WHITE_KING_SIDE:
+                snapshot.castlingType = "WK";
+            case Castling::WHITE_QUEEN_SIDE:
+                snapshot.castlingType = "WQ";
+            case Castling::BLACK_KING_SIDE:
+                snapshot.castlingType = "BK";
+            case Castling::BLACK_QUEEN_SIDE:
+                snapshot.castlingType = "BQ";
+            default:
+                snapshot.castlingType = "?";
+            }
+        }
+
+        if (move.isPromotion())
+        {
+            Piece promotionPiece = move.getPromotionPiece();
+            snapshot.promotionPiece = std::string{utils::pieceToFenChar(color, promotionPiece)};
+        }
+
+        return snapshot;
+    }
+
     void moveSnapshotToJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
                             const MoveSnapshot& moveSnapshot) noexcept
     {
@@ -44,8 +93,10 @@ namespace server::snapshot
         writer.EndArray();
     }
 
-    std::expected<void, std::string> jsonToMoveSnapshot(const rapidjson::Value& value, MoveSnapshot& move) noexcept
+    std::expected<MoveSnapshot, std::string> jsonToMoveSnapshot(const rapidjson::Value& value) noexcept
     {
+        MoveSnapshot snapshot;
+
         if (!value.IsArray())
             return std::unexpected(
                 std::format("Received a move document that is not an array : {}", std::to_string(value.GetType())));
@@ -70,12 +121,12 @@ namespace server::snapshot
         if (toSquare > 63)
             return std::unexpected(std::format("Received a move document with invalid toSquare : {}", toSquare));
 
-        move.fromSquare = static_cast<int>(fromSquare);
-        move.toSquare = static_cast<int>(toSquare);
+        snapshot.fromSquare = static_cast<int>(fromSquare);
+        snapshot.toSquare = static_cast<int>(toSquare);
 
-        move.capturedSquare.reset();
-        move.promotionPiece.reset();
-        move.castlingType.reset();
+        snapshot.capturedSquare.reset();
+        snapshot.promotionPiece.reset();
+        snapshot.castlingType.reset();
 
         // Check for optional parameters
         std::size_t i = 2;
@@ -91,7 +142,7 @@ namespace server::snapshot
                 return std::unexpected(
                     std::format("Received a move document with invalid capturedSquare : {}", capturedSquare));
 
-            move.capturedSquare = capturedSquare;
+            snapshot.capturedSquare = capturedSquare;
             i++;
         }
         if (i < array.Size()) // promotionPiece
@@ -106,16 +157,37 @@ namespace server::snapshot
                 return std::unexpected(
                     std::format("Received a move document with promotionPiece of invalid size : {}", promotionPiece));
 
-            move.promotionPiece = promotionPiece;
+            snapshot.promotionPiece = promotionPiece;
             i++;
         }
         if (i < array.Size() && array[i].IsString()) // castlingType
         {
-            move.castlingType = std::string(array[i].GetString(), array[i].GetStringLength());
+            snapshot.castlingType = std::string(array[i].GetString(), array[i].GetStringLength());
             i++;
         }
 
-        return std::expected<void, std::string>{};
+        return snapshot;
+    }
+
+    GameSnapshot gameToGameSnapshot(engine::game::Game& game) noexcept
+    {
+        GameSnapshot snapshot;
+        State& state = game.m_state;
+
+        snapshot.fen = state.buildFenOccupancy();
+        snapshot.turn = state.m_sideToMove == Color::WHITE ? "w" : "b";
+        snapshot.halfmove = state.m_halfMoveClock;
+        snapshot.fullmove = state.m_fullMoveClock;
+        snapshot.inCheck = state.m_isChecked;
+        snapshot.checkMate = state.m_isCheckMate;
+
+        snapshot.legalMoves.reserve(game.m_moveList.size());
+        for (const Move& move : game.m_moveList)
+        {
+            snapshot.legalMoves.push_back(moveToMoveSnapshot(move, state.m_sideToMove));
+        }
+
+        return snapshot;
     }
 
     void gameSnapshotToJson(rapidjson::StringBuffer& buffer, const GameSnapshot& gameSnapshot) noexcept
@@ -150,120 +222,12 @@ namespace server::snapshot
         writer.Key("legalMoves");
         writer.StartArray();
 
-        for (const MoveSnapshot& mv : gameSnapshot.legalMoves)
-            moveSnapshotToJson(writer, mv);
+        for (const MoveSnapshot& moveSnapshot : gameSnapshot.legalMoves)
+            moveSnapshotToJson(writer, moveSnapshot);
 
         writer.EndArray();
 
         writer.EndObject();
-    }
-
-    std::expected<void, std::string> jsonToGameSnapshot(const rapidjson::Value& value, GameSnapshot& game) noexcept
-    {
-        if (!value.IsObject())
-            return std::unexpected(
-                std::format("Received a game document that is not an object : {}", std::to_string(value.GetType())));
-
-        const rapidjson::GenericMemberIterator end = value.MemberEnd();
-
-        // roomId
-        if (rapidjson::GenericMemberIterator it = value.FindMember("roomId"); it == end)
-            return std::unexpected("Received a game document with missing field : roomId");
-        else if (!it->value.IsUint())
-            return std::unexpected(std::format("Received a game document that has invalid roomId type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.roomId = static_cast<server::core::RoomId>(it->value.GetUint());
-
-        // fen
-        if (rapidjson::GenericMemberIterator it = value.FindMember("fen"); it == end)
-            return std::unexpected("Received a game document with missing field : fen");
-        else if (!it->value.IsString())
-            return std::unexpected(std::format("Received a game document that has invalid fen type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.fen = std::string(it->value.GetString(), it->value.GetStringLength());
-
-        // turn
-        if (rapidjson::GenericMemberIterator it = value.FindMember("turn"); it == end)
-            return std::unexpected("Received a game document with missing field : turn");
-        else if (!it->value.IsString())
-            return std::unexpected(std::format("Received a game document that has invalid turn type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-        {
-            const auto len = it->value.GetStringLength();
-            if (len != 1)
-                return std::unexpected(std::format("Received a game document with turn of invalid size : {}", len));
-
-            game.turn = std::string(it->value.GetString(), len);
-        }
-
-        // halfmove
-        if (rapidjson::GenericMemberIterator it = value.FindMember("halfmove"); it == end)
-            return std::unexpected("Received a game document with missing field : halfmove");
-        else if (!it->value.IsUint())
-            return std::unexpected(std::format("Received a game document that has invalid halfmove type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.halfmove = static_cast<uint16_t>(it->value.GetUint());
-
-        // fullmove
-        if (rapidjson::GenericMemberIterator it = value.FindMember("fullmove"); it == end)
-            return std::unexpected("Received a game document with missing field : fullmove");
-        else if (!it->value.IsUint())
-            return std::unexpected(std::format("Received a game document that has invalid fullmove type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.fullmove = static_cast<uint16_t>(it->value.GetUint());
-
-        // inCheck
-        if (rapidjson::GenericMemberIterator it = value.FindMember("inCheck"); it == end)
-            return std::unexpected("Received a game document with missing field : inCheck");
-        else if (!it->value.IsBool())
-            return std::unexpected(std::format("Received a game document that has invalid inCheck type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.inCheck = it->value.GetBool();
-
-        // checkMate
-        if (rapidjson::GenericMemberIterator it = value.FindMember("checkMate"); it == end)
-            return std::unexpected("Received a game document with missing field : checkMate");
-        else if (!it->value.IsBool())
-            return std::unexpected(std::format("Received a game document that has invalid checkMate type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-            game.checkMate = it->value.GetBool();
-
-        // lastMove
-        if (rapidjson::GenericMemberIterator it = value.FindMember("lastMove"); it == end)
-            return std::unexpected("Received a game document with missing field : lastMove");
-        else
-        {
-            if (std::expected<void, std::string> res = jsonToMoveSnapshot(it->value, game.lastMove); !res.has_value())
-                return res;
-        }
-
-        // legalMoves
-        if (rapidjson::GenericMemberIterator it = value.FindMember("legalMoves"); it == end)
-            return std::unexpected("Received a game document with missing field : legalMoves");
-        else if (!it->value.IsArray())
-            return std::unexpected(std::format("Received a game document that has invalid legalMoves type : {}",
-                                               std::to_string(it->value.GetType())));
-        else
-        {
-            game.legalMoves.clear();
-            for (const rapidjson::Value& mv : it->value.GetArray())
-            {
-                MoveSnapshot moveSnapshot{};
-                if (std::expected<void, std::string> res = jsonToMoveSnapshot(mv, moveSnapshot); !res.has_value())
-                    return res;
-
-                game.legalMoves.push_back(moveSnapshot);
-            }
-        }
-
-        return std::expected<void, std::string>{};
     }
 
 } // namespace server::snapshot
