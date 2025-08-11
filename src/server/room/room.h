@@ -98,7 +98,11 @@ namespace server::room
         std::expected<void, std::string> removeSpectator(const std::shared_ptr<user::User>& user) noexcept;
 
         /**
-         * @brief
+         * @brief Apply a received MoveSnapshot to the game state.
+         *
+         * @param [in] moveSnapshot : The move to apply
+         *
+         * @return The GameSnapshot representing the new state of the game
          */
         snapshot::GameSnapshot makeMove(const snapshot::MoveSnapshot& moveSnapshot) noexcept;
 
