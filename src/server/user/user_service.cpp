@@ -20,6 +20,35 @@ namespace server::user
     {
     }
 
+    void UserService::createUser() noexcept
+    {
+        while (true)
+        {
+            Id id = m_idPool.acquire();
+
+            UsersMap::accessor acc;
+            if (m_usersMap.insert(acc, {id, std::make_shared<User>(User{id})}))
+            {
+                // Success
+                return;
+            }
+
+            // Rare case of collision
+            // Retry until sucess
+            m_idPool.release(id);
+        }
+    }
+
+    void UserService::deleteUser(const Id id) noexcept
+    {
+        UsersMap::accessor acc;
+        if (m_usersMap.find(acc, id))
+        {
+            m_usersMap.erase(acc);
+            m_idPool.release(id);
+        }
+    }
+
     std::expected<std::shared_ptr<User>, std::string> UserService::getUser(const Id id) const noexcept
     {
         UsersMap::const_accessor acc;
@@ -29,16 +58,5 @@ namespace server::user
         }
 
         return std::unexpected(std::format("User {} not found", id));
-    }
-
-    std::expected<void, std::string> UserService::addUser(const Id id) noexcept
-    {
-        UsersMap::accessor acc;
-        if (m_usersMap.find(acc, id))
-        {
-            return std::unexpected(std::format("User {} already exists", id));
-        }
-
-        m_usersMap.insert(acc, {id, std::make_shared<User>(User{id})});
     }
 } // namespace server::user
