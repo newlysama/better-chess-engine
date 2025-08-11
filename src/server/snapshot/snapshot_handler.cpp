@@ -138,7 +138,7 @@ namespace server::snapshot
         if (i < array.Size()) // capturedSquare
         {
             if (!array[i].IsInt())
-                return std::unexpected(std::format("Received a move document with invalid capturedSquare type",
+                return std::unexpected(std::format("Received a move document with invalid capturedSquare type : {}",
                                                    std::to_string(array[i].GetType())));
 
             int capturedSquare = array[i].GetInt();
