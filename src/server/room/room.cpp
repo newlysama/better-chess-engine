@@ -13,6 +13,7 @@
 
 #include "logging/logging.h"
 #include "server/core/const.h"
+#include "server/snapshot/snapshot_handler.h"
 
 namespace server::room
 {
@@ -178,22 +179,10 @@ namespace server::room
 
         m_game.makeMove<false>(move);
 
-        GameSnapshot gameSnapshot;
-        const State& state = m_game.m_state;
+        GameSnapshot snapshot = gameToGameSnapshot(m_game);
+        snapshot.roomId = m_id;
+        snapshot.lastMove = moveSnapshot;
 
-        gameSnapshot.roomId = m_id;
-        gameSnapshot.fen = state.getFenOccupancy();
-        gameSnapshot.turn = state.m_sideToMove == Color::WHITE ? "w" : "b";
-        gameSnapshot.halfmove = state.m_halfMoveClock;
-        gameSnapshot.fullmove = state.m_fullMoveClock;
-        gameSnapshot.inCheck = state.m_isChecked;
-        gameSnapshot.checkMate = state.m_isCheckMate;
-        gameSnapshot.lastMove = moveSnapshot;
-
-        gameSnapshot.legalMoves.reserve(m_game.m_moveList.size());
-        for (const Move& move : m_game.m_moveList)
-        {
-        }
+        return snapshot;
     }
-
 } // namespace server::room
