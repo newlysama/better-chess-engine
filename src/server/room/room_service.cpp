@@ -1,11 +1,12 @@
 /**
- * @file      romm_service.cpp
+ * @file      room_service.cpp
  * @author    Thibault THOMAS
  * @copyright Copyright 2025 Better Chess Engine
  * @par       This project is released under the MIT License
  *
  * @brief Room Service implementation.
  */
+
 #include "room_service.h"
 
 namespace server::room
