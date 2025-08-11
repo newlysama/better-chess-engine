@@ -15,6 +15,7 @@
 
 #include "engine/game/game.h"
 #include "server/core/types.h"
+#include "server/snapshot/snapshots.h"
 #include "server/user/user.h"
 
 namespace server::room
@@ -38,14 +39,14 @@ namespace server::room
         void createJoiningCode() noexcept;
 
         /**
-         * @brief Look for expired pointers in m_players.
+         * @brief Look for expired pointers in m_players, and clear them.
          *
          * @return True if found some, false otherwise.
          */
         bool checkPlayers() noexcept;
 
         /**
-         * @brief Look for expired pointers in m_spectators.
+         * @brief Look for expired pointers in m_spectators, and clear them.
          *
          * @return True if found some, false otherwise.
          */
@@ -58,7 +59,7 @@ namespace server::room
          *
          * @return true if present, false otherwise
          */
-        bool playersContains(std::shared_ptr<user::User>& user) noexcept;
+        bool playersContains(const std::shared_ptr<user::User>& user) noexcept;
 
         /**
          * @brief Add a user to room's players.
@@ -67,16 +68,16 @@ namespace server::room
          *
          * @return Nothing if succesfull, error message user if not
          */
-        std::expected<void, std::string> addPlayer(std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> addPlayer(const std::shared_ptr<user::User>& user) noexcept;
 
         /**
-         * @brief Add a yser to room's spectators.
+         * @brief Add a user to room's spectators.
          *
          * @param [in] user : the user to add
          *
          * @return Nothing if succesfull, error message user if not
          */
-        std::expected<void, std::string> addSpectator(std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> addSpectator(const std::shared_ptr<user::User>& user) noexcept;
 
         /**
          * @brief Remove a user from room's players.
@@ -85,7 +86,7 @@ namespace server::room
          *
          * @return Nothing if succesfull, error message user if not
          */
-        std::expected<void, std::string> removePlayer(std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> removePlayer(const std::shared_ptr<user::User>& user) noexcept;
 
         /**
          * @brief Remove a user from room's spectators.
@@ -94,7 +95,12 @@ namespace server::room
          *
          * @return Nothing if succesfull, error message user if not
          */
-        std::expected<void, std::string> removeSpectator(std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> removeSpectator(const std::shared_ptr<user::User>& user) noexcept;
+
+        /**
+         * @brief
+         */
+        snapshot::GameSnapshot makeMove(const snapshot::MoveSnapshot& moveSnapshot) noexcept;
 
       private:
         core::RoomId m_id;                 // Id of the Room

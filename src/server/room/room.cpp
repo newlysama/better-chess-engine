@@ -17,8 +17,11 @@
 namespace server::room
 {
     using namespace engine::game;
+    using namespace engine::board;
+    using namespace engine::core;
     using namespace server::core;
     using namespace server::user;
+    using namespace server::snapshot;
 
     Room::Room(RoomId id) noexcept
         : m_id(id)
@@ -80,7 +83,7 @@ namespace server::room
         return deleted;
     }
 
-    bool Room::playersContains(std::shared_ptr<user::User>& user) noexcept
+    bool Room::playersContains(const std::shared_ptr<user::User>& user) noexcept
     {
         for (int i = 0; i < 2; i++)
         {
@@ -95,7 +98,7 @@ namespace server::room
         return false;
     }
 
-    std::expected<void, std::string> Room::addPlayer(std::shared_ptr<User>& user) noexcept
+    std::expected<void, std::string> Room::addPlayer(const std::shared_ptr<User>& user) noexcept
     {
         // Room is full
         if (m_players.size() == 2)
@@ -121,7 +124,7 @@ namespace server::room
         return std::expected<void, std::string>{};
     }
 
-    std::expected<void, std::string> Room::addSpectator(std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::addSpectator(const std::shared_ptr<user::User>& user) noexcept
     {
         // User already present
         if (m_spectators.contains(user->m_id))
@@ -137,7 +140,7 @@ namespace server::room
         return std::expected<void, std::string>{};
     }
 
-    std::expected<void, std::string> Room::removePlayer(std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::removePlayer(const std::shared_ptr<user::User>& user) noexcept
     {
         for (int i = 0; i < 2; i++)
         {
@@ -153,7 +156,7 @@ namespace server::room
         return std::unexpected(std::format("Cannot remove user {} to room {}'s players : not found", user->m_id, m_id));
     }
 
-    std::expected<void, std::string> Room::removeSpectator(std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::removeSpectator(const std::shared_ptr<user::User>& user) noexcept
     {
         for (auto it = m_spectators.begin(); it != m_spectators.end(); it++)
         {
@@ -167,6 +170,30 @@ namespace server::room
         }
 
         return std::unexpected(std::format("Cannot remove user {} to room {}'s players : not found", user->m_id, m_id));
+    }
+
+    GameSnapshot Room::makeMove(const MoveSnapshot& moveSnapshot) noexcept
+    {
+        const Move& move = m_game.m_moveList.find(moveSnapshot.fromSquare, moveSnapshot.toSquare);
+
+        m_game.makeMove<false>(move);
+
+        GameSnapshot gameSnapshot;
+        const State& state = m_game.m_state;
+
+        gameSnapshot.roomId = m_id;
+        gameSnapshot.fen = state.getFenOccupancy();
+        gameSnapshot.turn = state.m_sideToMove == Color::WHITE ? "w" : "b";
+        gameSnapshot.halfmove = state.m_halfMoveClock;
+        gameSnapshot.fullmove = state.m_fullMoveClock;
+        gameSnapshot.inCheck = state.m_isChecked;
+        gameSnapshot.checkMate = state.m_isCheckMate;
+        gameSnapshot.lastMove = moveSnapshot;
+
+        gameSnapshot.legalMoves.reserve(m_game.m_moveList.size());
+        for (const Move& move : m_game.m_moveList)
+        {
+        }
     }
 
 } // namespace server::room
