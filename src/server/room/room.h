@@ -59,7 +59,7 @@ namespace server::room
          *
          * @return true if present, false otherwise
          */
-        bool playersContains(const std::shared_ptr<user::User>& user) noexcept;
+        bool playersContains(const std::shared_ptr<user::User>& user) const noexcept;
 
         /**
          * @brief Add a user to room's players.
