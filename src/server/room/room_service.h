@@ -38,7 +38,7 @@ namespace server::room
          *
          * @return The requested room if present, an error message if not
          */
-        std::expected<std::shared_ptr<Room>, std::string> getRoom(core::RoomId id) const noexcept;
+        std::expected<std::shared_ptr<Room>, std::string> getRoom(core::Id id) const noexcept;
 
         /**
          * @brief Add a room the m_roomsMap.
@@ -47,7 +47,7 @@ namespace server::room
          *
          * @return Noting if insertion was successful, an error message if not
          */
-        std::expected<void, std::string> addRoom(const core::RoomId id) noexcept;
+        std::expected<void, std::string> addRoom(const core::Id id) noexcept;
 
         /**
          * @brief Sends a MoveSnapshot to apply to a specific room.
@@ -57,7 +57,7 @@ namespace server::room
          *
          * @return The new game state's snapshot if room exists, error message if not
          */
-        std::expected<snapshot::GameSnapshot, std::string> makeMove(const core::RoomId id,
+        std::expected<snapshot::GameSnapshot, std::string> makeMove(const core::Id id,
                                                                     const snapshot::MoveSnapshot& snapshot) noexcept;
 
       private:

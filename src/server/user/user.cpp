@@ -13,7 +13,7 @@ namespace server::user
 {
     using namespace server::core;
 
-    User::User(UserId id)
+    User::User(Id id)
         : m_id(id)
     {
     }

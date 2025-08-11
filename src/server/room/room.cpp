@@ -24,7 +24,7 @@ namespace server::room
     using namespace server::user;
     using namespace server::snapshot;
 
-    Room::Room(RoomId id) noexcept
+    Room::Room(Id id) noexcept
         : m_id(id)
         , m_game{}
         , m_players{}

@@ -29,10 +29,10 @@ namespace server::core
 {
 
     /**
-     * @typedef UserId, RoomId
-     * @brief   Wrapper around uint16_t for user and room ids.
+     * @typedef Id
+     * @brief   Wrapper around uint16_t for ids.
      */
-    typedef uint16_t UserId, RoomId;
+    typedef uint16_t Id;
 
     /**
      * @typedef RoomPlayers
@@ -44,19 +44,19 @@ namespace server::core
      * @typedef RoomSpectators
      * @brief   Map of spectating users of a room.
      */
-    typedef std::unordered_map<UserId, std::weak_ptr<user::User>> RoomSpectators;
+    typedef std::unordered_map<Id, std::weak_ptr<user::User>> RoomSpectators;
 
     /**
      * @typedef UsersMap
      * @brief   Maps users through their id's.
      */
-    typedef tbb::concurrent_hash_map<UserId, std::shared_ptr<server::user::User>> UsersMap;
+    typedef tbb::concurrent_hash_map<Id, std::shared_ptr<server::user::User>> UsersMap;
 
     /**
      * @typedef RoomsMap
      * @brief   Maps rooms through their id's.
      */
-    typedef tbb::concurrent_hash_map<RoomId, std::shared_ptr<server::room::Room>> RoomsMap;
+    typedef tbb::concurrent_hash_map<Id, std::shared_ptr<server::room::Room>> RoomsMap;
 } // namespace server::core
 
 #endif // SERVER_TYPES_H_

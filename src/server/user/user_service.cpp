@@ -20,7 +20,7 @@ namespace server::user
     {
     }
 
-    std::expected<std::shared_ptr<User>, std::string> UserService::getUser(const UserId id) const noexcept
+    std::expected<std::shared_ptr<User>, std::string> UserService::getUser(const Id id) const noexcept
     {
         UsersMap::const_accessor acc;
         if (m_usersMap.find(acc, id))
@@ -31,7 +31,7 @@ namespace server::user
         return std::unexpected(std::format("User {} not found", id));
     }
 
-    std::expected<void, std::string> UserService::addUser(const UserId id) noexcept
+    std::expected<void, std::string> UserService::addUser(const Id id) noexcept
     {
         UsersMap::accessor acc;
         if (m_usersMap.find(acc, id))

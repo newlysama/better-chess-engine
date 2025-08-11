@@ -19,7 +19,7 @@ namespace server::user
     class User
     {
       public:
-        explicit User(core::UserId id);
+        explicit User(core::Id id);
 
         ~User() = default;
 
@@ -28,7 +28,7 @@ namespace server::user
             return m_id == other.m_id;
         }
 
-        core::UserId m_id; // Id of the user
+        core::Id m_id; // Id of the user
     };
 } // namespace server::user
 

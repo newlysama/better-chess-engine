@@ -37,7 +37,7 @@ namespace server::user
          *
          * @return The requested user if present, an error message if not
          */
-        std::expected<std::shared_ptr<User>, std::string> getUser(const core::UserId id) const noexcept;
+        std::expected<std::shared_ptr<User>, std::string> getUser(const core::Id id) const noexcept;
 
         /**
          * @brief Add a user the m_usersMap.
@@ -46,7 +46,7 @@ namespace server::user
          *
          * @return Noting if insertion was successful, an error message if not
          */
-        std::expected<void, std::string> addUser(const core::UserId id) noexcept;
+        std::expected<void, std::string> addUser(const core::Id id) noexcept;
 
       private:
         core::UsersMap m_usersMap; // Map each user with its id

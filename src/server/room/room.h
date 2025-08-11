@@ -26,7 +26,7 @@ namespace server::room
         /**
          * @brief Constructor.
          */
-        explicit Room(core::RoomId id) noexcept;
+        explicit Room(core::Id id) noexcept;
 
         /**
          * @brief Default destructor.
@@ -107,7 +107,7 @@ namespace server::room
         snapshot::GameSnapshot makeMove(const snapshot::MoveSnapshot& moveSnapshot) noexcept;
 
       private:
-        core::RoomId m_id;                 // Id of the Room
+        core::Id m_id;                     // Id of the Room
         std::string_view m_joinCode;       // Code to join the room
         engine::game::Game m_game;         // Instance of the engine
         core::RoomPlayers m_players;       // Vector of the 2 players

@@ -40,7 +40,7 @@ namespace server::snapshot
      */
     typedef struct GameSnapshot
     {
-        core::RoomId roomId;
+        core::Id roomId;
         std::string fen; // Only the occupancy part (ex: 8/8/8/8/8/8/8/8)
         std::string turn;
         uint16_t halfmove;

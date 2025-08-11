@@ -19,7 +19,7 @@ namespace server::room
     {
     }
 
-    std::expected<std::shared_ptr<Room>, std::string> RoomService::getRoom(const RoomId id) const noexcept
+    std::expected<std::shared_ptr<Room>, std::string> RoomService::getRoom(const Id id) const noexcept
     {
         RoomsMap::const_accessor acc;
         if (m_roomsMap.find(acc, id))
@@ -30,7 +30,7 @@ namespace server::room
         return std::unexpected(std::format("Room {} not found", id));
     }
 
-    std::expected<void, std::string> RoomService::addRoom(const RoomId id) noexcept
+    std::expected<void, std::string> RoomService::addRoom(const Id id) noexcept
     {
         RoomsMap::accessor acc;
         if (m_roomsMap.find(acc, id))
@@ -42,7 +42,7 @@ namespace server::room
         return std::expected<void, std::string>{};
     }
 
-    std::expected<GameSnapshot, std::string> RoomService::makeMove(const RoomId id, const MoveSnapshot& snap) noexcept
+    std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id id, const MoveSnapshot& snap) noexcept
     {
         RoomsMap::accessor acc;
         std::expected<std::shared_ptr<Room>, std::string> check = this->getRoom(id);
