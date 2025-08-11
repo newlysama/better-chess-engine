@@ -44,14 +44,19 @@ namespace server::snapshot
             {
             case Castling::WHITE_KING_SIDE:
                 snapshot.castlingType = "WK";
+                break;
             case Castling::WHITE_QUEEN_SIDE:
                 snapshot.castlingType = "WQ";
+                break;
             case Castling::BLACK_KING_SIDE:
                 snapshot.castlingType = "BK";
+                break;
             case Castling::BLACK_QUEEN_SIDE:
                 snapshot.castlingType = "BQ";
+                break;
             default:
                 snapshot.castlingType = "?";
+                break;
             }
         }
 
