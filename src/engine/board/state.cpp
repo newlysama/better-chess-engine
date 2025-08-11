@@ -118,7 +118,7 @@ namespace engine::board
         }
     }
 
-    std::string State::getFenOccupancy() const noexcept
+    std::string State::buildFenOccupancy() const noexcept
     {
         std::string fen;
 

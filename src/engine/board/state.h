@@ -47,7 +47,7 @@ namespace engine::board
         /**
          * @brief Builds a FEN string occupancy.
          */
-        std::string getFenOccupancy() const noexcept;
+        std::string buildFenOccupancy() const noexcept;
 
         /**
          * @brief Get a square's index, based on the rank's and file's indexes.
@@ -268,7 +268,6 @@ namespace engine::board
                                 std::format("FEN's occupancy part error: digit is > 8 : {}", c - '0'));
                         }
 
-                        // -1 because the for loop is gonna make +1
                         file += (c - '0');
                     }
                     else
