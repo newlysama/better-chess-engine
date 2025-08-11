@@ -40,7 +40,7 @@ namespace server::user
         std::expected<std::shared_ptr<User>, std::string> getUser(const core::UserId id) const noexcept;
 
         /**
-         * @brief Add a user the m_userMap.
+         * @brief Add a user the m_usersMap.
          *
          * @param [in] id : new user id
          *
@@ -49,7 +49,7 @@ namespace server::user
         std::expected<void, std::string> addUser(const core::UserId id) noexcept;
 
       private:
-        core::UsersMap m_userMap; // Map each user with its id
+        core::UsersMap m_usersMap; // Map each user with its id
     };
 } // namespace server::user
 
