@@ -25,6 +25,7 @@ namespace server::snapshot
     {
         MoveSnapshot snapshot;
 
+        snapshot.color = color;
         snapshot.fromSquare = move.getFromSquare();
         snapshot.toSquare = move.getToSquare();
 
@@ -74,6 +75,7 @@ namespace server::snapshot
     {
         writer.StartArray();
 
+        writer.Uint(static_cast<unsigned>(moveSnapshot.color));
         writer.Uint(static_cast<unsigned>(moveSnapshot.fromSquare));
         writer.Uint(static_cast<unsigned>(moveSnapshot.toSquare));
 
@@ -112,20 +114,25 @@ namespace server::snapshot
         const rapidjson::GenericArray array = value.GetArray();
 
         if (!array[0].IsUint())
-            return std::unexpected(std::format("Received a move document that has invalid fromSquares type : {}",
+            return std::unexpected(std::format("Received a move document that has invalid color type : {}",
                                                std::to_string(array[0].GetType())));
         if (!array[1].IsUint())
-            return std::unexpected(std::format("Received a move document that has invalid toSquare type : {}",
+            return std::unexpected(std::format("Received a move document that has invalid fromSquares type : {}",
                                                std::to_string(array[1].GetType())));
+        if (!array[2].IsUint())
+            return std::unexpected(std::format("Received a move document that has invalid toSquare type : {}",
+                                               std::to_string(array[2].GetType())));
 
-        unsigned fromSquare = array[0].GetUint();
-        unsigned toSquare = array[1].GetUint();
+        unsigned color = array[0].GetUint();
+        unsigned fromSquare = array[1].GetUint();
+        unsigned toSquare = array[2].GetUint();
 
         if (fromSquare > 63)
             return std::unexpected(std::format("Received a move document with invalid fromSquare : {}", fromSquare));
         if (toSquare > 63)
             return std::unexpected(std::format("Received a move document with invalid toSquare : {}", toSquare));
 
+        snapshot.color = static_cast<Color>(color);
         snapshot.fromSquare = static_cast<int>(fromSquare);
         snapshot.toSquare = static_cast<int>(toSquare);
 
