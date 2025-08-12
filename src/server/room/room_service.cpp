@@ -23,45 +23,45 @@ namespace server::room
     {
         while (true)
         {
-            Id id = m_idPool.acquire();
+            Id roomId = m_idPool.acquire();
 
             RoomsMap::accessor acc;
-            if (m_roomsMap.insert(acc, {id, std::make_shared<Room>(Room{id})}))
+            if (m_roomsMap.insert(acc, {roomId, std::make_shared<Room>(Room{roomId})}))
             {
                 return;
             }
 
             // Rare case of collision
             // Retry until sucess
-            m_idPool.release(id);
+            m_idPool.release(roomId);
         }
     }
 
-    void RoomService::closeRoom(const Id id) noexcept
+    void RoomService::closeRoom(const Id roomId) noexcept
     {
         RoomsMap::accessor acc;
-        if (m_roomsMap.find(acc, id))
+        if (m_roomsMap.find(acc, roomId))
         {
             m_roomsMap.erase(acc);
-            m_idPool.release(id);
+            m_idPool.release(roomId);
         }
     }
 
-    std::expected<std::shared_ptr<Room>, std::string> RoomService::getRoom(const Id id) const noexcept
+    std::expected<std::shared_ptr<Room>, std::string> RoomService::getRoom(const Id roomId) const noexcept
     {
         RoomsMap::const_accessor acc;
-        if (m_roomsMap.find(acc, id))
+        if (m_roomsMap.find(acc, roomId))
         {
             return acc->second;
         }
 
-        return std::unexpected(std::format("Room {} not found", id));
+        return std::unexpected(std::format("Room {} not found", roomId));
     }
 
-    std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id id, const MoveSnapshot& snap) noexcept
+    std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id roomId, const MoveSnapshot& snap) noexcept
     {
         RoomsMap::accessor acc;
-        std::expected<std::shared_ptr<Room>, std::string> check = this->getRoom(id);
+        std::expected<std::shared_ptr<Room>, std::string> check = this->getRoom(roomId);
 
         if (check.has_value())
         {
