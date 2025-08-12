@@ -34,54 +34,40 @@ namespace server::room
         ~Room() = default;
 
         /**
-         * @brief Look for expired pointers in m_players, and clear them.
-         *
-         * @return True if found some, false otherwise.
-         */
-        bool checkPlayers() noexcept;
-
-        /**
-         * @brief Look for expired pointers in m_spectators, and clear them.
-         *
-         * @return True if found some, false otherwise.
-         */
-        bool checkSpectators() noexcept;
-
-        /**
          * @brief Add a user to room's players.
          *
-         * @param [in] user : the user to add
+         * @param [in] userId : the user to add
          *
          * @return Nothing if succesfull, error message if not
          */
-        std::expected<void, std::string> addPlayer(const std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> addPlayer(const core::Id userId) noexcept;
 
         /**
          * @brief Add a user to room's spectators.
          *
-         * @param [in] user : the user to add
+         * @param [in] userId : the user to add
          *
          * @return Nothing if succesfull, error message if not
          */
-        std::expected<void, std::string> addSpectator(const std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> addSpectator(const core::Id userId) noexcept;
 
         /**
          * @brief Remove a user from room's players.
          *
-         * @param [in] user : the user to remove
+         * @param [in] userId : the user to remove
          *
          * @return Nothing if succesfull, error message if not
          */
-        std::expected<void, std::string> removePlayer(const std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> removePlayer(const core::Id userId) noexcept;
 
         /**
          * @brief Remove a user from room's spectators.
          *
-         * @param [in] user : the user to remove
+         * @param [in] userId : the user to remove
          *
          * @return Nothing if succesfull, error message if not
          */
-        std::expected<void, std::string> removeSpectator(const std::shared_ptr<user::User>& user) noexcept;
+        std::expected<void, std::string> removeSpectator(const core::Id userId) noexcept;
 
         /**
          * @brief Apply a received MoveSnapshot to the game state.
@@ -93,12 +79,6 @@ namespace server::room
         snapshot::GameSnapshot makeMove(const snapshot::MoveSnapshot& moveSnapshot) noexcept;
 
       private:
-        core::Id m_id;                     // Id of the Room
-        std::string m_joinCode;            // Code to join the room
-        engine::game::Game m_game;         // Instance of the engine
-        core::RoomPlayers m_players;       // Vector of the 2 players
-        core::RoomSpectators m_spectators; // Map of the spectators
-
         /**
          * @brief Generates a random joining code.
          */
@@ -107,11 +87,26 @@ namespace server::room
         /**
          * @brief Check if a user is present in m_players.
          *
-         * @param [in] user : user to look for
+         * @param [in] userId : user to look for
          *
          * @return true if present, false otherwise
          */
-        bool playersContains(const std::shared_ptr<user::User>& user) const noexcept;
+        bool playersContains(const core::Id userId) const noexcept;
+
+        /**
+         * @brief Check if a user is present in m_spectators.
+         *
+         * @param [in] userId : user to look for
+         *
+         * @return true if present, false otherwise
+         */
+        bool spectatorContains(const core::Id userId) const noexcept;
+
+        core::Id m_id;                     // Id of the Room
+        std::string m_joinCode;            // Code to join the room
+        engine::game::Game m_game;         // Instance of the engine
+        core::RoomPlayers m_players;       // Vector of the 2 players
+        core::RoomSpectators m_spectators; // Map of the spectators
     };
 } // namespace server::room
 

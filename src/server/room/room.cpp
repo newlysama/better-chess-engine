@@ -27,10 +27,11 @@ namespace server::room
     Room::Room(Id id) noexcept
         : m_id(id)
         , m_game{}
-        , m_players{}
+        , m_players{NULL_ID, NULL_ID}
         , m_spectators{}
     {
         this->createJoiningCode();
+        m_spectators.reserve(10);
     }
 
     void Room::createJoiningCode() noexcept
@@ -46,127 +47,103 @@ namespace server::room
         m_joinCode = std::move(out);
     }
 
-    bool Room::checkPlayers() noexcept
+    bool Room::playersContains(const Id userId) const noexcept
     {
-        // Reset a slots if a player's ptr has expired
-        auto clearIfExpired = [](std::weak_ptr<User>& player) -> bool {
-            if (player.expired())
-            {
-                player.reset();
-                return true;
-            }
-
-            return false;
-        };
-
-        return clearIfExpired(m_players.first) || clearIfExpired(m_players.second);
+        return m_players.first == userId || m_players.second == userId;
     }
 
-    bool Room::checkSpectators() noexcept
+    bool Room::spectatorContains(const Id userId) const noexcept
     {
-        auto erased = std::erase_if(m_spectators, [](auto& spectator) { return spectator.second.expired(); });
+        auto it = std::find(m_spectators.begin(), m_spectators.end(), userId);
 
-        if (erased > 0)
-        {
-            LOG_INFO("Found {} disconnected spectator(s) in room {}, freeing", erased, m_id);
+        if (it != m_spectators.end())
             return true;
-        }
 
         return false;
     }
 
-    bool Room::playersContains(const std::shared_ptr<user::User>& user) const noexcept
-    {
-        return m_players.first.lock() == user || m_players.second.lock() == user;
-    }
-
-    std::expected<void, std::string> Room::addPlayer(const std::shared_ptr<User>& user) noexcept
+    std::expected<void, std::string> Room::addPlayer(const Id userId) noexcept
     {
         // User already present
-        if (playersContains(user))
+        if (this->playersContains(userId))
         {
             return std::unexpected(
-                std::format("Cannot add user {} to room {}'s players : already present", user->m_id, m_id));
+                std::format("Cannot add user {} to room {}'s players : already present", userId, m_id));
         }
         // Room is full
-        else if (!m_players.first.expired() && !m_players.second.expired())
+        else if (m_players.first != NULL_ID && m_players.second != NULL_ID)
         {
-            std::shared_ptr<User> player1 = m_players.first.lock();
-            std::shared_ptr<User> player2 = m_players.second.lock();
-
             return std::unexpected(
                 std::format("Cannot add user {} to room {}'s players : room is full ({} and {} already present)",
-                            user->m_id, m_id, player1->m_id, player2->m_id));
+                            userId, m_id, m_players.first, m_players.second));
         }
 
         // Player 1 is set
-        if (!m_players.first.expired())
+        if (m_players.first != NULL_ID)
         {
-            m_players.second = user;
+            m_players.second = userId;
         }
         else
         {
-            m_players.first = user;
+            m_players.first = userId;
         }
 
-        LOG_INFO("Added user {} to room {}'s players", user->m_id, m_id);
+        LOG_INFO("Added user {} to room {}'s players", userId, m_id);
 
         return std::expected<void, std::string>{};
     }
 
-    std::expected<void, std::string> Room::addSpectator(const std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::addSpectator(const Id userId) noexcept
     {
         // User already present
-        if (m_spectators.contains(user->m_id))
+        if (this->spectatorContains(userId))
         {
             return std::unexpected(
-                std::format("Cannot add user {} to room {}'s spectators : already present", user->m_id, m_id));
+                std::format("Cannot add user {} to room {}'s spectators : already present", userId, m_id));
         }
 
-        // Use emplace since user is shared_ptr, not already weak_ptr
-        m_spectators.emplace(user->m_id, user);
-        LOG_INFO("Added user {} to room {}'s spectators", user->m_id, m_id);
+        m_spectators.push_back(userId);
+        LOG_INFO("Added user {} to room {}'s spectators", userId, m_id);
 
         return std::expected<void, std::string>{};
     }
 
-    std::expected<void, std::string> Room::removePlayer(const std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::removePlayer(const Id userId) noexcept
     {
-        auto clearIfMatch = [&](std::weak_ptr<User>& player) -> bool {
-            if (player.lock() == user)
-            {
-                player.reset();
-                return true;
-            }
-
-            return false;
-        };
-
-        if (clearIfMatch(m_players.first) || clearIfMatch(m_players.second))
+        if (m_players.first == userId)
         {
-            LOG_INFO("Removed user {} from room {}'s players", user->m_id, m_id);
+            LOG_INFO("Removed user {} from room {}'s players", userId, m_id);
             return std::expected<void, std::string>{};
         }
-
-        return std::unexpected(
-            std::format("Cannot remove user {} from room {}'s players : not found", user->m_id, m_id));
+        else if (m_players.second == userId)
+        {
+            LOG_INFO("Removed user {} from room {}'s players", userId, m_id);
+            return std::expected<void, std::string>{};
+        }
+        else
+        {
+            return std::unexpected(
+                std::format("Cannot remove user {} from room {}'s players : not found", userId, m_id));
+        }
     }
 
-    std::expected<void, std::string> Room::removeSpectator(const std::shared_ptr<user::User>& user) noexcept
+    std::expected<void, std::string> Room::removeSpectator(const Id userId) noexcept
     {
-        const auto erased = std::erase_if(m_spectators, [&](auto& pair) -> int {
-            auto spectator = pair.second.lock();
+        auto it = std::find(m_spectators.begin(), m_spectators.end(), userId);
 
-            return spectator && spectator == user;
-        });
-
-        if (erased > 0)
+        if (it != m_spectators.end())
         {
-            LOG_INFO("Removed user {} from room {}'s spectators", user->m_id, m_id);
-            return {};
+            *it = m_spectators.back();
+            m_spectators.pop_back();
+
+            LOG_INFO("Removed user {} from room {}'s spectators", userId, m_id);
+            return std::expected<void, std::string>{};
         }
-        return std::unexpected(
-            std::format("Cannot remove user {} from room {}'s spectators : not found", user->m_id, m_id));
+        else
+        {
+            return std::unexpected(
+                std::format("Cannot remove user {} from room {}'s spectators : not found", userId, m_id));
+        }
     }
 
     GameSnapshot Room::makeMove(const MoveSnapshot& moveSnapshot) noexcept

@@ -12,8 +12,8 @@
 
 #include <memory>
 #include <tbb/concurrent_hash_map.h>
-#include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace server::user
 {
@@ -36,15 +36,15 @@ namespace server::core
 
     /**
      * @typedef RoomPlayers
-     * @brief   Pair holding the 2 room players.
+     * @brief   Pair holding the 2 room players ids.
      */
-    typedef std::pair<std::weak_ptr<user::User>, std::weak_ptr<user::User>> RoomPlayers;
+    typedef std::pair<Id, Id> RoomPlayers;
 
     /**
      * @typedef RoomSpectators
      * @brief   Map of spectating users of a room.
      */
-    typedef std::unordered_map<Id, std::weak_ptr<user::User>> RoomSpectators;
+    typedef std::vector<Id> RoomSpectators;
 
     /**
      * @typedef UsersMap
