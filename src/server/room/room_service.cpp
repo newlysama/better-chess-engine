@@ -61,13 +61,20 @@ namespace server::room
     std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id roomId, const MoveSnapshot& snap) noexcept
     {
         RoomsMap::accessor acc;
-        std::expected<std::shared_ptr<Room>, std::string> check = this->getRoom(roomId);
+        auto checkRoom = this->getRoom(roomId);
 
-        if (check.has_value())
+        if (checkRoom.has_value())
         {
-            return check.value()->makeMove(snap);
+            auto checkGameSnapshot = checkRoom.value()->makeMove(snap);
+
+            if (checkGameSnapshot.has_value())
+            {
+                return checkGameSnapshot.value();
+            }
+
+            return std::unexpected(checkGameSnapshot.error());
         }
 
-        return std::unexpected(check.error());
+        return std::unexpected(checkRoom.error());
     }
 } // namespace server::room
