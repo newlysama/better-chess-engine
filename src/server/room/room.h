@@ -76,7 +76,8 @@ namespace server::room
          *
          * @return The GameSnapshot representing the new state of the game
          */
-        snapshot::GameSnapshot makeMove(const snapshot::MoveSnapshot& moveSnapshot) noexcept;
+        std::expected<snapshot::GameSnapshot, std::string> makeMove(
+            const snapshot::MoveSnapshot& moveSnapshot) noexcept;
 
       private:
         /**

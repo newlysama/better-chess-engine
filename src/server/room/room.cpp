@@ -27,7 +27,7 @@ namespace server::room
     Room::Room(Id id) noexcept
         : m_id(id)
         , m_game{}
-        , m_players{NULL_ID, NULL_ID}
+        , m_players{RoomPlayer{NULL_ID, Color::WHITE}, RoomPlayer{NULL_ID, Color::WHITE}}
         , m_spectators{}
     {
         this->createJoiningCode();
@@ -49,7 +49,7 @@ namespace server::room
 
     bool Room::playersContains(const Id userId) const noexcept
     {
-        return m_players.first == userId || m_players.second == userId;
+        return m_players.first.userId == userId || m_players.second.userId == userId;
     }
 
     bool Room::spectatorContains(const Id userId) const noexcept
@@ -71,21 +71,21 @@ namespace server::room
                 std::format("Cannot add user {} to room {}'s players : already present", userId, m_id));
         }
         // Room is full
-        else if (m_players.first != NULL_ID && m_players.second != NULL_ID)
+        else if (m_players.first.userId != NULL_ID && m_players.second.userId != NULL_ID)
         {
             return std::unexpected(
                 std::format("Cannot add user {} to room {}'s players : room is full ({} and {} already present)",
-                            userId, m_id, m_players.first, m_players.second));
+                            userId, m_id, m_players.first.userId, m_players.second.userId));
         }
 
         // Player 1 is set
-        if (m_players.first != NULL_ID)
+        if (m_players.first.userId != NULL_ID)
         {
-            m_players.second = userId;
+            m_players.second.userId = userId;
         }
         else
         {
-            m_players.first = userId;
+            m_players.first.userId = userId;
         }
 
         LOG_INFO("Added user {} to room {}'s players", userId, m_id);
@@ -110,12 +110,12 @@ namespace server::room
 
     std::expected<void, std::string> Room::removePlayer(const Id userId) noexcept
     {
-        if (m_players.first == userId)
+        if (m_players.first.userId == userId)
         {
             LOG_INFO("Removed user {} from room {}'s players", userId, m_id);
             return std::expected<void, std::string>{};
         }
-        else if (m_players.second == userId)
+        else if (m_players.second.userId == userId)
         {
             LOG_INFO("Removed user {} from room {}'s players", userId, m_id);
             return std::expected<void, std::string>{};
@@ -146,8 +146,14 @@ namespace server::room
         }
     }
 
-    GameSnapshot Room::makeMove(const MoveSnapshot& moveSnapshot) noexcept
+    std::expected<GameSnapshot, std::string> Room::makeMove(const MoveSnapshot& moveSnapshot) noexcept
     {
+        if (moveSnapshot.color != m_game.m_state.m_sideToMove)
+        {
+            return std::unexpected(
+                std::format("Received a moveSnapshot from the wrong team : {}", utils::toString(moveSnapshot.color)));
+        }
+
         const Move& move = m_game.m_moveList.find(moveSnapshot.fromSquare, moveSnapshot.toSquare);
 
         m_game.makeMove<false>(move);
