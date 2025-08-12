@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+#include "engine/core/enums.h"
+
 namespace server::user
 {
     class User;
@@ -35,14 +37,32 @@ namespace server::core
     typedef uint16_t Id;
 
     /**
-     * @typedef RoomPlayers
-     * @brief   Pair holding the 2 room players ids.
+     * @typedef RoomPlayer
+     * @brief   Struct representing a room player, holding its team and user Id.
      */
-    typedef std::pair<Id, Id> RoomPlayers;
+    typedef struct RoomPlayer
+    {
+        Id userId;
+        engine::core::Color color;
+
+        RoomPlayer(const Id id, const engine::core::Color color) noexcept
+            : userId(id)
+            , color(color)
+        {
+        }
+
+        ~RoomPlayer() = default;
+    } RoomPlayer;
+
+    /**
+     * @typedef RoomPlayers
+     * @brief   Pair holding the 2 room players.
+     */
+    typedef std::pair<RoomPlayer, RoomPlayer> RoomPlayers;
 
     /**
      * @typedef RoomSpectators
-     * @brief   Map of spectating users of a room.
+     * @brief   Vector of spectating users of a room.
      */
     typedef std::vector<Id> RoomSpectators;
 
