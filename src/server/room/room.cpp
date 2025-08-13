@@ -158,10 +158,20 @@ namespace server::room
     std::expected<GameSnapshot, std::string> Room::makeMove(const MoveSnapshot& moveSnapshot) noexcept
     {
         return serial([&] -> std::expected<GameSnapshot, std::string> {
+            if (!this->playersContains(moveSnapshot.userId))
+            {
+                return std::unexpected(
+                    std::format("Received a move request from a user than is not a player : {} (players : {} - {})",
+                                moveSnapshot.userId, m_players.first.userId, m_players.second.userId));
+            }
+
+            RoomPlayer player = m_players.first.id == moveSnapshot.userId ? m_players.first : m_playres.second;
+
             if (moveSnapshot.color != m_game.m_state.m_sideToMove)
             {
-                return std::unexpected(std::format("Received a moveSnapshot from the wrong team : {}",
-                                                   utils::toString(moveSnapshot.color)));
+                return std::unexpected(std::format(
+                    "Received a moveSnapshot from the wrong team. User {} with color {} - Side to move is {}",
+                    player.userId, player.color, utils::toString(moveSnapshot.color)));
             }
 
             const Move& move = m_game.m_moveList.find(moveSnapshot.fromSquare, moveSnapshot.toSquare);
