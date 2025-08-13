@@ -24,7 +24,8 @@ namespace server::snapshot
      */
     typedef struct MoveSnapshot
     {
-        engine::core::Color color;
+        core::Id roomId;
+        core::Id userId;
         int fromSquare;
         int toSquare;
         std::optional<int> capturedSquare;
