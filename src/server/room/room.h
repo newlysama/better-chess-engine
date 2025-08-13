@@ -12,6 +12,7 @@
 
 #include <expected>
 #include <memory>
+#include <tbb/task_arena.h>
 
 #include "engine/game/game.h"
 #include "server/core/types.h"
@@ -81,6 +82,17 @@ namespace server::room
 
       private:
         /**
+         * @brief Executes a function within m_taskArena.
+         *
+         * @param [in] func : the function to execute
+         */
+        template <class F>
+        decltype(auto) serial(F&& func)
+        {
+            return m_taskArena.execute([&] { return std::forward<F>(func)(); });
+        }
+
+        /**
          * @brief Generates a random joining code.
          */
         void createJoiningCode() noexcept;
@@ -103,8 +115,11 @@ namespace server::room
          */
         bool spectatorContains(const core::Id userId) const noexcept;
 
-        core::Id m_id;                     // Id of the Room
-        std::string m_joinCode;            // Code to join the room
+        core::Id m_id;          // Id of the Room
+        std::string m_joinCode; // Code to join the room
+
+      private:
+        tbb::task_arena m_taskArena;       // Execution arena (no dedicated thread)
         engine::game::Game m_game;         // Instance of the engine
         core::RoomPlayers m_players;       // Vector of the 2 players
         core::RoomSpectators m_spectators; // Map of the spectators
