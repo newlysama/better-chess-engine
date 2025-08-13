@@ -96,13 +96,11 @@ namespace server::room
         /**
          * @brief Sends a MoveSnapshot to apply to a specific room.
          *
-         * @param [in] roomId   : the room's id to send the snapshot to
          * @param [in] snapshot : the MoveSnapshot to send
          *
          * @return The new game state's snapshot if room exists, error message if not
          */
-        std::expected<snapshot::GameSnapshot, std::string> makeMove(const core::Id roomId,
-                                                                    const snapshot::MoveSnapshot& snapshot) noexcept;
+        std::expected<snapshot::GameSnapshot, std::string> makeMove(const snapshot::MoveSnapshot& snapshot) noexcept;
 
       private:
         core::RoomsMap m_roomsMap; // Maps each room with its id

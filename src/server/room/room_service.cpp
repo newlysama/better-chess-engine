@@ -89,7 +89,7 @@ namespace server::room
 
     std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id roomId, const MoveSnapshot& snap) noexcept
     {
-        auto checkRoom = this->getRoom(roomId);
+        auto checkRoom = this->getRoom(snap.roomId);
 
         return checkRoom.has_value() ? checkRoom.value()->makeMove(snap) : std::unexpected(checkRoom.error());
     }
