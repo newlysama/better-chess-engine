@@ -54,6 +54,46 @@ namespace server::room
         std::expected<std::shared_ptr<Room>, std::string> getRoom(const core::Id roomId) const noexcept;
 
         /**
+         * @brief Add a user to a given room's players.
+         *
+         * @param [in] roomId : the given room
+         * @param [in] userId : the given user
+         *
+         * @return Nothing if succesfull, error message if not
+         */
+        std::expected<void, std::string> addPlayer(const core::Id roomId, const core::Id userId) noexcept;
+
+        /**
+         * @brief Add a user to a given room's spectators.
+         *
+         * @param [in] roomId : the given room
+         * @param [in] userId : the given user
+         *
+         * @return Nothing if succesfull, error message if not
+         */
+        std::expected<void, std::string> addSpectator(const core::Id roomId, const core::Id userId) noexcept;
+
+        /**
+         * @brief Remove a user from a given room's players.
+         *
+         * @param [in] roomId : the given room
+         * @param [in] userId : the given user
+         *
+         * @return Nothing if succesfull, error message if not
+         */
+        std::expected<void, std::string> removePlayer(const core::Id roomId, const core::Id userId) noexcept;
+
+        /**
+         * @brief Remove a user from a given room's spectators.
+         *
+         * @param [in] roomId : the given room
+         * @param [in] userId : the given user
+         *
+         * @return Nothing if succesfull, error message if not
+         */
+        std::expected<void, std::string> removeSpectator(const core::Id roomId, const core::Id userId) noexcept;
+
+        /**
          * @brief Sends a MoveSnapshot to apply to a specific room.
          *
          * @param [in] roomId   : the room's id to send the snapshot to

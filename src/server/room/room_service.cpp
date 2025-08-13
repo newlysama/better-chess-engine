@@ -28,6 +28,7 @@ namespace server::room
             RoomsMap::accessor acc;
             if (m_roomsMap.insert(acc, {roomId, std::make_shared<Room>(Room{roomId})}))
             {
+                // Sucess
                 return;
             }
 
@@ -58,23 +59,38 @@ namespace server::room
         return std::unexpected(std::format("Room {} not found", roomId));
     }
 
-    std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id roomId, const MoveSnapshot& snap) noexcept
+    std::expected<void, std::string> RoomService::addPlayer(const core::Id roomId, const core::Id userId) noexcept
     {
-        RoomsMap::accessor acc;
         auto checkRoom = this->getRoom(roomId);
 
-        if (checkRoom.has_value())
-        {
-            auto checkGameSnapshot = checkRoom.value()->makeMove(snap);
+        return checkRoom.has_value() ? checkRoom.value()->addPlayer(userId) : std::unexpected(checkRoom.error());
+    }
 
-            if (checkGameSnapshot.has_value())
-            {
-                return checkGameSnapshot.value();
-            }
+    std::expected<void, std::string> RoomService::addSpectator(const core::Id roomId, const core::Id userId) noexcept
+    {
+        auto checkRoom = this->getRoom(roomId);
 
-            return std::unexpected(checkGameSnapshot.error());
-        }
+        return checkRoom.has_value() ? checkRoom.value()->addSpectator(userId) : std::unexpected(checkRoom.error());
+    }
 
-        return std::unexpected(checkRoom.error());
+    std::expected<void, std::string> RoomService::removePlayer(const core::Id roomId, const core::Id userId) noexcept
+    {
+        auto checkRoom = this->getRoom(roomId);
+
+        return checkRoom.has_value() ? checkRoom.value()->removePlayer(userId) : std::unexpected(checkRoom.error());
+    }
+
+    std::expected<void, std::string> RoomService::removeSpectator(const core::Id roomId, const core::Id userId) noexcept
+    {
+        auto checkRoom = this->getRoom(roomId);
+
+        return checkRoom.has_value() ? checkRoom.value()->removeSpectator(userId) : std::unexpected(checkRoom.error());
+    }
+
+    std::expected<GameSnapshot, std::string> RoomService::makeMove(const Id roomId, const MoveSnapshot& snap) noexcept
+    {
+        auto checkRoom = this->getRoom(roomId);
+
+        return checkRoom.has_value() ? checkRoom.value()->makeMove(snap) : std::unexpected(checkRoom.error());
     }
 } // namespace server::room
