@@ -22,6 +22,7 @@ namespace server::core
     // Joining code size
     inline constexpr int JOINING_CODE_SIZE = 6;
 
+    // Default id for a newly created user (means user not set)
     inline constexpr Id NULL_ID = 0;
 
 } // namespace server::core
