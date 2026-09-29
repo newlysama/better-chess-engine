@@ -11,6 +11,7 @@
 #define CONSOLE_RUNNER_H
 
 #include <expected>
+#include <optional>
 
 #include "engine/core/enums.h"
 #include "engine/game/game.h"
@@ -43,8 +44,7 @@ namespace console_runner
 
         /**
          * @brief Main loop function to run the game.
-         *
-         * @return The winner team
+         * Returns when the game is over, or when the input is closed (EOF).
          */
         void runGame() noexcept;
 
@@ -52,24 +52,25 @@ namespace console_runner
         /**
          * @brief Ask the user the move he wants to play.
          *
-         * @return std::string : the user's input
+         * @return std::optional<std::string> : the user's input, or std::nullopt if input is closed (EOF)
          */
-        std::string askInput() const noexcept;
+        std::optional<std::string> askInput() const noexcept;
 
         /**
          * @brief If previous player called a draw, ask it to the other player.
          *
-         * @return std::string : response from other player (yes/no)
+         * @return std::optional<std::string> : response from other player (yes/no),
+         * or std::nullopt if input is closed (EOF)
          */
-        std::string askDraw() const noexcept;
+        std::optional<std::string> askDraw() const noexcept;
 
         /**
          * @brief Asks user for promotion.
          * Restart until user enters a valid promotion.
          *
-         * @return Piece : the requested piece type.
+         * @return std::optional<Piece> : the requested piece type, or std::nullopt if input is closed (EOF)
          */
-        engine::core::Piece askPromotion() const noexcept;
+        std::optional<engine::core::Piece> askPromotion() const noexcept;
 
         /**
          * @brief Parses a user input and use it to build a move.
@@ -82,7 +83,7 @@ namespace console_runner
         /**
          * @brief Handles a draw request from a user.
          *
-         * @return bool : whether the draw is valid and accepted by both users
+         * @return bool : whether the game ends (draw accepted by both users, or input closed)
          */
         bool handleDrawRequest() noexcept;
 

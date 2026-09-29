@@ -9,6 +9,7 @@
 #ifndef OPTIONS_H_
 #define OPTIONS_H_
 
+#include <charconv>
 #include <expected>
 #include <optional>
 #include <string>
@@ -21,8 +22,8 @@ namespace options
     struct Options
     {
         std::optional<std::string> fen{};
-        bool benchmark;
-        int benchmark_depth;
+        bool benchmark{false};
+        int benchmark_depth{0};
     };
 
     /**
@@ -41,11 +42,14 @@ namespace options
             if (args.size() == 2 && args[0] == "--bench")
             {
                 opt.benchmark = true;
-                int depth = std::stoi(args[1]);
 
-                if (depth < 1 || depth > 10)
+                const std::string& depthStr = args[1];
+                int depth = 0;
+                auto [end, ec] = std::from_chars(depthStr.data(), depthStr.data() + depthStr.size(), depth);
+
+                if (ec != std::errc{} || end != depthStr.data() + depthStr.size() || depth < 1 || depth > 10)
                 {
-                    return std::unexpected("Usage : ./chess --bench <depth> (0 < depth < 10)");
+                    return std::unexpected("Usage : ./chess --bench <depth> (1 <= depth <= 10)");
                 }
                 else
                 {

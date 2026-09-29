@@ -34,7 +34,7 @@ namespace console_runner
     {
     }
 
-    std::string ConsoleRunner::askInput() const noexcept
+    std::optional<std::string> ConsoleRunner::askInput() const noexcept
     {
         std::string input;
 
@@ -47,21 +47,29 @@ namespace console_runner
             std::print("Move to play (ex: \"A2B3\") | Undo last move (\"U\"): ");
         }
 
-        std::cin >> input;
+        if (!(std::cin >> input))
+        {
+            LOG_INFO("Console input closed");
+            return std::nullopt;
+        }
 
         LOG_INFO("Got user console input: {}", input);
 
         return input;
     }
 
-    std::string ConsoleRunner::askDraw() const noexcept
+    std::optional<std::string> ConsoleRunner::askDraw() const noexcept
     {
         std::string input;
         std::print("{} player asked for a draw, accept ? (yes/no): ", utils::toString(m_game.m_state.m_sideToMove));
 
         while (true)
         {
-            std::cin >> input;
+            if (!(std::cin >> input))
+            {
+                LOG_INFO("Console input closed");
+                return std::nullopt;
+            }
 
             if (input == "yes" || input == "no")
             {
@@ -75,7 +83,7 @@ namespace console_runner
         }
     }
 
-    Piece ConsoleRunner::askPromotion() const noexcept
+    std::optional<Piece> ConsoleRunner::askPromotion() const noexcept
     {
         std::string promotion;
         Piece piece;
@@ -84,7 +92,12 @@ namespace console_runner
 
         while (true)
         {
-            std::cin >> promotion;
+            if (!(std::cin >> promotion))
+            {
+                LOG_INFO("Console input closed");
+                return std::nullopt;
+            }
+
             piece = utils::fromString(promotion);
 
             if (piece == Piece::UNKNOWN_PIECE || piece == Piece::KING || piece == Piece::PAWN)
@@ -157,9 +170,15 @@ namespace console_runner
             while (true)
             {
                 // Ask the enemy player his response to the draw request
-                std::string drawResponse = this->askDraw();
+                std::optional<std::string> drawResponse = this->askDraw();
 
-                if (drawResponse == "yes")
+                if (!drawResponse)
+                {
+                    std::println("\nInput closed, leaving the game.");
+                    return true;
+                }
+
+                if (drawResponse.value() == "yes")
                 {
                     LOG_INFO("Both players acctepted the draw. Ending the this->");
                     std::println("Game ended on a draw");
@@ -195,7 +214,15 @@ namespace console_runner
 
         while (true)
         {
-            std::string userInput = this->askInput();
+            std::optional<std::string> input = this->askInput();
+
+            if (!input)
+            {
+                std::println("\nInput closed, leaving the game.");
+                return;
+            }
+
+            const std::string& userInput = input.value();
 
             if (userInput == "U" || userInput == "u")
             {
@@ -241,7 +268,15 @@ namespace console_runner
 
             if (move.value().isPromotion() == true)
             {
-                move.value().setPromotionPiece(this->askPromotion());
+                std::optional<Piece> promotion = this->askPromotion();
+
+                if (!promotion)
+                {
+                    std::println("\nInput closed, leaving the game.");
+                    return;
+                }
+
+                move.value().setPromotionPiece(promotion.value());
             }
 
             m_game.makeMove<true>(move.value());
@@ -253,7 +288,8 @@ namespace console_runner
 
             if (m_game.m_state.m_isCheckMate)
             {
-                Color winner = Color::WHITE ? Color::BLACK : Color::WHITE;
+                // The side to move is the one that got checkmated
+                Color winner = m_game.m_state.getEnemyColor();
                 LOG_INFO("{} team won the game.", utils::toString(winner));
                 std::println("{} team won the game !", utils::toString(winner));
 

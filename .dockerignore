@@ -1,0 +1,7 @@
+build/
+builddir/
+logs/
+.git/
+.github/
+.vscode/
+.claude/

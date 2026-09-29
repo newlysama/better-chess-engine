@@ -7,6 +7,10 @@
  * @brief Entry point of the program
  */
 
+#include <cstdlib>
+#include <print>
+#include <stdexcept>
+
 #include "engine/benchmark/benchmark.h"
 #include "engine/magics_generator/magics_generator.h"
 #include "logging/logging.h"
@@ -19,7 +23,7 @@
  * @param [in] options : processed user entered options
  */
 
-static int run(const options::Options& options)
+static int run([[maybe_unused]] const options::Options& options)
 {
 #if defined(PLAY_CONSOLE)
     if (options.benchmark)
@@ -30,16 +34,19 @@ static int run(const options::Options& options)
 
     auto fen = options.fen;
 
-    console_runner::ConsoleRunner runner =
-        fen.has_value() ? console_runner::ConsoleRunner{fen.value()} : console_runner::ConsoleRunner{};
+    try
+    {
+        console_runner::ConsoleRunner runner =
+            fen.has_value() ? console_runner::ConsoleRunner{fen.value()} : console_runner::ConsoleRunner{};
 
-    runner.runGame();
+        runner.runGame();
+    }
+    catch (const std::invalid_argument& e)
+    {
+        std::println("Invalid FEN: {}", e.what());
+        return EXIT_FAILURE;
+    }
 
-    return 0;
-
-#elif defined(PLAY_SERVER)
-    LOG_INFO("Starting server (not implemented yet)");
-    // TODO: server loop here
     return 0;
 
 #elif defined(GENERATE_MAGICS)
@@ -67,5 +74,5 @@ int main(int argc, char* argv[])
 
     // Dispatch according to mode
     const auto& options = parsed.value();
-    run(options);
+    return run(options);
 }

@@ -437,7 +437,7 @@ namespace test
     // Scenario : a pinned bishop can only move on the pinned diagonal
     TEST(MoveGen, IllegalMove_PinnedBishopDiagonal)
     {
-        Game game{"8/8/5q2/4B3/3K4/8/8/8 w - - 0 1"};
+        Game game{"k7/8/5q2/4B3/3K4/8/8/8 w - - 0 1"};
 
         Move allowedCapture{36, 45, MoveType::CAPTURE, Piece::BISHOP}; // e5 -> f6
         Move illegalC3{36, 18, MoveType::QUIET, Piece::BISHOP};        // e5 -> c3
@@ -559,7 +559,7 @@ namespace test
     // Scenario : pinned bishop can't go behind the king
     TEST(MoveGen, IllegalMove_PinnedBishopBehindKing)
     {
-        Game game{"8/8/8/8/4B3/3K4/2q5/8 w - - 0 1"};
+        Game game{"8/8/8/8/4B3/3K4/2q5/k7 w - - 0 1"};
 
         Move toF5{28, 37, MoveType::QUIET, Piece::BISHOP}; // e4 -> f5
         Move toG6{28, 46, MoveType::QUIET, Piece::BISHOP}; // e4 -> g6
@@ -572,6 +572,52 @@ namespace test
         EXPECT_FALSE(game.m_moveList.contains(toH7));
         EXPECT_FALSE(game.m_moveList.contains(toC2));
         EXPECT_FALSE(game.m_moveList.contains(toG2));
+    }
+
+    // ---------------------------------------------------------------------
+    // CHECKMATE DETECTION
+    // ---------------------------------------------------------------------
+
+    // Scenario: Fool's mate position loaded from FEN, white is checkmated.
+    TEST(MoveGen, Checkmate_FoolsMate_fromFen)
+    {
+        Game game{"rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3"};
+
+        EXPECT_TRUE(game.m_state.m_isChecked);
+        EXPECT_EQ(game.m_moveList.size(), 0);
+        EXPECT_TRUE(game.m_state.m_isCheckMate);
+    }
+
+    // Scenario: Fool's mate played move by move, white is checkmated after Qh4#.
+    TEST(MoveGen, Checkmate_FoolsMate_playedMoves)
+    {
+        Game game{};
+
+        const std::array<Move, 4> moves = {
+            Move{13, 21, MoveType::QUIET,       Piece::PAWN }, // f2 -> f3
+            Move{52, 36, MoveType::DOUBLE_PUSH, Piece::PAWN }, // e7 -> e5
+            Move{14, 30, MoveType::DOUBLE_PUSH, Piece::PAWN }, // g2 -> g4
+            Move{59, 31, MoveType::QUIET,       Piece::QUEEN}, // d8 -> h4
+        };
+
+        for (const Move& move : moves)
+        {
+            ASSERT_TRUE(game.m_moveList.contains(move));
+            game.makeMove<true>(move);
+            game.m_moveList.generateAllMoves(game.m_state);
+        }
+
+        EXPECT_TRUE(game.m_state.m_isChecked);
+        EXPECT_TRUE(game.m_state.m_isCheckMate);
+    }
+
+    // Scenario: Check that is not a mate (king can escape).
+    TEST(MoveGen, Check_notCheckmate)
+    {
+        Game game{"4k3/8/8/8/8/8/8/r3K3 w - - 0 1"};
+
+        EXPECT_TRUE(game.m_state.m_isChecked);
+        EXPECT_FALSE(game.m_state.m_isCheckMate);
     }
 
 } // namespace test
