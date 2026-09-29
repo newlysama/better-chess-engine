@@ -269,8 +269,10 @@ The tests notably validate move generation by comparing results against known **
 
 The `--bench` mode included in the repository (depth 6, across the 35 test positions) reports the following, for reference, on the project's development machine:
 
-- **~114 million nodes/second** at peak
-- **~74 million nodes/second** on average
+- **~1.25 billion nodes/second** at peak
+- **~750 million nodes/second** on average
+
+Full results for each version are stored in `src/engine/benchmark/` (`v1.0/`, `v1.1/`, ...).
 
 These numbers depend heavily on the hardware used (core count, clock speed, cache size); rerun `./build/src/main/chess --bench <depth>` on your own machine to get a representative measurement.
 
