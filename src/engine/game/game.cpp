@@ -40,7 +40,7 @@ namespace engine::game
         {
             if (!std::getline(iss, token, ' '))
             {
-                throw std::invalid_argument("FEN's occupancy part error: less than 8 fields.");
+                throw std::invalid_argument("FEN error: less than 6 space-separated fields.");
             }
 
             parts[i] = token;

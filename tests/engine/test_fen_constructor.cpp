@@ -25,6 +25,28 @@ namespace test
         ASSERT_##BQ(state.hasCastlingRight<Castling::BLACK_QUEEN_SIDE>()); \
     } while (false)
 
+    // Default constructor must match the starting position FEN
+    TEST(GameInitTest, DefaultConstructorMatchesStartFen)
+    {
+        const Game defaultGame{};
+        const Game fenGame{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
+
+        ASSERT_EQ(defaultGame.m_state.m_kgSquares, fenGame.m_state.m_kgSquares);
+        ASSERT_EQ(defaultGame.m_state.m_allOccBB.m_data, fenGame.m_state.m_allOccBB.m_data);
+        ASSERT_EQ(defaultGame.m_state.m_castlingRights, fenGame.m_state.m_castlingRights);
+        ASSERT_EQ(defaultGame.m_moveList.size(), fenGame.m_moveList.size());
+    }
+
+    // Invalid FENs must be rejected with std::invalid_argument
+    TEST(GameInitTest, InvalidFenThrows)
+    {
+        EXPECT_THROW(Game{"notafen"}, std::invalid_argument);
+        EXPECT_THROW(Game{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR x KQkq - 0 1"}, std::invalid_argument);
+        EXPECT_THROW(Game{"8/8/8/8/8/8/8/8 w - - 0 1"}, std::invalid_argument);      // no kings
+        EXPECT_THROW(Game{"4k3/8/8/8/8/8/8/8 w - - 0 1"}, std::invalid_argument);    // no white king
+        EXPECT_THROW(Game{"4k3/8/8/8/8/8/8/3KK3 w - - 0 1"}, std::invalid_argument); // two white kings
+    }
+
     // Base board
     TEST(GameInitTest, FEN1)
     {

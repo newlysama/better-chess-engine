@@ -186,7 +186,7 @@ namespace engine::board
 
         int m_epSquare = -1; // When En Passant is enabled, this var is set
 
-        core::KingSquares m_kgSquares = {3, 60}; // Square for each king
+        core::KingSquares m_kgSquares = {4, 60}; // Square for each king (e1, e8)
         bool m_isChecked = false;                // Check state for the current king
         bool m_isDoubleChecked = false;          // Double check state for the current king
         bool m_isCheckMate = false;              // GAME OVER BABY
@@ -304,6 +304,13 @@ namespace engine::board
                 {
                     return std::unexpected(std::format("FEN's occupancy part error: invalid number of files {}", file));
                 }
+            }
+
+            // Each side must have exactly one king
+            if (m_piecesBB[core::Color::WHITE][core::Piece::KING].popCount() != 1 ||
+                m_piecesBB[core::Color::BLACK][core::Piece::KING].popCount() != 1)
+            {
+                return std::unexpected("FEN's occupancy part error: each side must have exactly one king");
             }
 
             return std::expected<void, std::string>{};
