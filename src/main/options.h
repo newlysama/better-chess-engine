@@ -21,8 +21,8 @@ namespace options
     struct Options
     {
         std::optional<std::string> fen{};
-        bool benchmark;
-        int benchmark_depth;
+        bool benchmark{false};
+        int benchmark_depth{0};
     };
 
     /**

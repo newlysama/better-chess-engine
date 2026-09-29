@@ -140,6 +140,24 @@ export CC=clang-19
 export CXX=clang++-19
 ```
 
+### Or: build inside Docker
+
+No local toolchain needed — the `Dockerfile` at the repo root carries the
+same packages CI installs. Build the image once, then mount the repo into
+it for any build:
+
+```bash
+docker build -t bce-builder .
+docker run --rm -it --user "$(id -u):$(id -g)" -v "$PWD":/workspace bce-builder
+# inside the container:
+meson setup build -Dmode=release -Dconsole=true
+ninja -C build
+./build/src/main/chess
+```
+
+`--user "$(id -u):$(id -g)"` keeps build artifacts owned by you instead of
+root (the container runs as root by default).
+
 ---
 
 ## Building
