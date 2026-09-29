@@ -201,17 +201,31 @@ ninja -C build
 
 ## Usage
 
-Once built with `-Dconsole=true`, the `chess` executable accepts the following options:
+The options accepted by the `chess` executable depend on how it was built:
+
+| Option | Available in |
+|---|---|
+| *(none)*: start a game | `-Dconsole=true` builds |
+| `--fen <fen>` | `-Dconsole=true` builds |
+| `--bench <depth>` | every build except `-Dgenerate_magics=true` |
 
 ```bash
-# Start a game from the standard starting position
+# Start a game from the standard starting position (console build)
 ./build/src/main/chess
 
-# Start a game from a custom FEN position
+# Start a game from a custom FEN position (console build)
 ./build/src/main/chess --fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-# Run the performance benchmark (perft) at a given depth (1 to 10)
+# Run the performance benchmark (perft) at a given depth (1 to 10), console build or not
 ./build/src/main/chess --bench 6
+```
+
+The benchmark doesn't need the console, so you can build a benchmark-only binary:
+
+```bash
+meson setup build-bench -Dmode=release
+ninja -C build-bench
+./build-bench/src/main/chess --bench 6
 ```
 
 The `--bench` mode runs a parallelized *perft* across 35 test positions and reports, for each one, the number of nodes searched, the elapsed time, and nodes per second, followed by an overall summary (min/max/average).

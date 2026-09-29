@@ -25,13 +25,18 @@
 
 static int run([[maybe_unused]] const options::Options& options)
 {
-#if defined(PLAY_CONSOLE)
+#if defined(GENERATE_MAGICS)
+    engine::magics_generator::initMagics();
+    return 0;
+
+#else
     if (options.benchmark)
     {
         engine::benchmark::benchmark_perft(options.benchmark_depth);
         return 0;
     }
 
+#if defined(PLAY_CONSOLE)
     auto fen = options.fen;
 
     try
@@ -46,14 +51,8 @@ static int run([[maybe_unused]] const options::Options& options)
         std::println("Invalid FEN: {}", e.what());
         return EXIT_FAILURE;
     }
+#endif
 
-    return 0;
-
-#elif defined(GENERATE_MAGICS)
-    engine::magics_generator::initMagics();
-    return 0;
-
-#else
     return 0;
 #endif
 }
